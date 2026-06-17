@@ -162,6 +162,16 @@ export default function LoginPage() {
           )}
         </CardContent>
       </Card>
+      
+      <div className="mt-8 max-w-sm w-full p-4 rounded-lg bg-blue-50 border border-blue-100 text-sm text-blue-800 shadow-sm">
+        <p className="font-semibold mb-1 flex items-center gap-1">
+          <span className="text-lg">💡</span> สำหรับกรรมการ (Demo)
+        </p>
+        <ul className="list-disc pl-5 space-y-1 mt-2">
+          <li>กรอกเบอร์โทรศัพท์: <strong>0812345678</strong></li>
+          <li>กรอกรหัส OTP: <strong>123456</strong></li>
+        </ul>
+      </div>
     </div>
   );
 }
