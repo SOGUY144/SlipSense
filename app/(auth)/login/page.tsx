@@ -113,7 +113,7 @@ export default function LoginPage() {
                 <Input
                   id="phone"
                   type="tel"
-                  placeholder="0812345678"
+                  placeholder="0842345678"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
@@ -168,7 +168,7 @@ export default function LoginPage() {
           <span className="text-lg">💡</span> สำหรับกรรมการ (Demo)
         </p>
         <ul className="list-disc pl-5 space-y-1 mt-2">
-          <li>กรอกเบอร์โทรศัพท์: <strong>0812345678</strong></li>
+          <li>กรอกเบอร์โทรศัพท์: <strong>0842345678</strong></li>
           <li>กรอกรหัส OTP: <strong>123456</strong></li>
         </ul>
       </div>
