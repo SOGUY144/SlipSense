@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.82",
+    "@ai-sdk/openai": "^3.0.72",
     "@ai-sdk/react": "^3.0.208",
-    "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-dialog": "^1.1.14",

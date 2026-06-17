@@ -49,49 +49,52 @@ export async function POST(request: Request) {
       })
       .returning();
 
-    try {
-      const base64 = buffer.toString("base64");
-      const extracted = await extractSlipData(
-        base64,
-        getMediaType(file.type)
-      );
+    const base64 = buffer.toString("base64");
+    const mediaType = getMediaType(file.type);
+    
+    // Process in background
+    processSlipInBackground(job.id, base64, mediaType).catch(console.error);
 
-      const [updatedJob] = await db
-        .update(slipJobs)
-        .set({
-          status: "done",
-          extractedData: extracted,
-          confidence: extracted.overallConfidence,
-        })
-        .where(eq(slipJobs.id, job.id))
-        .returning();
-
-      const { data: signedUrl } = await supabase.storage
-        .from("slips")
-        .createSignedUrl(storagePath, 3600);
-
-      return apiSuccess({
-        job: updatedJob,
-        extracted,
-        imageUrl: signedUrl?.signedUrl,
-      }, 201);
-    } catch (aiError) {
-      console.error("AI Error =>", aiError);
-      const message =
-        aiError instanceof Error ? aiError.message : "AI processing failed";
-
-      await db
-        .update(slipJobs)
-        .set({ status: "failed", errorMessage: message })
-        .where(eq(slipJobs.id, job.id));
-
-      return apiError(message, 500);
-    }
+    return apiSuccess({
+      job,
+    }, 201);
   } catch (error) {
     if (error instanceof Error && error.message === "Unauthorized") {
       return apiError("Unauthorized", 401);
     }
     return apiError("Failed to process slip", 500);
+  }
+}
+
+async function processSlipInBackground(
+  jobId: string, 
+  base64: string, 
+  mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif"
+) {
+  try {
+    const extracted = await extractSlipData(base64, mediaType);
+
+    await db
+      .update(slipJobs)
+      .set({
+        status: "done",
+        extractedData: extracted,
+        confidence: extracted.overallConfidence,
+      })
+      .where(eq(slipJobs.id, jobId));
+      
+  } catch (aiError) {
+    console.error("AI Background Error =>", aiError);
+    let message = aiError instanceof Error ? aiError.message : "AI processing failed";
+    
+    if (message.includes("503") || message.includes("429") || message.includes("Service Unavailable")) {
+      message = "ระบบ AI หนาแน่นชั่วคราว กรุณากดลองใหม่อีกครั้ง";
+    }
+
+    await db
+      .update(slipJobs)
+      .set({ status: "failed", errorMessage: message })
+      .where(eq(slipJobs.id, jobId));
   }
 }
 

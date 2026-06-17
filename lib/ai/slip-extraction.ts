@@ -1,114 +1,104 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { generateObject } from "ai";
+import { openai } from "@ai-sdk/openai";
+import { z } from "zod";
 import {
   extractedSlipSchema,
   type ExtractedSlip,
 } from "@/lib/validations/schemas";
 
-function getGeminiClient() {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error("GEMINI_API_KEY is not set");
-  }
-  return new GoogleGenerativeAI(apiKey);
-}
-
 const SLIP_EXTRACTION_PROMPT = `คุณเป็น AI ผู้เชี่ยวชาญในการอ่านสลิปโอนเงินธนาคารไทย (PromptPay, KBank, SCB, Krungthai, BBL, TTB, ฯลฯ)
 
-วิเคราะห์รูปสลิปและส่งคืน JSON เท่านั้น ไม่มีข้อความอื่น:
-
-{
-  "amount": <จำนวนเงินเป็นตัวเลข ไม่มี comma>,
-  "occurredAt": "<ISO 8601 datetime เช่น 2026-06-16T14:30:00+07:00>",
-  "counterparty": "<ชื่อผู้โอนหรือผู้รับ>",
-  "note": "<หมายเหตุ/รายละเอียด ถ้ามี>",
-  "type": "income" หรือ "expense",
-  "category": "<หมวดหมู่>",
-  "bank": "<ชื่อธนาคาร>",
-  "overallConfidence": "high" | "medium" | "low",
-  "fieldConfidence": {
-    "amount": "high" | "medium" | "low",
-    "occurredAt": "high" | "medium" | "low",
-    "counterparty": "high" | "medium" | "low",
-    "note": "high" | "medium" | "low",
-    "type": "high" | "medium" | "low",
-    "category": "high" | "medium" | "low"
-  }
-}
-
+วิเคราะห์รูปสลิปและส่งคืนข้อมูลตามโครงสร้างที่กำหนด
 หมวดหมู่รายรับ: "รายได้จากการขาย", "รายได้อื่นๆ"
 หมวดหมู่รายจ่าย: "ค่าวัตถุดิบ", "ค่าเช่า", "ค่าจ้าง", "ค่าน้ำค่าไฟ", "ค่าขนส่ง", "ค่าใช้จ่ายอื่นๆ"
 
 กฎ:
 - ถ้าเงินเข้าบัญชีร้าน = income, เงินออกจากบัญชี = expense
-- ถ้าอ่านไม่ชัด ให้ confidence ต่ำและเดาอย่างสมเหตุสมผล
-- ส่ง JSON อย่างเดียว ไม่มี markdown`;
+- ถ้าอ่านไม่ชัด ให้ confidence ต่ำและเดาอย่างสมเหตุสมผล`;
 
 const INSIGHT_PROMPT = `คุณเป็นที่ปรึกษาการเงินสำหรับเจ้าของร้าน SME ไทย
 วิเคราะห์ข้อมูลการเงินต่อไปนี้และให้คำแนะนำ 2-3 ข้อที่เป็นตัวเลขจริง ไม่ใช่คำแนะนำทั่วไป
-ตอบเป็นภาษาไทย ในรูปแบบ JSON array:
-
-[
-  {
-    "content": "<คำแนะนำที่มีตัวเลข>",
-    "metadata": { "category": "<หมวด>", "savingsAmount": <ตัวเลข> }
-  }
-]
-
-ส่ง JSON array อย่างเดียว ไม่มี markdown`;
-
-function parseJsonFromResponse(text: string): unknown {
-  const cleaned = text
-    .replace(/```json\n?/gi, "")
-    .replace(/```\n?/g, "")
-    .trim();
-  return JSON.parse(cleaned);
-}
+ตอบเป็นภาษาไทย`;
 
 async function callWithRetry<T>(
   fn: () => Promise<T>,
-  retries = 1
+  maxRetries = 5
 ): Promise<T> {
-  try {
-    return await fn();
-  } catch (error) {
-    if (retries > 0) {
-      await new Promise((r) => setTimeout(r, 2000));
-      return callWithRetry(fn, retries - 1);
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fn();
+    } catch (error: any) {
+      const is503 = error?.status === 503 || error?.message?.includes("Service Unavailable") || error?.message?.includes("503");
+      const is429 = error?.status === 429 || error?.message?.includes("429") || error?.message?.includes("Too Many Requests");
+      const isRetryable = is503 || is429;
+      
+      if (!isRetryable || i === maxRetries - 1) throw error;
+      
+      // Exponential backoff + jitter
+      const delay = 1000 * Math.pow(2, i) + Math.random() * 500;
+      console.log(`[AI Retry] API busy, retrying in ${Math.round(delay)}ms... (Attempt ${i + 1}/${maxRetries})`);
+      await new Promise((r) => setTimeout(r, delay));
     }
-    throw error;
   }
+  throw new Error("Max retries exceeded");
 }
+
+const aiSlipSchema = z.object({
+  amount: z.number(),
+  occurredAt: z.string(),
+  counterparty: z.string().nullable(),
+  note: z.string().nullable(),
+  type: z.enum(["income", "expense"]),
+  category: z.string(),
+  bank: z.string().nullable(),
+  overallConfidence: z.enum(["high", "medium", "low"]),
+  fieldConfidence: z.object({
+    amount: z.enum(["high", "medium", "low"]).nullable(),
+    occurredAt: z.enum(["high", "medium", "low"]).nullable(),
+    counterparty: z.enum(["high", "medium", "low"]).nullable(),
+    note: z.enum(["high", "medium", "low"]).nullable(),
+    type: z.enum(["high", "medium", "low"]).nullable(),
+    category: z.enum(["high", "medium", "low"]).nullable(),
+  }).nullable(),
+});
 
 export async function extractSlipData(
   imageBase64: string,
   mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif"
 ): Promise<ExtractedSlip> {
   return callWithRetry(async () => {
-    const genAI = getGeminiClient();
-    const model = genAI.getGenerativeModel({
-      model: "gemini-flash-latest",
-      generationConfig: {
-        responseMimeType: "application/json",
-      },
+    const { object } = await generateObject({
+      model: openai("gpt-4o-mini"),
+      schema: aiSlipSchema,
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: SLIP_EXTRACTION_PROMPT },
+            { type: "image", image: `data:${mediaType};base64,${imageBase64}` }
+          ]
+        }
+      ]
     });
-
-    const result = await model.generateContent([
-      SLIP_EXTRACTION_PROMPT,
-      {
-        inlineData: {
-          data: imageBase64,
-          mimeType: mediaType,
-        },
-      },
-    ]);
-
-    const responseText = result.response.text();
-    if (!responseText) {
-      throw new Error("No text response from AI");
-    }
-
-    const parsed = parseJsonFromResponse(responseText);
-    return extractedSlipSchema.parse(parsed);
+    
+    return {
+      amount: object.amount,
+      occurredAt: object.occurredAt,
+      type: object.type,
+      category: object.category,
+      counterparty: object.counterparty || undefined,
+      note: object.note || undefined,
+      bank: object.bank || undefined,
+      overallConfidence: object.overallConfidence,
+      fieldConfidence: object.fieldConfidence ? {
+        amount: object.fieldConfidence.amount || undefined,
+        occurredAt: object.fieldConfidence.occurredAt || undefined,
+        counterparty: object.fieldConfidence.counterparty || undefined,
+        note: object.fieldConfidence.note || undefined,
+        type: object.fieldConfidence.type || undefined,
+        category: object.fieldConfidence.category || undefined,
+      } : undefined,
+    };
   });
 }
 
@@ -121,29 +111,16 @@ export async function generateInsights(
   financialSummary: string
 ): Promise<InsightResult[]> {
   return callWithRetry(async () => {
-    const genAI = getGeminiClient();
-    const model = genAI.getGenerativeModel({
-      model: "gemini-flash-latest",
-      generationConfig: {
-        responseMimeType: "application/json",
-      },
+    const { object } = await generateObject({
+      model: openai("gpt-4o-mini"),
+      output: "array",
+      schema: z.object({
+        content: z.string(),
+        metadata: z.record(z.string(), z.unknown()).optional(),
+      }),
+      prompt: INSIGHT_PROMPT + "\n\nข้อมูลการเงิน:\n" + financialSummary,
     });
-
-    const result = await model.generateContent([
-      INSIGHT_PROMPT + "\n\nข้อมูลการเงิน:\n" + financialSummary
-    ]);
-
-    const responseText = result.response.text();
-    if (!responseText) {
-      throw new Error("No text response from AI");
-    }
-
-    const parsed = parseJsonFromResponse(responseText);
-    if (!Array.isArray(parsed)) {
-      throw new Error("Expected array of insights");
-    }
-
-    return parsed as InsightResult[];
+    return object as InsightResult[];
   });
 }
 

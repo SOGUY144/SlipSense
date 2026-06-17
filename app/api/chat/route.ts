@@ -1,5 +1,5 @@
 import { streamText } from "ai";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { openai } from "@ai-sdk/openai";
 import { db } from "@/lib/db";
 import { transactions } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
@@ -10,10 +10,6 @@ export async function POST(req: Request) {
   try {
     const { shop } = await requireAuth();
     const { messages } = await req.json();
-
-    const google = createGoogleGenerativeAI({
-      apiKey: process.env.GEMINI_API_KEY || "",
-    });
 
     const txs = await db
       .select()
@@ -44,19 +40,11 @@ ${contextData}
 
 ถ้าผู้ใช้ถามข้อมูลที่ไม่มีในประวัติ ให้ตอบไปตามตรงว่าไม่มีข้อมูล`;
 
-    // Sanitize messages for Gemini (must alternate user/model)
-    const sanitizedMessages = [];
-    for (const msg of messages) {
-      if (sanitizedMessages.length > 0 && sanitizedMessages[sanitizedMessages.length - 1].role === msg.role) {
-        sanitizedMessages.pop();
-      }
-      sanitizedMessages.push(msg);
-    }
-
+    // OpenAI requires alternating user/assistant roles technically, but Vercel AI SDK handles it well.
     const result = await streamText({
-      model: google("gemini-flash-latest"),
+      model: openai("gpt-4o-mini"),
       system: systemPrompt,
-      messages: sanitizedMessages,
+      messages: messages,
     });
 
     return result.toTextStreamResponse();

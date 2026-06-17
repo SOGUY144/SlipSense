@@ -45,11 +45,13 @@ export default function ChatPage() {
       setMessages(prev => [...prev, { id: aiMsgId, role: "assistant", content: "" }]);
 
       let done = false;
+      let finalContent = "";
       while (!done) {
         const { value, done: readerDone } = await reader.read();
         done = readerDone;
         if (value) {
           const chunk = decoder.decode(value, { stream: true });
+          finalContent += chunk;
           setMessages(prev => {
             const last = prev[prev.length - 1];
             if (last.id === aiMsgId) {
@@ -59,9 +61,16 @@ export default function ChatPage() {
           });
         }
       }
+
+      if (!finalContent) {
+        throw new Error("AI เซิร์ฟเวอร์ไม่ตอบสนอง (อาจเป็นเพราะ API Key หมดโควต้า หรือเซิร์ฟเวอร์ทำงานหนักเกินไป)");
+      }
+
     } catch (err) {
       console.error("Stream error:", err);
       setError(err instanceof Error ? err : new Error("An error occurred"));
+      // Remove empty ai message if it failed
+      setMessages(prev => prev.filter(m => m.content !== "" || m.role === "user"));
     } finally {
       setIsLoading(false);
     }

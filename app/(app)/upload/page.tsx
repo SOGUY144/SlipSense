@@ -14,7 +14,7 @@ import {
 
 interface UploadResult {
   fileName: string;
-  status: "pending" | "uploading" | "done" | "error";
+  status: "pending" | "uploading" | "processing" | "done" | "error";
   jobId?: string;
   error?: string;
 }
@@ -42,6 +42,34 @@ export default function UploadPage() {
       alert("ไม่สามารถบันทึกได้ กรุณาลองใหม่");
       setSavingBatch(false);
     }
+  }
+
+  function pollJobStatus(jobId: string, index: number) {
+    const maxRetries = 30; // Max 1 minute polling (2s intervals)
+    let retries = 0;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/jobs/${jobId}`);
+        if (!res.ok) throw new Error("Failed to fetch job");
+        const data = await res.json();
+        const status = data.job.status;
+
+        if (status === "done") {
+          setResults((prev) => prev.map((r, i) => (i === index ? { ...r, status: "done" } : r)));
+          clearInterval(interval);
+        } else if (status === "failed") {
+          setResults((prev) => prev.map((r, i) => (i === index ? { ...r, status: "error", error: data.job.errorMessage || "ประมวลผลไม่สำเร็จ" } : r)));
+          clearInterval(interval);
+        }
+      } catch (err) {
+        retries++;
+        if (retries >= maxRetries) {
+          setResults((prev) => prev.map((r, i) => (i === index ? { ...r, status: "error", error: "หมดเวลารอ กรุณาลองใหม่" } : r)));
+          clearInterval(interval);
+        }
+      }
+    }, 2000);
   }
 
   async function processFiles(files: FileList | File[]) {
@@ -85,10 +113,12 @@ export default function UploadPage() {
         setResults((prev) =>
           prev.map((r, idx) =>
             idx === i
-              ? { ...r, status: "done", jobId: data.job.id }
+              ? { ...r, status: "processing", jobId: data.job.id }
               : r
           )
         );
+
+        pollJobStatus(data.job.id, i);
       } catch {
         setResults((prev) =>
           prev.map((r, idx) =>
@@ -109,6 +139,7 @@ export default function UploadPage() {
     }
   }
 
+  const isWorking = uploading || results.some(r => r.status === "uploading" || r.status === "processing");
   const doneCount = results.filter((r) => r.status === "done").length;
   const doneJobs = results.filter((r) => r.status === "done" && r.jobId).map((r) => r.jobId as string);
 
@@ -133,7 +164,7 @@ export default function UploadPage() {
 
       <Card
         className="cursor-pointer border-dashed border-2 hover:border-primary/50 transition-colors"
-        onClick={() => !uploading && fileInputRef.current?.click()}
+        onClick={() => !isWorking && fileInputRef.current?.click()}
       >
         <CardContent className="flex flex-col items-center gap-4 py-12">
           <div className="rounded-full bg-primary/10 p-4">
@@ -152,7 +183,7 @@ export default function UploadPage() {
         <Button
           className="flex-1 gap-2"
           onClick={() => fileInputRef.current?.click()}
-          disabled={uploading}
+          disabled={isWorking}
         >
           <Camera className="h-4 w-4" />
           ถ่ายรูป
@@ -161,7 +192,7 @@ export default function UploadPage() {
           variant="outline"
           className="flex-1 gap-2"
           onClick={() => fileInputRef.current?.click()}
-          disabled={uploading}
+          disabled={isWorking}
         >
           <Upload className="h-4 w-4" />
           เลือกไฟล์
@@ -173,33 +204,37 @@ export default function UploadPage() {
           <CardHeader>
             <CardTitle className="text-base">สถานะการอัปโหลด</CardTitle>
             <CardDescription>
-              {uploading
+              {isWorking
                 ? "กำลังประมวลผล..."
                 : `สำเร็จ ${doneCount}/${results.length} ใบ`}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             {results.map((r, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between rounded-lg border p-3"
-              >
-                <span className="text-sm truncate max-w-[200px]">
-                  {r.fileName}
-                </span>
-                {r.status === "uploading" && (
-                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                )}
-                {r.status === "done" && (
-                  <CheckCircle className="h-4 w-4 text-success" />
-                )}
-                {r.status === "error" && (
-                  <XCircle className="h-4 w-4 text-destructive" />
+              <div key={i} className="flex flex-col rounded-lg border p-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm truncate max-w-[200px] font-medium">
+                    {r.fileName}
+                  </span>
+                  {(r.status === "uploading" || r.status === "processing") && (
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  )}
+                  {r.status === "done" && (
+                    <CheckCircle className="h-4 w-4 text-success" />
+                  )}
+                  {r.status === "error" && (
+                    <XCircle className="h-4 w-4 text-destructive" />
+                  )}
+                </div>
+                {r.status === "error" && r.error && (
+                  <div className="mt-2 text-xs text-destructive bg-destructive/10 p-2 rounded border border-destructive/20">
+                    {r.error}
+                  </div>
                 )}
               </div>
             ))}
 
-            {!uploading && doneJobs.length > 0 && (
+            {!isWorking && doneJobs.length > 0 && (
               <div className="flex flex-col gap-2 mt-4">
                 <Button
                   className="w-full"
