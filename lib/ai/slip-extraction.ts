@@ -116,7 +116,10 @@ export async function generateInsights(
       output: "array",
       schema: z.object({
         content: z.string(),
-        metadata: z.record(z.string(), z.unknown()).optional(),
+        metadata: z.object({
+          category: z.string().nullable(),
+          urgency: z.enum(["high", "medium", "low"]).nullable()
+        }).nullable(),
       }),
       prompt: INSIGHT_PROMPT + "\n\nข้อมูลการเงิน:\n" + financialSummary,
     });
