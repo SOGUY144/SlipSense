@@ -159,7 +159,7 @@ export function AnalyticsCharts({
                   axisLine={false}
                   dx={-10}
                 />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} allowEscapeViewBox={{ x: true, y: true }} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} allowEscapeViewBox={{ x: false, y: true }} />
                 <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px', fontSize: '12px', fontWeight: 500 }} />
                 <Bar dataKey="income" name="รายรับ" fill="url(#colorIncome)" radius={[6, 6, 0, 0]} maxBarSize={40} />
                 <Bar dataKey="expense" name="รายจ่าย" fill="url(#colorExpense)" radius={[6, 6, 0, 0]} maxBarSize={40} />
@@ -220,7 +220,7 @@ export function AnalyticsCharts({
                     axisLine={false} 
                     dx={-10} 
                   />
-                  <Tooltip content={<CustomTooltip />} allowEscapeViewBox={{ x: true, y: true }} />
+                  <Tooltip content={<CustomTooltip />} allowEscapeViewBox={{ x: false, y: true }} />
                   <Legend iconType="circle" wrapperStyle={{ paddingTop: '10px', fontSize: '12px', fontWeight: 500 }} />
                   <Area type="monotone" dataKey="income" name="รายรับ" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#areaIncome)" />
                   <Area type="monotone" dataKey="expense" name="รายจ่าย" stroke="#ef4444" strokeWidth={3} fillOpacity={1} fill="url(#areaExpense)" />
@@ -268,7 +268,7 @@ export function AnalyticsCharts({
                         />
                       ))}
                     </Pie>
-                    <Tooltip content={<CustomPieTooltip />} allowEscapeViewBox={{ x: true, y: true }} />
+                    <Tooltip content={<CustomPieTooltip />} allowEscapeViewBox={{ x: false, y: true }} />
                   </PieChart>
                 </ResponsiveContainer>
                 {/* Center Text for Donut */}
@@ -337,7 +337,7 @@ export function AnalyticsCharts({
                       tickLine={false} 
                       axisLine={false} 
                     />
-                    <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--muted)', opacity: 0.5 }} allowEscapeViewBox={{ x: true, y: true }} />
+                    <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--muted)', opacity: 0.5 }} allowEscapeViewBox={{ x: false, y: true }} />
                     <Bar 
                       dataKey="income" 
                       name="รายรับรวม" 

@@ -134,23 +134,23 @@ export function OnboardingReminders({ onComplete, forceOpen }: { onComplete: () 
 
         {step === 1 ? (
           <div className="space-y-4 py-4">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 max-h-[60vh] overflow-y-auto p-1">
               {COMMON_BILLS.map((bill) => {
                 const isSelected = selectedBills.includes(bill.id);
                 return (
                   <button
                     key={bill.id}
                     onClick={() => handleToggleBill(bill.id)}
-                    className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all ${
+                    className={`group relative flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-300 overflow-hidden ${
                       isSelected
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-muted bg-background hover:bg-muted/50"
+                        ? "border-primary bg-primary/5 text-primary shadow-md shadow-primary/10 scale-[1.02]"
+                        : "border-border/60 bg-white hover:border-primary/40 hover:bg-slate-50 hover:shadow-sm active:scale-95"
                     }`}
                   >
-                    <div className={`p-3 rounded-full mb-2 ${isSelected ? "bg-primary/20" : "bg-muted"}`}>
+                    <div className={`p-3 rounded-full mb-2 transition-colors ${isSelected ? "bg-primary/20 text-primary" : "bg-slate-100 text-slate-500 group-hover:text-primary"}`}>
                       {bill.icon}
                     </div>
-                    <span className="text-sm font-medium text-center">{bill.title}</span>
+                    <span className="text-xs font-bold text-center leading-tight">{bill.title}</span>
                   </button>
                 );
               })}

@@ -78,7 +78,7 @@ export function AppShell({
       {pathname !== "/chat" && (
         <Link 
           href="/chat" 
-          className="fixed bottom-20 right-4 md:right-[calc(50%-240px)] z-50 rounded-full bg-primary p-3.5 text-primary-foreground shadow-lg hover:bg-primary/90 transition-all hover:scale-105 flex items-center justify-center animate-bounce"
+          className="fixed bottom-24 right-4 z-50 rounded-full bg-primary p-3.5 text-primary-foreground shadow-lg hover:bg-primary/90 transition-all hover:scale-105 flex items-center justify-center animate-bounce"
           style={{ animationDuration: '3s' }}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bot"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
@@ -95,16 +95,20 @@ export function AppShell({
                 key={href}
                 href={href}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-1 rounded-xl min-w-[64px] h-full transition-all duration-300",
-                  isUpload 
-                    ? "bg-gradient-to-br from-blue-400 to-primary text-primary-foreground shadow-lg shadow-primary/30 -translate-y-5 h-16 w-16 rounded-full border-[3px] border-background hover:scale-105 active:scale-95" 
-                    : active
-                      ? "text-primary font-bold -translate-y-1"
-                      : "text-slate-400 hover:text-primary font-medium hover:-translate-y-0.5"
+                  "relative flex flex-col items-center justify-center flex-1 min-w-0 h-full transition-all duration-300",
+                  !isUpload && active ? "text-primary font-bold -translate-y-1" : !isUpload ? "text-slate-400 hover:text-primary font-medium hover:-translate-y-0.5" : ""
                 )}
               >
-                <Icon className={cn("h-6 w-6 transition-all duration-300", isUpload ? "h-7 w-7 text-white" : "", active && !isUpload ? "drop-shadow-sm" : "")} strokeWidth={active || isUpload ? 2.5 : 2} />
-                {!isUpload && <span className={cn("text-[10px] leading-none transition-all duration-300", active ? "opacity-100 font-bold" : "opacity-80")}>{label}</span>}
+                {isUpload ? (
+                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 h-14 w-14 rounded-full bg-gradient-to-br from-blue-400 to-primary text-primary-foreground shadow-lg shadow-primary/30 border-4 border-slate-50 flex items-center justify-center hover:scale-105 active:scale-95 transition-all">
+                    <Icon className="h-6 w-6 text-white drop-shadow-sm" strokeWidth={2.5} />
+                  </div>
+                ) : (
+                  <>
+                    <Icon className={cn("h-6 w-6 transition-all duration-300", active ? "drop-shadow-sm" : "")} strokeWidth={active ? 2.5 : 2} />
+                    <span className={cn("text-[10px] leading-none transition-all duration-300 mt-1 truncate max-w-[50px] text-center", active ? "opacity-100 font-bold" : "opacity-80")}>{label}</span>
+                  </>
+                )}
               </Link>
             );
           })}
