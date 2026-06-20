@@ -130,6 +130,18 @@ export default function SettingsPage() {
 
       <Card>
         <CardHeader>
+          <CardTitle className="text-base">หมวดหมู่ (Categories)</CardTitle>
+          <CardDescription>จัดการหมวดหมู่รายรับและรายจ่ายของร้าน</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button variant="outline" onClick={() => router.push("/settings/categories")}>
+            จัดการหมวดหมู่
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
             AI คำแนะนำ

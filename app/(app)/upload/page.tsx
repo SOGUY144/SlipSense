@@ -194,11 +194,11 @@ export default function UploadPage() {
         </p>
       </div>
 
-      <div className="flex rounded-lg bg-muted p-1">
+      <div className="flex rounded-xl bg-muted p-1.5 shadow-sm border-2 border-border/50">
         <button
-          className={`flex-1 rounded-md py-1.5 text-sm font-medium transition-all ${
+          className={`flex-1 rounded-lg py-3 text-base font-bold transition-all ${
             mode === "scan"
-              ? "bg-background text-foreground shadow-sm"
+              ? "bg-background text-foreground shadow-md border-2 border-border"
               : "text-muted-foreground hover:bg-background/50"
           }`}
           onClick={() => setMode("scan")}
@@ -206,9 +206,9 @@ export default function UploadPage() {
           📸 สแกนสลิป
         </button>
         <button
-          className={`flex-1 rounded-md py-1.5 text-sm font-medium transition-all ${
+          className={`flex-1 rounded-lg py-3 text-base font-bold transition-all ${
             mode === "manual"
-              ? "bg-background text-foreground shadow-sm"
+              ? "bg-background text-foreground shadow-md border-2 border-border"
               : "text-muted-foreground hover:bg-background/50"
           }`}
           onClick={() => setMode("manual")}
@@ -237,38 +237,38 @@ export default function UploadPage() {
       />
 
       <Card
-        className="cursor-pointer border-dashed border-2 hover:border-primary/50 transition-colors"
+        className="cursor-pointer border-dashed border-4 border-primary/40 bg-primary/5 hover:border-primary transition-colors shadow-sm"
         onClick={() => !isWorking && fileInputRef.current?.click()}
       >
-        <CardContent className="flex flex-col items-center gap-4 py-12">
-          <div className="rounded-full bg-primary/10 p-4">
-            <Upload className="h-8 w-8 text-primary" />
+        <CardContent className="flex flex-col items-center gap-6 py-16">
+          <div className="rounded-full bg-primary/20 p-6">
+            <Upload className="h-12 w-12 text-primary" strokeWidth={2.5} />
           </div>
           <div className="text-center">
-            <p className="font-medium">แตะเพื่อเลือกรูปสลิป</p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xl font-bold">แตะเพื่อเลือกรูปสลิป</p>
+            <p className="text-base text-muted-foreground mt-2 font-medium">
               หรือถ่ายรูปจากกล้อง · รองรับหลายใบ
             </p>
           </div>
         </CardContent>
       </Card>
 
-      <div className="flex gap-3">
+      <div className="flex gap-4">
         <Button
-          className="flex-1 gap-2"
+          className="flex-1 gap-3 h-16 text-lg rounded-xl shadow-md font-bold"
           onClick={() => fileInputRef.current?.click()}
           disabled={isWorking}
         >
-          <Camera className="h-4 w-4" />
+          <Camera className="h-6 w-6" strokeWidth={2.5} />
           ถ่ายรูป
         </Button>
         <Button
           variant="outline"
-          className="flex-1 gap-2"
+          className="flex-1 gap-3 h-16 text-lg rounded-xl border-2 border-primary/30 text-primary font-bold hover:bg-primary/10"
           onClick={() => fileInputRef.current?.click()}
           disabled={isWorking}
         >
-          <Upload className="h-4 w-4" />
+          <Upload className="h-6 w-6" strokeWidth={2.5} />
           เลือกไฟล์
         </Button>
       </div>

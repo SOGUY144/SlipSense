@@ -105,8 +105,54 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      <Card className="border-none shadow-md overflow-hidden bg-gradient-to-br from-card to-muted/30">
-        <div className="p-4 border-b flex items-center justify-between bg-card">
+      <Card className="border-2 border-primary bg-primary/10 shadow-md">
+        <CardContent className="p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Wallet className="h-6 w-6 text-primary" strokeWidth={2.5} />
+              <span className="font-bold text-lg text-primary">กำไรสุทธิ</span>
+            </div>
+            <Badge variant={profitUp ? "success" : "destructive"} className="text-sm px-2 py-1 shadow-sm font-bold">
+              {formatPercent(summary?.profitChangePercent ?? 0)}
+            </Badge>
+          </div>
+          <p className="text-4xl font-black text-primary tracking-tight">
+            {formatCurrency(summary?.current.profit ?? 0)}
+          </p>
+          <p className="mt-2 text-sm font-medium text-muted-foreground">
+            เทียบเดือนก่อน{" "}
+            {formatCurrency(summary?.previous.profit ?? 0)}
+          </p>
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-2 gap-3">
+        <Card className="border-2 border-success/40 bg-success/5">
+          <CardContent className="p-4 flex flex-col items-center text-center">
+            <div className="flex items-center justify-center gap-1.5 text-success font-bold mb-2">
+              <TrendingUp className="h-5 w-5" strokeWidth={2.5} />
+              <span className="text-sm">รายรับ</span>
+            </div>
+            <p className="text-2xl font-black text-success tracking-tight">
+              {formatCurrency(summary?.current.income ?? 0)}
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="border-2 border-destructive/40 bg-destructive/5">
+          <CardContent className="p-4 flex flex-col items-center text-center">
+            <div className="flex items-center justify-center gap-1.5 text-destructive font-bold mb-2">
+              <TrendingDown className="h-5 w-5" strokeWidth={2.5} />
+              <span className="text-sm">รายจ่าย</span>
+            </div>
+            <p className="text-2xl font-black text-destructive tracking-tight">
+              {formatCurrency(summary?.current.expense ?? 0)}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="border-2 border-border/60 shadow-sm overflow-hidden bg-gradient-to-br from-card to-muted/30">
+        <div className="p-4 border-b-2 border-border/40 flex items-center justify-between bg-card">
           <div className="flex items-center gap-2">
             <div className="p-1.5 bg-primary/10 rounded-md">
               <Calendar className="w-4 h-4 text-primary" />
@@ -115,7 +161,7 @@ export default function DashboardPage() {
           </div>
           <Link
             href="/reminders"
-            className="text-xs font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
+            className="text-xs font-bold text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
           >
             จัดการบิล
             <ChevronRight className="w-3 h-3" />
@@ -166,7 +212,7 @@ export default function DashboardPage() {
                       <Button 
                         size="sm" 
                         variant={isOverdue ? "destructive" : isDueSoon ? "default" : "outline"}
-                        className="h-7 text-[10px] px-2.5 rounded-full"
+                        className="h-7 text-[10px] px-2.5 rounded-full font-bold"
                         onClick={async () => {
                           const now = new Date();
                           const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -189,62 +235,16 @@ export default function DashboardPage() {
               })}
             </div>
           ) : (
-            <div className="p-6 flex flex-col items-center justify-center text-center">
-              <div className="w-12 h-12 bg-success/10 text-success rounded-full flex items-center justify-center mb-3">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <div className="p-3 px-4 flex items-center justify-between text-center bg-card">
+              <div className="flex items-center gap-2 text-success">
+                <div className="w-6 h-6 bg-success/10 rounded-full flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                </div>
+                <p className="text-sm font-bold">ไม่มีบิลใกล้ถึงกำหนด</p>
               </div>
-              <p className="text-sm font-medium">ไม่มีบิลที่ใกล้ถึงกำหนดจ่าย</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                พักผ่อนได้เลย หรือกด "จัดการบิล" เพื่อเพิ่มรายการใหม่
-              </p>
+              <p className="text-xs font-medium text-muted-foreground">พักผ่อนได้เลย 🎉</p>
             </div>
           )}
-        </CardContent>
-      </Card>
-
-      <div className="grid grid-cols-2 gap-3">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 text-success">
-              <TrendingUp className="h-4 w-4" />
-              <span className="text-xs text-muted-foreground">รายรับ</span>
-            </div>
-            <p className="mt-1 text-lg font-bold">
-              {formatCurrency(summary?.current.income ?? 0)}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 text-destructive">
-              <TrendingDown className="h-4 w-4" />
-              <span className="text-xs text-muted-foreground">รายจ่าย</span>
-            </div>
-            <p className="mt-1 text-lg font-bold">
-              {formatCurrency(summary?.current.expense ?? 0)}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card className="border-primary/20 bg-primary/5">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Wallet className="h-5 w-5 text-primary" />
-              <span className="font-medium">กำไรสุทธิ</span>
-            </div>
-            <Badge variant={profitUp ? "success" : "destructive"}>
-              {formatPercent(summary?.profitChangePercent ?? 0)}
-            </Badge>
-          </div>
-          <p className="mt-2 text-2xl font-bold text-primary">
-            {formatCurrency(summary?.current.profit ?? 0)}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            เทียบเดือนก่อน{" "}
-            {formatCurrency(summary?.previous.profit ?? 0)}
-          </p>
         </CardContent>
       </Card>
 
@@ -310,17 +310,17 @@ export default function DashboardPage() {
           </Card>
         ) : (
           summary?.recentTransactions.map((tx) => (
-            <Card key={tx.id}>
+            <Card key={tx.id} className="border-2 border-border/60">
               <CardContent className="flex items-center justify-between p-4">
                 <div>
-                  <p className="text-sm font-medium">{tx.category}</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-base font-bold">{tx.category}</p>
+                  <p className="text-sm font-medium text-muted-foreground mt-0.5">
                     {tx.counterparty ?? "—"} ·{" "}
                     {formatDate(tx.occurredAt)}
                   </p>
                 </div>
                 <p
-                  className={`font-semibold ${
+                  className={`text-lg font-black tracking-tight ${
                     tx.type === "income"
                       ? "text-success"
                       : "text-destructive"

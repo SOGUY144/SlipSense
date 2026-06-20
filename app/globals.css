@@ -29,26 +29,26 @@
 
 :root {
   --radius: 0.75rem;
-  --background: oklch(0.985 0.002 240);
-  --foreground: oklch(0.18 0.02 260);
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.15 0 0);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.02 260);
+  --card-foreground: oklch(0.15 0 0);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.02 260);
-  --primary: oklch(0.45 0.14 250);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.95 0.02 250);
-  --secondary-foreground: oklch(0.25 0.04 260);
-  --muted: oklch(0.96 0.01 250);
-  --muted-foreground: oklch(0.5 0.02 260);
-  --accent: oklch(0.92 0.04 180);
-  --accent-foreground: oklch(0.25 0.06 180);
-  --destructive: oklch(0.55 0.22 25);
-  --border: oklch(0.9 0.01 250);
-  --input: oklch(0.9 0.01 250);
-  --ring: oklch(0.45 0.14 250);
-  --success: oklch(0.55 0.15 145);
-  --warning: oklch(0.75 0.15 75);
+  --popover-foreground: oklch(0.15 0 0);
+  --primary: oklch(0.40 0.15 250); /* Darker blue */
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.92 0 0);
+  --secondary-foreground: oklch(0.15 0 0);
+  --muted: oklch(0.92 0 0);
+  --muted-foreground: oklch(0.35 0 0); /* Darker muted text for contrast */
+  --accent: oklch(0.92 0 0);
+  --accent-foreground: oklch(0.15 0 0);
+  --destructive: oklch(0.50 0.22 25); /* Strong red */
+  --border: oklch(0.75 0 0); /* Stronger border */
+  --input: oklch(0.75 0 0);
+  --ring: oklch(0.40 0.15 250);
+  --success: oklch(0.45 0.18 145); /* Strong green */
+  --warning: oklch(0.70 0.20 75);
 }
 
 @layer base {
@@ -57,6 +57,6 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-family: var(--font-prompt), system-ui, -apple-system, sans-serif;
   }
 }

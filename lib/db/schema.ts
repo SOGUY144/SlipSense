@@ -23,6 +23,11 @@ export const transactionTypeEnum = pgEnum("transaction_type", [
   "expense",
 ]);
 
+export const categoryTypeEnum = pgEnum("category_type", [
+  "income",
+  "expense",
+]);
+
 export const confidenceEnum = pgEnum("confidence_level", [
   "high",
   "medium",
@@ -101,6 +106,19 @@ export const transactions = pgTable("transactions", {
     .notNull(),
 });
 
+export const categories = pgTable("categories", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  shopId: uuid("shop_id")
+    .notNull()
+    .references(() => shops.id, { onDelete: "cascade" }),
+  type: categoryTypeEnum("type").notNull(),
+  name: text("name").notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
 export const insights = pgTable("insights", {
   id: uuid("id").primaryKey().defaultRandom(),
   shopId: uuid("shop_id")
@@ -118,6 +136,14 @@ export const shopsRelations = relations(shops, ({ many }) => ({
   transactions: many(transactions),
   slipJobs: many(slipJobs),
   insights: many(insights),
+  categories: many(categories),
+}));
+
+export const categoriesRelations = relations(categories, ({ one }) => ({
+  shop: one(shops, {
+    fields: [categories.shopId],
+    references: [shops.id],
+  }),
 }));
 
 export const profilesRelations = relations(profiles, ({ many }) => ({
@@ -190,3 +216,4 @@ export type SlipJob = typeof slipJobs.$inferSelect;
 export type Transaction = typeof transactions.$inferSelect;
 export type Insight = typeof insights.$inferSelect;
 export type BillReminder = typeof billReminders.$inferSelect;
+export type Category = typeof categories.$inferSelect;

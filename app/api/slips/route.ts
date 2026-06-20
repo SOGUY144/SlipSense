@@ -1,6 +1,6 @@
 import { eq, desc } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { slipJobs } from "@/lib/db/schema";
+import { slipJobs, categories as dbCategories } from "@/lib/db/schema";
 import { requireAuth } from "@/lib/auth/helpers";
 import { apiError, apiSuccess } from "@/lib/api/response";
 import {
@@ -51,9 +51,12 @@ export async function POST(request: Request) {
 
     const base64 = buffer.toString("base64");
     const mediaType = getMediaType(file.type);
-    
+    const activeCategories = await db.query.categories.findMany({
+      where: eq(dbCategories.shopId, shop.id),
+    });
+
     // Process in background
-    processSlipInBackground(job.id, base64, mediaType).catch(console.error);
+    processSlipInBackground(job.id, base64, mediaType, activeCategories).catch(console.error);
 
     return apiSuccess({
       job,
@@ -69,10 +72,11 @@ export async function POST(request: Request) {
 async function processSlipInBackground(
   jobId: string, 
   base64: string, 
-  mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif"
+  mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif",
+  categories: {type: string, name: string}[]
 ) {
   try {
-    const extracted = await extractSlipData(base64, mediaType);
+    const extracted = await extractSlipData(base64, mediaType, categories);
 
     await db
       .update(slipJobs)

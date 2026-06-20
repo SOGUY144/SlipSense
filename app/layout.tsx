@@ -1,5 +1,12 @@
 import type { Metadata, Viewport } from "next";
+import { Prompt } from "next/font/google";
 import "./globals.css";
+
+const prompt = Prompt({ 
+  subsets: ["latin", "thai"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-prompt",
+});
 
 export const metadata: Metadata = {
   title: "SlipSense — AI วิเคราะห์สุขภาพการเงินร้านค้า",
@@ -20,8 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th">
-      <body>{children}</body>
+    <html lang="th" className={prompt.variable}>
+      <body className="font-sans">{children}</body>
     </html>
   );
 }

@@ -31,6 +31,18 @@ interface BatchItem {
   fieldConfidence?: any;
 }
 
+const safeFormatDate = (dateStr: string | undefined | null) => {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? "" : d.toISOString().slice(0, 16);
+};
+
+const safeParseDate = (dateStr: string) => {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? "" : d.toISOString();
+};
+
 export default function BatchReviewPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -42,6 +54,22 @@ export default function BatchReviewPage() {
   const [error, setError] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [detailedIndex, setDetailedIndex] = useState<number | null>(null);
+  const [dbCategories, setDbCategories] = useState<{id: string, type: string, name: string}[]>([]);
+
+  useEffect(() => {
+    fetch("/api/categories")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) setDbCategories(data);
+      })
+      .catch(console.error);
+  }, []);
+
+  const getAvailableCategories = (type: string, currentVal: string) => {
+    const cats = dbCategories.filter((c) => c.type === type).map((c) => c.name);
+    if (currentVal && !cats.includes(currentVal)) cats.push(currentVal);
+    return cats;
+  };
 
   useEffect(() => {
     async function load() {
@@ -62,7 +90,7 @@ export default function BatchReviewPage() {
             type: ex.type || "expense",
             category: ex.category || "ค่าใช้จ่ายอื่นๆ",
             amount: ex.amount || 0,
-            occurredAt: ex.occurredAt || new Date().toISOString(),
+            occurredAt: safeParseDate(ex.occurredAt) || new Date().toISOString(),
             confidence: ex.overallConfidence,
             counterparty: ex.counterparty || "",
             note: ex.note || "",
@@ -205,7 +233,7 @@ export default function BatchReviewPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {(items[detailedIndex].type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).map(
+                      {getAvailableCategories(items[detailedIndex].type, items[detailedIndex].category).map(
                         (cat) => (
                           <SelectItem key={cat} value={cat}>
                             {cat}
@@ -235,8 +263,8 @@ export default function BatchReviewPage() {
                   </div>
                   <Input
                     type="datetime-local"
-                    value={items[detailedIndex].occurredAt ? new Date(items[detailedIndex].occurredAt).toISOString().slice(0, 16) : ""}
-                    onChange={(e) => updateItem(detailedIndex, "occurredAt", new Date(e.target.value).toISOString())}
+                    value={safeFormatDate(items[detailedIndex].occurredAt)}
+                    onChange={(e) => updateItem(detailedIndex, "occurredAt", safeParseDate(e.target.value))}
                   />
                 </div>
                 
@@ -297,8 +325,8 @@ export default function BatchReviewPage() {
 
       <div className="space-y-6">
         {items.map((item, index) => (
-          <Card key={item.slipJobId} className="overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-            <CardHeader className="bg-muted/30 py-2 px-4 border-b">
+          <Card key={item.slipJobId} className="overflow-hidden shadow-sm hover:shadow-md transition-shadow border-2 border-border/60">
+            <CardHeader className="bg-muted/50 py-3 px-4 border-b-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <span className="bg-primary/10 text-primary w-6 h-6 rounded-full flex items-center justify-center text-xs">
@@ -333,12 +361,12 @@ export default function BatchReviewPage() {
               <div className="flex-1 space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold text-muted-foreground">ประเภท</Label>
+                    <Label className="text-sm font-bold">ประเภท</Label>
                     <Select
                       value={item.type}
                       onValueChange={(v) => updateItem(index, "type", v)}
                     >
-                      <SelectTrigger className="h-9 text-sm">
+                      <SelectTrigger className="h-12 text-base font-bold border-2 border-border/60">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -348,16 +376,16 @@ export default function BatchReviewPage() {
                     </Select>
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold text-muted-foreground">หมวดหมู่</Label>
+                    <Label className="text-sm font-bold">หมวดหมู่</Label>
                     <Select
                       value={item.category}
                       onValueChange={(v) => updateItem(index, "category", v)}
                     >
-                      <SelectTrigger className="h-9 text-sm">
+                      <SelectTrigger className="h-12 text-base font-medium border-2 border-border/60">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {(item.type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).map(
+                        {getAvailableCategories(item.type, item.category).map(
                           (cat) => (
                             <SelectItem key={cat} value={cat}>
                               {cat}
@@ -371,21 +399,21 @@ export default function BatchReviewPage() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold text-muted-foreground">จำนวนเงิน (บาท)</Label>
+                    <Label className="text-sm font-bold">จำนวนเงิน (บาท)</Label>
                     <Input
                       type="number"
                       value={item.amount}
                       onChange={(e) => updateItem(index, "amount", parseFloat(e.target.value) || 0)}
-                      className="h-9 text-sm font-medium"
+                      className="h-12 text-lg font-bold border-2 border-border/60"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold text-muted-foreground">วันที่</Label>
+                    <Label className="text-sm font-bold">วันที่</Label>
                     <Input
                       type="datetime-local"
-                      value={item.occurredAt ? new Date(item.occurredAt).toISOString().slice(0, 16) : ""}
-                      onChange={(e) => updateItem(index, "occurredAt", new Date(e.target.value).toISOString())}
-                      className="h-9 text-sm"
+                      value={safeFormatDate(item.occurredAt)}
+                      onChange={(e) => updateItem(index, "occurredAt", safeParseDate(e.target.value))}
+                      className="h-12 text-base font-medium border-2 border-border/60"
                     />
                   </div>
                 </div>
@@ -396,13 +424,13 @@ export default function BatchReviewPage() {
       </div>
 
       {/* Sticky Bottom Bar */}
-      <div className="fixed bottom-[64px] left-0 right-0 p-4 bg-background/90 backdrop-blur-md border-t shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-30">
-        <div className="max-w-lg mx-auto flex gap-3 px-4">
-          <Button variant="outline" className="flex-1" onClick={() => router.push("/upload")} disabled={saving}>
+      <div className="fixed bottom-[64px] left-0 right-0 p-4 bg-background border-t-2 border-border z-30 shadow-[0_-4px_15px_rgba(0,0,0,0.05)]">
+        <div className="max-w-lg mx-auto flex gap-3 px-2">
+          <Button variant="outline" className="flex-1 h-16 text-lg font-bold border-2 border-border/60" onClick={() => router.push("/upload")} disabled={saving}>
             ยกเลิก
           </Button>
-          <Button className="flex-1 shadow-md" onClick={handleSaveAll} disabled={saving}>
-            {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+          <Button className="flex-1 h-16 text-lg font-bold shadow-md" onClick={handleSaveAll} disabled={saving}>
+            {saving ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
             {saving ? "กำลังบันทึก..." : `บันทึกทั้งหมด (${items.length} รายการ)`}
           </Button>
         </div>

@@ -6,15 +6,32 @@ import {
   type ExtractedSlip,
 } from "@/lib/validations/schemas";
 
-const SLIP_EXTRACTION_PROMPT = `คุณเป็น AI ผู้เชี่ยวชาญในการอ่านสลิปโอนเงินธนาคารไทย (PromptPay, KBank, SCB, Krungthai, BBL, TTB, ฯลฯ)
+export function buildSlipExtractionPrompt(categories: {type: string, name: string}[]): string {
+  const incomeCats = categories.filter(c => c.type === 'income').map(c => `"${c.name}"`).join(', ');
+  const expenseCats = categories.filter(c => c.type === 'expense').map(c => `"${c.name}"`).join(', ');
 
-วิเคราะห์รูปสลิปและส่งคืนข้อมูลตามโครงสร้างที่กำหนด
-หมวดหมู่รายรับ: "รายได้จากการขาย", "รายได้อื่นๆ"
-หมวดหมู่รายจ่าย: "ค่าวัตถุดิบ", "ค่าเช่า", "ค่าจ้าง", "ค่าน้ำค่าไฟ", "ค่าขนส่ง", "ค่าใช้จ่ายอื่นๆ"
+  return `คุณเป็น AI ผู้เชี่ยวชาญในการอ่านสลิปโอนเงินธนาคารไทย และใบเสร็จ/บิลซื้อของ (Receipt/Bill)
+
+วิเคราะห์รูปภาพและส่งคืนข้อมูลตามโครงสร้างที่กำหนด
+หมวดหมู่รายรับที่อนุญาตให้ใช้: ${incomeCats || "รายได้จากการขาย, รายได้อื่นๆ"}
+หมวดหมู่รายจ่ายที่อนุญาตให้ใช้: ${expenseCats || "ค่าวัตถุดิบ, ค่าเช่า, ค่าใช้จ่ายอื่นๆ"}
 
 กฎ:
-- ถ้าเงินเข้าบัญชีร้าน = income, เงินออกจากบัญชี = expense
-- ถ้าอ่านไม่ชัด ให้ confidence ต่ำและเดาอย่างสมเหตุสมผล`;
+1. การแยกแยะประเภท:
+   - ถ้าเป็น "สลิปโอนเงินเข้า" = income
+   - ถ้าเป็น "สลิปโอนเงินออก" หรือ "ใบเสร็จ/บิลซื้อของ" = expense
+2. กรณีเป็น ใบเสร็จ/บิลซื้อของ (Receipt/Bill):
+   - ให้ดึง "ชื่อร้านค้า/ซัพพลายเออร์" ไปใส่ในช่อง counterparty
+   - ยอดรวมทั้งหมด (Total/Grand Total) ไปใส่ในช่อง amount
+   - หมวดหมู่ (category): หากบิลมีสินค้าหลายหมวดปนกัน ให้ประเมินว่าสินค้าหมวดใดมีมูลค่ารวมสูงที่สุดในบิลนั้น แล้วจัดบิลเข้าหมวดหมู่นั้น หากก้ำกึ่งแยกยากให้จัดเข้า "ค่าใช้จ่ายอื่นๆ"
+   - ให้ดึงรายการสินค้าหลักๆ 1-3 รายการแรก (พร้อมจำนวนและราคา) ไปสรุปไว้ในช่อง note อัตโนมัติ (เช่น "เนื้อหมู 500฿, ผักสด 200฿")
+3. การอ่านวันที่ (สำคัญมาก):
+   - วันที่และเวลา (occurredAt) ให้ดึงจากภาพโดยตรงและแปลงเป็นรูปแบบ YYYY-MM-DDThh:mm:ss เท่านั้น (ไม่ต้องเติม Z ต่อท้าย)
+   - แปลงเดือนภาษาไทยให้ถูกต้อง (ม.ค.=01, ... ธ.ค.=12)
+   - ปี พ.ศ. ให้ลบด้วย 543 เพื่อเป็นปี ค.ศ.
+   - ตัวอย่าง: "07 มิ.ย. 2569 - 19:04" ต้องส่งค่าเป็น "2026-06-07T19:04:00" เท่านั้น
+4. ถ้าอ่านส่วนใดไม่ชัด ให้ confidence ของฟิลด์นั้นต่ำและเดาอย่างสมเหตุสมผล`;
+}
 
 export interface FinancialFacts {
   income: number;
@@ -108,7 +125,8 @@ const aiSlipSchema = z.object({
 
 export async function extractSlipData(
   imageBase64: string,
-  mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif"
+  mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif",
+  categories: {type: string, name: string}[] = []
 ): Promise<ExtractedSlip> {
   return callWithRetry(async () => {
     const { object } = await generateObject({
@@ -118,7 +136,7 @@ export async function extractSlipData(
         {
           role: "user",
           content: [
-            { type: "text", text: SLIP_EXTRACTION_PROMPT },
+            { type: "text", text: buildSlipExtractionPrompt(categories) },
             { type: "image", image: `data:${mediaType};base64,${imageBase64}` }
           ]
         }

@@ -78,23 +78,26 @@ export function AppShell({
         </Link>
       )}
 
-      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
-        <div className="mx-auto flex max-w-lg items-center justify-around py-2">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t-2 border-border bg-card shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+        <div className="mx-auto flex h-16 max-w-lg items-center justify-around px-2 pb-1">
           {navItems.map(({ href, label, icon: Icon }) => {
-            const active = pathname.startsWith(href);
+            const active = pathname.startsWith(href) && (href !== "/dashboard" || pathname === "/dashboard");
+            const isUpload = href === "/upload";
             return (
               <Link
                 key={href}
                 href={href}
                 className={cn(
-                  "flex flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 text-xs transition-colors",
-                  active
-                    ? "text-primary font-medium"
-                    : "text-muted-foreground hover:text-foreground"
+                  "flex flex-col items-center justify-center gap-1 rounded-xl min-w-[64px] h-full transition-all",
+                  isUpload 
+                    ? "bg-primary text-primary-foreground shadow-lg -translate-y-4 h-16 w-16 rounded-full border-4 border-background hover:bg-primary/90" 
+                    : active
+                      ? "text-primary font-bold"
+                      : "text-muted-foreground hover:text-foreground font-medium"
                 )}
               >
-                <Icon className="h-5 w-5" />
-                <span>{label}</span>
+                <Icon className={cn("h-6 w-6", isUpload ? "h-7 w-7" : "")} strokeWidth={active || isUpload ? 2.5 : 2} />
+                {!isUpload && <span className="text-[11px] leading-none">{label}</span>}
               </Link>
             );
           })}

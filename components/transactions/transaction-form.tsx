@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -50,6 +51,14 @@ interface TransactionFormProps {
   showConfidence?: boolean;
 }
 
+import { useEffect, useState } from "react";
+
+interface Category {
+  id: string;
+  type: "income" | "expense";
+  name: string;
+}
+
 export function TransactionForm({
   form,
   onSubmit,
@@ -60,8 +69,25 @@ export function TransactionForm({
   showConfidence = false,
 }: TransactionFormProps) {
   const watchType = form.watch("type");
-  const categories =
-    watchType === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+  const [dbCategories, setDbCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    fetch("/api/categories")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) setDbCategories(data);
+      })
+      .catch(console.error);
+  }, []);
+
+  const availableCategories = dbCategories
+    .filter((c) => c.type === watchType)
+    .map((c) => c.name);
+
+  const currentCategory = form.watch("category");
+  if (currentCategory && !availableCategories.includes(currentCategory)) {
+    availableCategories.push(currentCategory);
+  }
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -75,7 +101,7 @@ export function TransactionForm({
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label>ประเภท</Label>
+              <Label className="text-base font-bold">ประเภท</Label>
               {showConfidence && <ConfidenceBadge level={fieldConfidence.type} />}
             </div>
             <Select
@@ -90,7 +116,7 @@ export function TransactionForm({
                 form.clearErrors("category");
               }}
             >
-              <SelectTrigger className={form.formState.errors.type ? "border-destructive" : ""}>
+              <SelectTrigger className={cn("h-14 text-lg font-bold border-2", form.formState.errors.type ? "border-destructive" : "border-border/60")}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -105,7 +131,7 @@ export function TransactionForm({
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label>หมวดหมู่</Label>
+              <Label className="text-base font-bold">หมวดหมู่</Label>
               {showConfidence && <ConfidenceBadge level={fieldConfidence.category} />}
             </div>
             <Select
@@ -115,15 +141,19 @@ export function TransactionForm({
                 form.clearErrors("category");
               }}
             >
-              <SelectTrigger className={form.formState.errors.category ? "border-destructive" : ""}>
+              <SelectTrigger className={cn("h-14 text-base font-medium border-2", form.formState.errors.category ? "border-destructive" : "border-border/60")}>
                 <SelectValue placeholder="เลือกหมวดหมู่" />
               </SelectTrigger>
               <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
-                  </SelectItem>
-                ))}
+                {availableCategories.length === 0 ? (
+                  <div className="p-2 text-sm text-muted-foreground text-center">กำลังโหลด...</div>
+                ) : (
+                  availableCategories.map((cat) => (
+                    <SelectItem key={cat} value={cat}>
+                      {cat}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
             {form.formState.errors.category && (
@@ -133,14 +163,14 @@ export function TransactionForm({
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="amount">จำนวนเงิน (บาท)</Label>
+              <Label htmlFor="amount" className="text-base font-bold">จำนวนเงิน (บาท)</Label>
               {showConfidence && <ConfidenceBadge level={fieldConfidence.amount} />}
             </div>
             <Input
               id="amount"
               type="number"
               step="0.01"
-              className={form.formState.errors.amount ? "border-destructive" : ""}
+              className={cn("h-14 text-xl font-bold border-2", form.formState.errors.amount ? "border-destructive" : "border-border/60")}
               {...form.register("amount", { valueAsNumber: true })}
             />
             {form.formState.errors.amount && (
@@ -150,13 +180,13 @@ export function TransactionForm({
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="occurredAt">วันที่</Label>
+              <Label htmlFor="occurredAt" className="text-base font-bold">วันที่</Label>
               {showConfidence && <ConfidenceBadge level={fieldConfidence.occurredAt} />}
             </div>
             <Input
               id="occurredAt"
               type="datetime-local"
-              className={form.formState.errors.occurredAt ? "border-destructive" : ""}
+              className={cn("h-14 text-base font-medium border-2", form.formState.errors.occurredAt ? "border-destructive" : "border-border/60")}
               value={
                 form.watch("occurredAt")
                   ? new Date(form.watch("occurredAt")).toISOString().slice(0, 16)
@@ -176,24 +206,26 @@ export function TransactionForm({
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="counterparty">ผู้โอน/ผู้รับ</Label>
+              <Label htmlFor="counterparty" className="text-base font-bold">ผู้โอน/ผู้รับ</Label>
               {showConfidence && <ConfidenceBadge level={fieldConfidence.counterparty} />}
             </div>
             <Input 
               id="counterparty" 
               placeholder="ถ้ามี" 
+              className="h-14 text-base font-medium border-2 border-border/60"
               {...form.register("counterparty")} 
             />
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="note">หมายเหตุ</Label>
+              <Label htmlFor="note" className="text-base font-bold">หมายเหตุ</Label>
               {showConfidence && <ConfidenceBadge level={fieldConfidence.note} />}
             </div>
             <Textarea 
               id="note" 
               placeholder="ถ้ามี" 
+              className="text-base font-medium border-2 border-border/60 min-h-[100px]"
               {...form.register("note")} 
             />
           </div>
@@ -205,13 +237,13 @@ export function TransactionForm({
           <Button
             type="button"
             variant="outline"
-            className="flex-1"
+            className="flex-1 h-14 text-lg font-bold border-2 border-border/60"
             onClick={onCancel}
           >
             ยกเลิก
           </Button>
         )}
-        <Button type="submit" className="flex-1" disabled={saving}>
+        <Button type="submit" className="flex-1 h-14 text-lg font-bold shadow-md" disabled={saving}>
           {saving ? "กำลังบันทึก..." : "บันทึก"}
         </Button>
       </div>

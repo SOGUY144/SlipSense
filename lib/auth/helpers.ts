@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { shopMembers, shops, profiles } from "@/lib/db/schema";
+import { shopMembers, shops, profiles, categories } from "@/lib/db/schema";
 import { createClient } from "@/lib/supabase/server";
 
 export async function getAuthenticatedUser() {
@@ -58,6 +58,14 @@ export async function ensureUserOnboarded(
     userId,
     role: "owner",
   });
+
+  const defaultExpenses = ["ค่าวัตถุดิบ", "ค่าเช่า", "ค่าจ้าง", "ค่าน้ำค่าไฟ", "ค่าขนส่ง", "ค่าใช้จ่ายอื่นๆ"];
+  const defaultIncomes = ["รายได้จากการขาย", "รายได้อื่นๆ"];
+
+  await db.insert(categories).values([
+    ...defaultIncomes.map(name => ({ shopId: shop.id, type: "income" as const, name })),
+    ...defaultExpenses.map(name => ({ shopId: shop.id, type: "expense" as const, name }))
+  ]);
 
   return shop;
 }
