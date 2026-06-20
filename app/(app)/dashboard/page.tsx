@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Camera, TrendingUp, TrendingDown, Wallet, Loader2, Sparkles, Bell, Calendar, ChevronRight, PartyPopper } from "lucide-react";
+import { Camera, TrendingUp, TrendingDown, Wallet, Loader2, Sparkles, Bell, Calendar, ChevronRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -261,12 +261,20 @@ export default function DashboardPage() {
               })}
             </div>
           ) : (
-            <div className="p-6 flex flex-col items-center justify-center text-center bg-gradient-to-br from-success/15 via-success/5 to-transparent">
-              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-sm mb-3 border border-success/10 animate-bounce" style={{ animationDuration: '3s' }}>
-                <PartyPopper className="w-7 h-7 text-success" strokeWidth={2} />
+            <div className="p-8 flex flex-col items-center justify-center text-center bg-gradient-to-b from-success/5 to-transparent relative overflow-hidden">
+              <div className="absolute top-0 w-full h-1 bg-gradient-to-r from-transparent via-success/30 to-transparent"></div>
+              
+              <div className="relative mb-4 group">
+                <div className="absolute inset-0 bg-success/30 blur-xl rounded-full scale-150 group-hover:scale-175 transition-transform duration-500"></div>
+                <div className="relative w-16 h-16 bg-gradient-to-tr from-emerald-500 to-green-400 rounded-2xl flex items-center justify-center shadow-lg shadow-success/40 transform -rotate-6 group-hover:rotate-0 transition-all duration-300">
+                  <CheckCircle2 className="w-8 h-8 text-white drop-shadow-md" strokeWidth={2.5} />
+                </div>
               </div>
-              <p className="text-sm font-bold text-success-foreground">ไม่มีบิลใกล้ถึงกำหนด</p>
-              <p className="text-xs font-medium text-muted-foreground mt-1">พักผ่อนให้เต็มที่ เดือนนี้เคลียร์ครบแล้ว!</p>
+              
+              <p className="text-base font-extrabold text-foreground tracking-tight">ไม่มีบิลใกล้ถึงกำหนด</p>
+              <p className="text-sm font-medium text-muted-foreground mt-1 max-w-[200px] leading-relaxed">
+                ยอดเยี่ยม! เดือนนี้คุณเคลียร์บิลครบหมดแล้ว พักผ่อนได้เลย 🌿
+              </p>
             </div>
           )}
         </CardContent>
