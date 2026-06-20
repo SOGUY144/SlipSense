@@ -30,67 +30,105 @@ export async function POST() {
     const { shop } = await requireAuth();
 
     const now = new Date();
-    const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1);
+    // Get first day of previous month
+    const startOfPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    // Get first day of current month
+    const startOfCurrMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    const txs = await db
+    // Fetch ALL transactions for the shop to determine monthsOfData
+    const allTxs = await db
       .select()
       .from(transactions)
-      .where(
-        and(
-          eq(transactions.shopId, shop.id),
-          gte(transactions.occurredAt, threeMonthsAgo),
-          lte(transactions.occurredAt, now)
-        )
-      );
+      .where(eq(transactions.shopId, shop.id))
+      .orderBy(transactions.occurredAt);
 
-    if (txs.length < 3) {
+    if (allTxs.length < 3) {
       return apiError("ต้องมีธุรกรรมอย่างน้อย 3 รายการก่อนสร้างคำแนะนำ", 400);
     }
 
-    const categoryTotals = new Map<string, number>();
-    let totalIncome = 0;
-    let totalExpense = 0;
+    const firstTxDate = allTxs[0].occurredAt;
+    const monthsOfData = Math.max(1, (now.getFullYear() - firstTxDate.getFullYear()) * 12 + now.getMonth() - firstTxDate.getMonth() + 1);
 
-    txs.forEach((t) => {
+    // Current Month data
+    let currIncome = 0;
+    let currExpense = 0;
+    const currCategoryTotals = new Map<string, number>();
+
+    // Previous Month data
+    let prevIncome = 0;
+    let prevExpense = 0;
+    const prevCategoryTotals = new Map<string, number>();
+
+    allTxs.forEach((t) => {
       const amount = parseFloat(t.amount);
-      if (t.type === "income") {
-        totalIncome += amount;
-      } else {
-        totalExpense += amount;
-        categoryTotals.set(
-          t.category,
-          (categoryTotals.get(t.category) ?? 0) + amount
-        );
+      const isCurrentMonth = t.occurredAt >= startOfCurrMonth;
+      const isPrevMonth = t.occurredAt >= startOfPrevMonth && t.occurredAt < startOfCurrMonth;
+
+      if (isCurrentMonth) {
+        if (t.type === "income") currIncome += amount;
+        else {
+          currExpense += amount;
+          currCategoryTotals.set(t.category, (currCategoryTotals.get(t.category) ?? 0) + amount);
+        }
+      } else if (isPrevMonth) {
+        if (t.type === "income") prevIncome += amount;
+        else {
+          prevExpense += amount;
+          prevCategoryTotals.set(t.category, (prevCategoryTotals.get(t.category) ?? 0) + amount);
+        }
       }
     });
+
+    const currProfit = currIncome - currExpense;
+    const prevProfit = prevIncome - prevExpense;
+
+    let profitChangePct = 0;
+    if (prevProfit !== 0) {
+      profitChangePct = ((currProfit - prevProfit) / Math.abs(prevProfit)) * 100;
+    } else if (currProfit > 0) {
+      profitChangePct = 100;
+    } else if (currProfit < 0) {
+      profitChangePct = -100;
+    }
+
+    let topCategory: string | null = null;
+    let topCategoryAmount = 0;
+    for (const [cat, amt] of currCategoryTotals.entries()) {
+      if (amt > topCategoryAmount) {
+        topCategoryAmount = amt;
+        topCategory = cat;
+      }
+    }
+
+    let topCategoryChangePct: number | null = null;
+    if (topCategory) {
+      const prevTopAmount = prevCategoryTotals.get(topCategory) || 0;
+      if (prevTopAmount !== 0) {
+        topCategoryChangePct = ((topCategoryAmount - prevTopAmount) / prevTopAmount) * 100;
+      } else if (topCategoryAmount > 0) {
+        topCategoryChangePct = 100;
+      }
+    }
 
     let prefsText = "";
     const prefs = shop.preferences as any;
     if (prefs) {
-      prefsText = `
-โปรไฟล์พฤติกรรมผู้ใช้ (สำคัญมาก! ใช้อ้างอิงการให้คำแนะนำ):
-- เป้าหมายงบใช้จ่ายต่อวัน: ${prefs.dailyBudget} บาท
-- โซนที่พักอาศัย/ค่าครองชีพ: ${prefs.location}
-- สถานะครอบครัว/ภาระ: ${prefs.familyStatus}
-- ลักษณะอาชีพ/รายได้: ${prefs.jobStatus}
-      `.trim();
+      prefsText = `โปรไฟล์พฤติกรรมผู้ใช้ (สำคัญมาก! ใช้อ้างอิงการให้คำแนะนำ):\n- เป้าหมายงบใช้จ่ายต่อวัน: ${prefs.dailyBudget} บาท\n- โซนที่พักอาศัย/ค่าครองชีพ: ${prefs.location}\n- สถานะครอบครัว/ภาระ: ${prefs.familyStatus}\n- ลักษณะอาชีพ/รายได้: ${prefs.jobStatus}`;
     }
 
-    const summary = `
-ร้าน: ${shop.name}
-รายรับรวม 3 เดือน: ฿${totalIncome.toLocaleString()}
-รายจ่ายรวม 3 เดือน: ฿${totalExpense.toLocaleString()}
-กำไร: ฿${(totalIncome - totalExpense).toLocaleString()}
-หมวดค่าใช้จ่าย:
-${Array.from(categoryTotals.entries())
-  .map(([cat, amt]) => `- ${cat}: ฿${amt.toLocaleString()}`)
-  .join("\n")}
-จำนวนธุรกรรม: ${txs.length} รายการ
+    const facts = {
+      income: currIncome,
+      expense: currExpense,
+      profit: currProfit,
+      profitChangePct,
+      topCategory,
+      topCategoryAmount,
+      topCategoryChangePct,
+      monthsOfData,
+      preferencesText: prefsText,
+    };
 
-${prefsText}
-    `.trim();
-
-    const generated = await generateInsights(summary);
+    const generated = await generateInsights(facts);
 
     const inserted = await db
       .insert(insights)
