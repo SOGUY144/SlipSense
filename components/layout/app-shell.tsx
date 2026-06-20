@@ -19,10 +19,9 @@ import { NotificationBell } from "@/components/reminders/notification-bell";
 
 const navItems = [
   { href: "/dashboard", label: "หน้าหลัก", icon: LayoutDashboard },
-  { href: "/upload", label: "ถ่ายสลิป", icon: Camera },
   { href: "/transactions", label: "รายการ", icon: List },
+  { href: "/upload", label: "ถ่ายสลิป", icon: Camera },
   { href: "/analytics", label: "วิเคราะห์", icon: BarChart3 },
-  { href: "/settings", label: "ตั้งค่า", icon: Settings },
   { href: "/profile", label: "โปรไฟล์", icon: UserCircle },
 ];
 
@@ -55,6 +54,13 @@ export function AppShell({
           </div>
           <div className="flex items-center gap-1">
             <NotificationBell />
+            <Link
+              href="/settings"
+              className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+              aria-label="ตั้งค่า"
+            >
+              <Settings className="h-5 w-5" />
+            </Link>
             <button
               onClick={handleLogout}
               className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
