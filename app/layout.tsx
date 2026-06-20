@@ -1,11 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Prompt } from "next/font/google";
+import { Prompt, Inter } from "next/font/google";
 import "./globals.css";
 
 const prompt = Prompt({ 
   subsets: ["latin", "thai"],
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-prompt",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
@@ -27,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th" className={prompt.variable}>
+    <html lang="th" className={`${prompt.variable} ${inter.variable}`}>
       <body className="font-sans">{children}</body>
     </html>
   );

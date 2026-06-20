@@ -86,6 +86,10 @@ export default function DashboardPage() {
   }
 
   const profitUp = (summary?.profitChangePercent ?? 0) >= 0;
+  
+  const totalFlow = (summary?.current.income ?? 0) + (summary?.current.expense ?? 0);
+  const incomePct = totalFlow > 0 ? ((summary?.current.income ?? 0) / totalFlow) * 100 : 50;
+  const expensePct = totalFlow > 0 ? ((summary?.current.expense ?? 0) / totalFlow) * 100 : 50;
 
   return (
     <div className="space-y-6">
@@ -121,47 +125,60 @@ export default function DashboardPage() {
               {formatPercent(summary?.profitChangePercent ?? 0)}
             </Badge>
           </div>
-          <p className="text-5xl font-extrabold text-white tracking-tight drop-shadow-sm">
+          <p className="text-5xl font-extrabold text-white tracking-tight drop-shadow-sm font-number mt-1">
             {formatCurrency(summary?.current.profit ?? 0)}
           </p>
-          <div className="flex items-center gap-2 mt-3 text-sm font-medium text-white/70">
+          
+          {/* Income vs Expense Bar */}
+          <div className="mt-5 space-y-1.5">
+            <div className="flex justify-between text-xs font-medium text-white/80">
+              <span>รายรับ {Math.round(incomePct)}%</span>
+              <span>รายจ่าย {Math.round(expensePct)}%</span>
+            </div>
+            <div className="h-1.5 w-full bg-white/20 rounded-full overflow-hidden flex">
+              <div className="h-full bg-emerald-400" style={{ width: `${incomePct}%` }}></div>
+              <div className="h-full bg-rose-400" style={{ width: `${expensePct}%` }}></div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 mt-4 text-xs font-medium text-white/70">
             <span>เทียบเดือนก่อน</span>
-            <span className="text-white/90 font-semibold">{formatCurrency(summary?.previous.profit ?? 0)}</span>
+            <span className="text-white/90 font-semibold font-number">{formatCurrency(summary?.previous.profit ?? 0)}</span>
           </div>
         </CardContent>
       </Card>
 
       <div className="grid grid-cols-2 gap-3">
-        <Card className="border border-success/20 shadow-md shadow-success/5 bg-gradient-to-br from-success/5 to-card hover:-translate-y-0.5 transition-transform duration-200">
+        <Card className="border border-success/20 shadow-md shadow-success/5 bg-gradient-to-br from-success/10 to-white/60 backdrop-blur-xl hover:-translate-y-0.5 transition-transform duration-200">
           <CardContent className="p-5 flex flex-col items-center text-center">
             <div className="flex items-center justify-center gap-1.5 text-success font-bold mb-2">
-              <div className="p-1.5 bg-success/10 rounded-full">
+              <div className="p-1.5 bg-success/10 rounded-full shadow-sm shadow-success/20">
                 <TrendingUp className="h-4 w-4" strokeWidth={2.5} />
               </div>
               <span className="text-sm">รายรับ</span>
             </div>
-            <p className="text-2xl font-bold text-foreground">
+            <p className="text-2xl font-bold text-foreground font-number">
               {formatCurrency(summary?.current.income ?? 0)}
             </p>
           </CardContent>
         </Card>
-        <Card className="border border-destructive/20 shadow-md shadow-destructive/5 bg-gradient-to-br from-destructive/5 to-card hover:-translate-y-0.5 transition-transform duration-200">
+        <Card className="border border-destructive/20 shadow-md shadow-destructive/5 bg-gradient-to-br from-destructive/10 to-white/60 backdrop-blur-xl hover:-translate-y-0.5 transition-transform duration-200">
           <CardContent className="p-5 flex flex-col items-center text-center">
             <div className="flex items-center justify-center gap-1.5 text-destructive font-bold mb-2">
-              <div className="p-1.5 bg-destructive/10 rounded-full">
+              <div className="p-1.5 bg-destructive/10 rounded-full shadow-sm shadow-destructive/20">
                 <TrendingDown className="h-4 w-4" strokeWidth={2.5} />
               </div>
               <span className="text-sm">รายจ่าย</span>
             </div>
-            <p className="text-2xl font-bold text-foreground">
+            <p className="text-2xl font-bold text-foreground font-number">
               {formatCurrency(summary?.current.expense ?? 0)}
             </p>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="border border-border/50 shadow-md bg-card overflow-hidden hover:shadow-lg transition-shadow duration-200">
-        <div className="p-4 border-b flex items-center justify-between bg-primary/5">
+      <Card className="border border-white/60 shadow-lg shadow-slate-200/50 bg-white/70 backdrop-blur-xl overflow-hidden hover:shadow-xl transition-shadow duration-300 rounded-2xl">
+        <div className="p-4 border-b border-white/50 flex items-center justify-between bg-white/40">
           <div className="flex items-center gap-2">
             <div className="p-1.5 bg-primary/10 rounded-md text-primary">
               <Calendar className="w-4 h-4" />
@@ -244,14 +261,12 @@ export default function DashboardPage() {
               })}
             </div>
           ) : (
-            <div className="p-3 px-4 flex items-center justify-between text-center bg-card">
-              <div className="flex items-center gap-2 text-success">
-                <div className="w-6 h-6 bg-success/10 rounded-full flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                </div>
-                <p className="text-sm font-bold">ไม่มีบิลใกล้ถึงกำหนด</p>
+            <div className="p-6 flex flex-col items-center justify-center text-center bg-gradient-to-br from-success/15 via-success/5 to-transparent">
+              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-sm mb-3 border border-success/10 animate-bounce" style={{ animationDuration: '3s' }}>
+                <span className="text-3xl">🎉</span>
               </div>
-              <p className="text-xs font-medium text-muted-foreground">พักผ่อนได้เลย 🎉</p>
+              <p className="text-sm font-bold text-success-foreground">ไม่มีบิลใกล้ถึงกำหนด</p>
+              <p className="text-xs font-medium text-muted-foreground mt-1">พักผ่อนให้เต็มที่ เดือนนี้เคลียร์ครบแล้ว!</p>
             </div>
           )}
         </CardContent>
@@ -277,11 +292,11 @@ export default function DashboardPage() {
         </div>
         {insights.length > 0 ? (
           insights.slice(0, 2).map((insight) => (
-            <Card key={insight.id} className="border border-primary/20 shadow-sm hover:shadow-md transition-shadow bg-gradient-to-br from-primary/5 to-transparent relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-                <Sparkles className="w-16 h-16 text-primary" />
+            <Card key={insight.id} className="border border-white/60 shadow-md shadow-primary/5 hover:shadow-lg transition-all bg-gradient-to-br from-white/90 to-white/50 backdrop-blur-xl relative overflow-hidden rounded-2xl">
+              <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
+                <Sparkles className="w-24 h-24 text-primary" />
               </div>
-              <CardContent className="p-4 relative z-10">
+              <CardContent className="p-5 relative z-10">
                 <p className="text-sm text-foreground/90 leading-relaxed font-medium">{insight.content}</p>
               </CardContent>
             </Card>
@@ -309,23 +324,23 @@ export default function DashboardPage() {
         </div>
 
         {(summary?.recentTransactions ?? []).length === 0 ? (
-          <Card>
+          <Card className="border border-white/60 bg-white/70 backdrop-blur-xl shadow-md rounded-2xl">
             <CardContent className="flex flex-col items-center gap-3 py-8">
-              <Camera className="h-10 w-10 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">
+              <Camera className="h-10 w-10 text-muted-foreground/50" />
+              <p className="text-sm text-muted-foreground font-medium">
                 ยังไม่มีธุรกรรม — เริ่มด้วยการถ่ายสลิป
               </p>
               <Link href="/upload">
-                <Button size="sm">ถ่ายสลิปแรก</Button>
+                <Button size="sm" className="shadow-md rounded-xl">ถ่ายสลิปแรก</Button>
               </Link>
             </CardContent>
           </Card>
         ) : (
           summary?.recentTransactions.map((tx) => (
-            <Card key={tx.id} className="border border-border/40 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 bg-card">
+            <Card key={tx.id} className="border border-white/60 shadow-md shadow-slate-200/40 hover:shadow-lg transition-all hover:-translate-y-0.5 bg-white/70 backdrop-blur-xl rounded-2xl">
               <CardContent className="flex items-center justify-between p-4">
                 <div className="flex items-center gap-3">
-                  <div className={`p-2.5 rounded-full ${tx.type === 'income' ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}>
+                  <div className={`p-2.5 rounded-full shadow-sm ${tx.type === 'income' ? 'bg-success/15 text-success shadow-success/20' : 'bg-destructive/15 text-destructive shadow-destructive/20'}`}>
                     {tx.type === 'income' ? <TrendingUp className="w-4 h-4" strokeWidth={2.5}/> : <TrendingDown className="w-4 h-4" strokeWidth={2.5}/>}
                   </div>
                   <div>
@@ -337,7 +352,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <p
-                  className={`text-lg font-bold tracking-tight ${
+                  className={`text-lg font-bold tracking-tight font-number ${
                     tx.type === "income"
                       ? "text-success"
                       : "text-destructive"
