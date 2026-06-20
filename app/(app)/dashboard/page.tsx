@@ -110,13 +110,13 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Wallet className="h-6 w-6 text-primary" strokeWidth={2.5} />
-              <span className="font-bold text-lg text-primary">กำไรสุทธิ</span>
+              <span className="font-semibold text-lg text-primary">กำไรสุทธิ</span>
             </div>
-            <Badge variant={profitUp ? "success" : "destructive"} className="text-sm px-2 py-1 shadow-sm font-bold">
+            <Badge variant={profitUp ? "success" : "destructive"} className="text-sm px-2 py-1 shadow-sm font-semibold">
               {formatPercent(summary?.profitChangePercent ?? 0)}
             </Badge>
           </div>
-          <p className="text-4xl font-black text-primary tracking-tight">
+          <p className="text-4xl font-bold text-primary">
             {formatCurrency(summary?.current.profit ?? 0)}
           </p>
           <p className="mt-2 text-sm font-medium text-muted-foreground">
@@ -129,22 +129,22 @@ export default function DashboardPage() {
       <div className="grid grid-cols-2 gap-3">
         <Card className="border-2 border-success/40 bg-success/5">
           <CardContent className="p-4 flex flex-col items-center text-center">
-            <div className="flex items-center justify-center gap-1.5 text-success font-bold mb-2">
+            <div className="flex items-center justify-center gap-1.5 text-success font-semibold mb-2">
               <TrendingUp className="h-5 w-5" strokeWidth={2.5} />
               <span className="text-sm">รายรับ</span>
             </div>
-            <p className="text-2xl font-black text-success tracking-tight">
+            <p className="text-2xl font-bold text-success">
               {formatCurrency(summary?.current.income ?? 0)}
             </p>
           </CardContent>
         </Card>
         <Card className="border-2 border-destructive/40 bg-destructive/5">
           <CardContent className="p-4 flex flex-col items-center text-center">
-            <div className="flex items-center justify-center gap-1.5 text-destructive font-bold mb-2">
+            <div className="flex items-center justify-center gap-1.5 text-destructive font-semibold mb-2">
               <TrendingDown className="h-5 w-5" strokeWidth={2.5} />
               <span className="text-sm">รายจ่าย</span>
             </div>
-            <p className="text-2xl font-black text-destructive tracking-tight">
+            <p className="text-2xl font-bold text-destructive">
               {formatCurrency(summary?.current.expense ?? 0)}
             </p>
           </CardContent>
