@@ -132,7 +132,7 @@ export default function DashboardPage() {
       </Card>
 
       <div className="grid grid-cols-2 gap-3">
-        <Card className="border-none shadow-md shadow-success/5 bg-card hover:-translate-y-0.5 transition-transform duration-200">
+        <Card className="border border-success/20 shadow-md shadow-success/5 bg-gradient-to-br from-success/5 to-card hover:-translate-y-0.5 transition-transform duration-200">
           <CardContent className="p-5 flex flex-col items-center text-center">
             <div className="flex items-center justify-center gap-1.5 text-success font-bold mb-2">
               <div className="p-1.5 bg-success/10 rounded-full">
@@ -145,7 +145,7 @@ export default function DashboardPage() {
             </p>
           </CardContent>
         </Card>
-        <Card className="border-none shadow-md shadow-destructive/5 bg-card hover:-translate-y-0.5 transition-transform duration-200">
+        <Card className="border border-destructive/20 shadow-md shadow-destructive/5 bg-gradient-to-br from-destructive/5 to-card hover:-translate-y-0.5 transition-transform duration-200">
           <CardContent className="p-5 flex flex-col items-center text-center">
             <div className="flex items-center justify-center gap-1.5 text-destructive font-bold mb-2">
               <div className="p-1.5 bg-destructive/10 rounded-full">
@@ -160,8 +160,8 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <Card className="border-none shadow-md bg-card overflow-hidden hover:shadow-lg transition-shadow duration-200">
-        <div className="p-4 border-b flex items-center justify-between bg-muted/30">
+      <Card className="border border-border/50 shadow-md bg-card overflow-hidden hover:shadow-lg transition-shadow duration-200">
+        <div className="p-4 border-b flex items-center justify-between bg-primary/5">
           <div className="flex items-center gap-2">
             <div className="p-1.5 bg-primary/10 rounded-md text-primary">
               <Calendar className="w-4 h-4" />
@@ -185,7 +185,7 @@ export default function DashboardPage() {
                 const isDueSoon = alert.daysLeft >= 0 && alert.daysLeft <= 3;
                 
                 return (
-                  <div key={alert.id} className="p-4 flex items-center gap-3 hover:bg-muted/30 transition-colors">
+                  <div key={alert.id} className={`p-4 flex items-center gap-3 hover:bg-muted/30 transition-colors border-l-4 ${isOverdue ? 'border-l-destructive' : isDueSoon ? 'border-l-warning' : 'border-l-primary/40'}`}>
                     <div className={`p-2.5 rounded-full shrink-0 ${
                       isOverdue ? 'bg-destructive/10 text-destructive' : 
                       isDueSoon ? 'bg-warning/10 text-warning' : 
@@ -277,9 +277,12 @@ export default function DashboardPage() {
         </div>
         {insights.length > 0 ? (
           insights.slice(0, 2).map((insight) => (
-            <Card key={insight.id} className="border-none shadow-sm hover:shadow-md transition-shadow bg-card">
-              <CardContent className="p-4">
-                <p className="text-sm text-foreground/90 leading-relaxed">{insight.content}</p>
+            <Card key={insight.id} className="border border-primary/20 shadow-sm hover:shadow-md transition-shadow bg-gradient-to-br from-primary/5 to-transparent relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                <Sparkles className="w-16 h-16 text-primary" />
+              </div>
+              <CardContent className="p-4 relative z-10">
+                <p className="text-sm text-foreground/90 leading-relaxed font-medium">{insight.content}</p>
               </CardContent>
             </Card>
           ))
@@ -319,7 +322,7 @@ export default function DashboardPage() {
           </Card>
         ) : (
           summary?.recentTransactions.map((tx) => (
-            <Card key={tx.id} className="border-none shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 bg-card">
+            <Card key={tx.id} className="border border-border/40 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 bg-card">
               <CardContent className="flex items-center justify-between p-4">
                 <div className="flex items-center gap-3">
                   <div className={`p-2.5 rounded-full ${tx.type === 'income' ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}>
