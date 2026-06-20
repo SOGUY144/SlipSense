@@ -149,7 +149,7 @@ export default function DashboardPage() {
       </Card>
 
       <div className="grid grid-cols-2 gap-3">
-        <Card className="border border-success/20 shadow-md shadow-success/5 bg-gradient-to-br from-success/10 to-white/60 backdrop-blur-xl hover:-translate-y-0.5 transition-transform duration-200">
+        <Card className="border-none shadow-sm bg-white hover:-translate-y-0.5 transition-transform duration-200">
           <CardContent className="p-5 flex flex-col items-center text-center">
             <div className="flex items-center justify-center gap-1.5 text-success font-bold mb-2">
               <div className="p-1.5 bg-success/10 rounded-full shadow-sm shadow-success/20">
@@ -162,7 +162,7 @@ export default function DashboardPage() {
             </p>
           </CardContent>
         </Card>
-        <Card className="border border-destructive/20 shadow-md shadow-destructive/5 bg-gradient-to-br from-destructive/10 to-white/60 backdrop-blur-xl hover:-translate-y-0.5 transition-transform duration-200">
+        <Card className="border-none shadow-sm bg-white hover:-translate-y-0.5 transition-transform duration-200">
           <CardContent className="p-5 flex flex-col items-center text-center">
             <div className="flex items-center justify-center gap-1.5 text-destructive font-bold mb-2">
               <div className="p-1.5 bg-destructive/10 rounded-full shadow-sm shadow-destructive/20">
@@ -177,8 +177,8 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <Card className="border border-white/60 shadow-lg shadow-slate-200/50 bg-white/70 backdrop-blur-xl overflow-hidden hover:shadow-xl transition-shadow duration-300 rounded-2xl">
-        <div className="p-4 border-b border-white/50 flex items-center justify-between bg-white/40">
+      <Card className="border-none shadow-sm bg-white overflow-hidden rounded-2xl">
+        <div className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="p-1.5 bg-primary/10 rounded-md text-primary">
               <Calendar className="w-4 h-4" />
@@ -300,7 +300,7 @@ export default function DashboardPage() {
         </div>
         {insights.length > 0 ? (
           insights.slice(0, 2).map((insight) => (
-            <Card key={insight.id} className="border border-white/60 shadow-md shadow-primary/5 hover:shadow-lg transition-all bg-gradient-to-br from-white/90 to-white/50 backdrop-blur-xl relative overflow-hidden rounded-2xl">
+            <Card key={insight.id} className="border-none shadow-sm bg-white relative overflow-hidden rounded-2xl">
               <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
                 <Sparkles className="w-24 h-24 text-primary" />
               </div>
@@ -332,7 +332,7 @@ export default function DashboardPage() {
         </div>
 
         {(summary?.recentTransactions ?? []).length === 0 ? (
-          <Card className="border border-white/60 bg-white/70 backdrop-blur-xl shadow-md rounded-2xl">
+          <Card className="border-none shadow-sm bg-white rounded-2xl">
             <CardContent className="flex flex-col items-center gap-3 py-8">
               <Camera className="h-10 w-10 text-muted-foreground/50" />
               <p className="text-sm text-muted-foreground font-medium">
@@ -345,7 +345,7 @@ export default function DashboardPage() {
           </Card>
         ) : (
           summary?.recentTransactions.map((tx) => (
-            <Card key={tx.id} className="border border-white/60 shadow-md shadow-slate-200/40 hover:shadow-lg transition-all hover:-translate-y-0.5 bg-white/70 backdrop-blur-xl rounded-2xl">
+            <Card key={tx.id} className="border-none shadow-sm bg-white hover:shadow-md transition-all hover:-translate-y-0.5 rounded-2xl">
               <CardContent className="flex items-center justify-between p-4">
                 <div className="flex items-center gap-3">
                   <div className={`p-2.5 rounded-full shadow-sm ${tx.type === 'income' ? 'bg-success/15 text-success shadow-success/20' : 'bg-destructive/15 text-destructive shadow-destructive/20'}`}>

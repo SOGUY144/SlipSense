@@ -44,15 +44,8 @@ export function AppShell({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 relative overflow-hidden">
-      {/* Premium Ambient Background */}
-      <div className="absolute top-0 left-0 w-full h-full -z-10 pointer-events-none">
-        <div className="absolute top-[-5%] left-[-10%] w-[50%] h-[30%] rounded-full bg-blue-400/20 blur-[100px]"></div>
-        <div className="absolute top-[15%] right-[-5%] w-[40%] h-[40%] rounded-full bg-indigo-400/10 blur-[100px]"></div>
-        <div className="absolute bottom-[20%] left-[10%] w-[30%] h-[30%] rounded-full bg-blue-300/10 blur-[100px]"></div>
-      </div>
-
-      <header className="sticky top-0 z-40 border-b border-white/40 bg-white/70 backdrop-blur-md supports-[backdrop-filter]:bg-white/60">
+    <div className="min-h-screen bg-slate-50/80 relative">
+      <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm">
         <div className="mx-auto flex h-14 max-w-lg items-center justify-between px-4">
           <div>
             <p className="text-xs text-muted-foreground">SlipSense</p>
@@ -85,8 +78,8 @@ export function AppShell({
         </Link>
       )}
 
-      <nav className="fixed bottom-4 left-4 right-4 z-40 mx-auto max-w-lg">
-        <div className="flex h-16 items-center justify-around rounded-2xl border border-white/40 bg-white/80 px-2 pb-1 shadow-xl shadow-slate-200/50 backdrop-blur-xl">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 mx-auto max-w-lg bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] pb-1" style={{ paddingBottom: 'calc(4px + env(safe-area-inset-bottom))' }}>
+        <div className="flex h-16 items-center justify-around px-2">
           {navItems.map(({ href, label, icon: Icon }) => {
             const active = pathname.startsWith(href) && (href !== "/dashboard" || pathname === "/dashboard");
             const isUpload = href === "/upload";
