@@ -12,6 +12,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+import { TransactionForm } from "@/components/transactions/transaction-form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { transactionSchema } from "@/lib/validations/schemas";
+import type { z } from "zod";
+
+type FormData = z.infer<typeof transactionSchema>;
+
 interface UploadResult {
   fileName: string;
   status: "pending" | "uploading" | "processing" | "done" | "error";
@@ -22,9 +30,43 @@ interface UploadResult {
 export default function UploadPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [mode, setMode] = useState<"scan" | "manual">("scan");
   const [results, setResults] = useState<UploadResult[]>([]);
   const [uploading, setUploading] = useState(false);
   const [savingBatch, setSavingBatch] = useState(false);
+  const [savingManual, setSavingManual] = useState(false);
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(transactionSchema),
+    defaultValues: {
+      type: "expense",
+      category: "ค่าใช้จ่ายอื่นๆ",
+      amount: 0,
+      occurredAt: new Date().toISOString(),
+    },
+  });
+
+  async function onManualSubmit(data: FormData) {
+    setSavingManual(true);
+    try {
+      const res = await fetch("/api/transactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.error || "บันทึกไม่สำเร็จ");
+      }
+
+      router.push("/dashboard");
+    } catch (error: any) {
+      alert(error.message || "เกิดข้อผิดพลาดในการบันทึก กรุณาลองใหม่");
+    } finally {
+      setSavingManual(false);
+    }
+  }
 
   async function handleBatchSave(jobIds: string[]) {
     if (jobIds.length === 0) return;
@@ -146,13 +188,45 @@ export default function UploadPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-bold">ถ่าย/อัปโหลดสลิป</h1>
+        <h1 className="text-xl font-bold">เพิ่มรายการใหม่</h1>
         <p className="text-sm text-muted-foreground">
-          AI จะอ่านและจัดหมวดให้อัตโนมัติ
+          สแกนสลิปด้วย AI หรือกรอกข้อมูลด้วยตัวเอง
         </p>
       </div>
 
-      <input
+      <div className="flex rounded-lg bg-muted p-1">
+        <button
+          className={`flex-1 rounded-md py-1.5 text-sm font-medium transition-all ${
+            mode === "scan"
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:bg-background/50"
+          }`}
+          onClick={() => setMode("scan")}
+        >
+          📸 สแกนสลิป
+        </button>
+        <button
+          className={`flex-1 rounded-md py-1.5 text-sm font-medium transition-all ${
+            mode === "manual"
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:bg-background/50"
+          }`}
+          onClick={() => setMode("manual")}
+        >
+          ✍️ กรอกข้อมูลเอง
+        </button>
+      </div>
+
+      {mode === "manual" ? (
+        <TransactionForm
+          form={form}
+          onSubmit={onManualSubmit}
+          saving={savingManual}
+          title="กรอกรายละเอียดรายการ"
+        />
+      ) : (
+        <>
+          <input
         ref={fileInputRef}
         type="file"
         accept="image/jpeg,image/png,image/webp"
@@ -271,6 +345,8 @@ export default function UploadPage() {
             )}
           </CardContent>
         </Card>
+      )}
+        </>
       )}
     </div>
   );

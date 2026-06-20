@@ -45,6 +45,8 @@ function ConfidenceBadge({ level }: { level?: string }) {
   return <Badge variant={conf.variant}>{conf.label}</Badge>;
 }
 
+import { TransactionForm } from "@/components/transactions/transaction-form";
+
 export default function ReviewPage({
   params,
 }: {
@@ -70,10 +72,6 @@ export default function ReviewPage({
       occurredAt: new Date().toISOString(),
     },
   });
-
-  const watchType = form.watch("type");
-  const categories =
-    watchType === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
 
   useEffect(() => {
     async function load() {
@@ -110,14 +108,18 @@ export default function ReviewPage({
 
   async function onSubmit(data: FormData) {
     setSaving(true);
-    const res = await fetch("/api/transactions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    setSaving(false);
+    try {
+      const res = await fetch("/api/transactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
-    if (res.ok) {
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.error || "บันทึกไม่สำเร็จ");
+      }
+
       if (nextJobs.length > 0) {
         const nextId = nextJobs[0];
         const remaining = nextJobs.slice(1).join(",");
@@ -125,6 +127,10 @@ export default function ReviewPage({
       } else {
         router.push("/dashboard");
       }
+    } catch (error: any) {
+      alert(error.message || "เกิดข้อผิดพลาดในการบันทึก กรุณาลองใหม่");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -166,133 +172,15 @@ export default function ReviewPage({
         </Card>
       )}
 
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center justify-between">
-              ข้อมูลที่ AI อ่านได้
-              <ConfidenceBadge level={form.watch("confidence")} />
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label>ประเภท</Label>
-                <ConfidenceBadge level={fieldConfidence.type} />
-              </div>
-              <Select
-                value={form.watch("type")}
-                onValueChange={(v) => {
-                  form.setValue("type", v as "income" | "expense");
-                  form.setValue(
-                    "category",
-                    v === "income"
-                      ? "รายได้จากการขาย"
-                      : "ค่าใช้จ่ายอื่นๆ"
-                  );
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="income">รายรับ</SelectItem>
-                  <SelectItem value="expense">รายจ่าย</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label>หมวดหมู่</Label>
-                <ConfidenceBadge level={fieldConfidence.category} />
-              </div>
-              <Select
-                value={form.watch("category")}
-                onValueChange={(v) => form.setValue("category", v)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {cat}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="amount">จำนวนเงิน (บาท)</Label>
-                <ConfidenceBadge level={fieldConfidence.amount} />
-              </div>
-              <Input
-                id="amount"
-                type="number"
-                step="0.01"
-                {...form.register("amount", { valueAsNumber: true })}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="occurredAt">วันที่</Label>
-                <ConfidenceBadge level={fieldConfidence.occurredAt} />
-              </div>
-              <Input
-                id="occurredAt"
-                type="datetime-local"
-                value={
-                  form.watch("occurredAt")
-                    ? new Date(form.watch("occurredAt"))
-                        .toISOString()
-                        .slice(0, 16)
-                    : ""
-                }
-                onChange={(e) =>
-                  form.setValue(
-                    "occurredAt",
-                    new Date(e.target.value).toISOString()
-                  )
-                }
-              />
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="counterparty">ผู้โอน/ผู้รับ</Label>
-                <ConfidenceBadge level={fieldConfidence.counterparty} />
-              </div>
-              <Input id="counterparty" {...form.register("counterparty")} />
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="note">หมายเหตุ</Label>
-                <ConfidenceBadge level={fieldConfidence.note} />
-              </div>
-              <Textarea id="note" {...form.register("note")} />
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="flex gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            className="flex-1"
-            onClick={() => router.push("/upload")}
-          >
-            ยกเลิก
-          </Button>
-          <Button type="submit" className="flex-1" disabled={saving}>
-            {saving ? "กำลังบันทึก..." : "บันทึก"}
-          </Button>
-        </div>
-      </form>
+      <TransactionForm 
+        form={form} 
+        onSubmit={onSubmit} 
+        saving={saving} 
+        fieldConfidence={fieldConfidence} 
+        onCancel={() => router.push("/upload")} 
+        title="ข้อมูลที่ AI อ่านได้"
+        showConfidence={true}
+      />
     </div>
   );
 }

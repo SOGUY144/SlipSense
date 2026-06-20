@@ -28,8 +28,8 @@ export type ExtractedSlip = z.infer<typeof extractedSlipSchema>;
 export const transactionSchema = z.object({
   slipJobId: z.string().uuid().optional(),
   type: z.enum(["income", "expense"]),
-  category: z.string().min(1),
-  amount: z.number().positive(),
+  category: z.string().min(1, "กรุณาเลือกหมวดหมู่"),
+  amount: z.number({ invalid_type_error: "กรุณากรอกตัวเลข" }).positive("กรุณากรอกจำนวนเงินให้มากกว่า 0"),
   occurredAt: z.string(),
   counterparty: z.string().optional(),
   note: z.string().optional(),
