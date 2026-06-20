@@ -237,13 +237,13 @@ export function TransactionForm({
           <Button
             type="button"
             variant="outline"
-            className="flex-1 h-14 text-lg font-bold border-2 border-border/60"
+            className="flex-1 h-14 text-lg font-bold border-2 border-border/60 hover:bg-muted/50 hover:scale-[1.02] active:scale-95 transition-all"
             onClick={onCancel}
           >
             ยกเลิก
           </Button>
         )}
-        <Button type="submit" className="flex-1 h-14 text-lg font-bold shadow-md" disabled={saving}>
+        <Button type="submit" className="flex-1 h-14 text-lg font-bold shadow-lg shadow-primary/25 hover:scale-[1.02] active:scale-95 transition-all" disabled={saving}>
           {saving ? "กำลังบันทึก..." : "บันทึก"}
         </Button>
       </div>

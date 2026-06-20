@@ -105,59 +105,68 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      <Card className="border-2 border-primary bg-primary/10 shadow-md">
-        <CardContent className="p-5">
+      <Card className="border-none shadow-xl shadow-primary/20 bg-gradient-to-br from-slate-900 via-primary to-blue-600 overflow-hidden relative">
+        <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+          <Wallet className="w-32 h-32 text-white transform rotate-12" />
+        </div>
+        <CardContent className="p-6 relative z-10">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Wallet className="h-6 w-6 text-primary" strokeWidth={2.5} />
-              <span className="font-semibold text-lg text-primary">กำไรสุทธิ</span>
+              <div className="p-2 bg-white/10 rounded-lg backdrop-blur-md">
+                <Wallet className="h-5 w-5 text-white" strokeWidth={2.5} />
+              </div>
+              <span className="font-semibold text-lg text-white/90">กำไรสุทธิ</span>
             </div>
-            <Badge variant={profitUp ? "success" : "destructive"} className="text-sm px-2 py-1 shadow-sm font-semibold">
+            <Badge variant={profitUp ? "success" : "destructive"} className="text-sm px-2.5 py-1 shadow-md font-bold border-none">
               {formatPercent(summary?.profitChangePercent ?? 0)}
             </Badge>
           </div>
-          <p className="text-4xl font-bold text-primary">
+          <p className="text-5xl font-extrabold text-white tracking-tight drop-shadow-sm">
             {formatCurrency(summary?.current.profit ?? 0)}
           </p>
-          <p className="mt-2 text-sm font-medium text-muted-foreground">
-            เทียบเดือนก่อน{" "}
-            {formatCurrency(summary?.previous.profit ?? 0)}
-          </p>
+          <div className="flex items-center gap-2 mt-3 text-sm font-medium text-white/70">
+            <span>เทียบเดือนก่อน</span>
+            <span className="text-white/90 font-semibold">{formatCurrency(summary?.previous.profit ?? 0)}</span>
+          </div>
         </CardContent>
       </Card>
 
       <div className="grid grid-cols-2 gap-3">
-        <Card className="border-2 border-success/40 bg-success/5">
-          <CardContent className="p-4 flex flex-col items-center text-center">
-            <div className="flex items-center justify-center gap-1.5 text-success font-semibold mb-2">
-              <TrendingUp className="h-5 w-5" strokeWidth={2.5} />
+        <Card className="border-none shadow-md shadow-success/5 bg-card hover:-translate-y-0.5 transition-transform duration-200">
+          <CardContent className="p-5 flex flex-col items-center text-center">
+            <div className="flex items-center justify-center gap-1.5 text-success font-bold mb-2">
+              <div className="p-1.5 bg-success/10 rounded-full">
+                <TrendingUp className="h-4 w-4" strokeWidth={2.5} />
+              </div>
               <span className="text-sm">รายรับ</span>
             </div>
-            <p className="text-2xl font-bold text-success">
+            <p className="text-2xl font-bold text-foreground">
               {formatCurrency(summary?.current.income ?? 0)}
             </p>
           </CardContent>
         </Card>
-        <Card className="border-2 border-destructive/40 bg-destructive/5">
-          <CardContent className="p-4 flex flex-col items-center text-center">
-            <div className="flex items-center justify-center gap-1.5 text-destructive font-semibold mb-2">
-              <TrendingDown className="h-5 w-5" strokeWidth={2.5} />
+        <Card className="border-none shadow-md shadow-destructive/5 bg-card hover:-translate-y-0.5 transition-transform duration-200">
+          <CardContent className="p-5 flex flex-col items-center text-center">
+            <div className="flex items-center justify-center gap-1.5 text-destructive font-bold mb-2">
+              <div className="p-1.5 bg-destructive/10 rounded-full">
+                <TrendingDown className="h-4 w-4" strokeWidth={2.5} />
+              </div>
               <span className="text-sm">รายจ่าย</span>
             </div>
-            <p className="text-2xl font-bold text-destructive">
+            <p className="text-2xl font-bold text-foreground">
               {formatCurrency(summary?.current.expense ?? 0)}
             </p>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="border-2 border-border/60 shadow-sm overflow-hidden bg-gradient-to-br from-card to-muted/30">
-        <div className="p-4 border-b-2 border-border/40 flex items-center justify-between bg-card">
+      <Card className="border-none shadow-md bg-card overflow-hidden hover:shadow-lg transition-shadow duration-200">
+        <div className="p-4 border-b flex items-center justify-between bg-muted/30">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-primary/10 rounded-md">
-              <Calendar className="w-4 h-4 text-primary" />
+            <div className="p-1.5 bg-primary/10 rounded-md text-primary">
+              <Calendar className="w-4 h-4" />
             </div>
-            <h2 className="text-sm font-bold">บิลประจำเดือน</h2>
+            <h2 className="text-sm font-bold text-foreground">บิลประจำเดือน</h2>
           </div>
           <Link
             href="/reminders"
@@ -268,9 +277,9 @@ export default function DashboardPage() {
         </div>
         {insights.length > 0 ? (
           insights.slice(0, 2).map((insight) => (
-            <Card key={insight.id}>
+            <Card key={insight.id} className="border-none shadow-sm hover:shadow-md transition-shadow bg-card">
               <CardContent className="p-4">
-                <p className="text-sm">{insight.content}</p>
+                <p className="text-sm text-foreground/90 leading-relaxed">{insight.content}</p>
               </CardContent>
             </Card>
           ))
@@ -310,17 +319,22 @@ export default function DashboardPage() {
           </Card>
         ) : (
           summary?.recentTransactions.map((tx) => (
-            <Card key={tx.id} className="border-2 border-border/60">
+            <Card key={tx.id} className="border-none shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 bg-card">
               <CardContent className="flex items-center justify-between p-4">
-                <div>
-                  <p className="text-base font-bold">{tx.category}</p>
-                  <p className="text-sm font-medium text-muted-foreground mt-0.5">
-                    {tx.counterparty ?? "—"} ·{" "}
-                    {formatDate(tx.occurredAt)}
-                  </p>
+                <div className="flex items-center gap-3">
+                  <div className={`p-2.5 rounded-full ${tx.type === 'income' ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}>
+                    {tx.type === 'income' ? <TrendingUp className="w-4 h-4" strokeWidth={2.5}/> : <TrendingDown className="w-4 h-4" strokeWidth={2.5}/>}
+                  </div>
+                  <div>
+                    <p className="text-base font-bold text-foreground">{tx.category}</p>
+                    <p className="text-xs font-medium text-muted-foreground mt-0.5">
+                      {tx.counterparty ?? "—"} ·{" "}
+                      {formatDate(tx.occurredAt)}
+                    </p>
+                  </div>
                 </div>
                 <p
-                  className={`text-lg font-black tracking-tight ${
+                  className={`text-lg font-bold tracking-tight ${
                     tx.type === "income"
                       ? "text-success"
                       : "text-destructive"

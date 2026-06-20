@@ -78,8 +78,8 @@ export function AppShell({
         </Link>
       )}
 
-      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t-2 border-border bg-card shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
-        <div className="mx-auto flex h-16 max-w-lg items-center justify-around px-2 pb-1">
+      <nav className="fixed bottom-4 left-4 right-4 z-40 mx-auto max-w-lg">
+        <div className="flex h-16 items-center justify-around rounded-2xl border border-white/40 bg-white/80 px-2 pb-1 shadow-xl shadow-slate-200/50 backdrop-blur-xl">
           {navItems.map(({ href, label, icon: Icon }) => {
             const active = pathname.startsWith(href) && (href !== "/dashboard" || pathname === "/dashboard");
             const isUpload = href === "/upload";
@@ -88,16 +88,16 @@ export function AppShell({
                 key={href}
                 href={href}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-1 rounded-xl min-w-[64px] h-full transition-all",
+                  "flex flex-col items-center justify-center gap-1 rounded-xl min-w-[64px] h-full transition-all duration-300",
                   isUpload 
-                    ? "bg-primary text-primary-foreground shadow-lg -translate-y-4 h-16 w-16 rounded-full border-4 border-background hover:bg-primary/90" 
+                    ? "bg-gradient-to-br from-blue-400 to-primary text-primary-foreground shadow-lg shadow-primary/30 -translate-y-5 h-16 w-16 rounded-full border-[3px] border-background hover:scale-105 active:scale-95" 
                     : active
-                      ? "text-primary font-bold"
-                      : "text-muted-foreground hover:text-foreground font-medium"
+                      ? "text-primary font-bold -translate-y-1"
+                      : "text-slate-400 hover:text-primary font-medium hover:-translate-y-0.5"
                 )}
               >
-                <Icon className={cn("h-6 w-6", isUpload ? "h-7 w-7" : "")} strokeWidth={active || isUpload ? 2.5 : 2} />
-                {!isUpload && <span className="text-[11px] leading-none">{label}</span>}
+                <Icon className={cn("h-6 w-6 transition-all duration-300", isUpload ? "h-7 w-7 text-white" : "", active && !isUpload ? "drop-shadow-sm" : "")} strokeWidth={active || isUpload ? 2.5 : 2} />
+                {!isUpload && <span className={cn("text-[10px] leading-none transition-all duration-300", active ? "opacity-100 font-bold" : "opacity-80")}>{label}</span>}
               </Link>
             );
           })}
