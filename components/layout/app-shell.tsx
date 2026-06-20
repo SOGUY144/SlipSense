@@ -44,8 +44,15 @@ export function AppShell({
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
+    <div className="min-h-screen bg-slate-50 relative overflow-hidden">
+      {/* Premium Ambient Background */}
+      <div className="absolute top-0 left-0 w-full h-full -z-10 pointer-events-none">
+        <div className="absolute top-[-5%] left-[-10%] w-[50%] h-[30%] rounded-full bg-blue-400/20 blur-[100px]"></div>
+        <div className="absolute top-[15%] right-[-5%] w-[40%] h-[40%] rounded-full bg-indigo-400/10 blur-[100px]"></div>
+        <div className="absolute bottom-[20%] left-[10%] w-[30%] h-[30%] rounded-full bg-blue-300/10 blur-[100px]"></div>
+      </div>
+
+      <header className="sticky top-0 z-40 border-b border-white/40 bg-white/70 backdrop-blur-md supports-[backdrop-filter]:bg-white/60">
         <div className="mx-auto flex h-14 max-w-lg items-center justify-between px-4">
           <div>
             <p className="text-xs text-muted-foreground">SlipSense</p>
