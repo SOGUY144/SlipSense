@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Camera, TrendingUp, TrendingDown, Wallet, Loader2, Sparkles, Bell, Calendar, ChevronRight } from "lucide-react";
+import { Camera, TrendingUp, TrendingDown, Wallet, Loader2, Sparkles, Bell, Calendar, ChevronRight, PartyPopper } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -263,7 +263,7 @@ export default function DashboardPage() {
           ) : (
             <div className="p-6 flex flex-col items-center justify-center text-center bg-gradient-to-br from-success/15 via-success/5 to-transparent">
               <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-sm mb-3 border border-success/10 animate-bounce" style={{ animationDuration: '3s' }}>
-                <span className="text-3xl">🎉</span>
+                <PartyPopper className="w-7 h-7 text-success" strokeWidth={2} />
               </div>
               <p className="text-sm font-bold text-success-foreground">ไม่มีบิลใกล้ถึงกำหนด</p>
               <p className="text-xs font-medium text-muted-foreground mt-1">พักผ่อนให้เต็มที่ เดือนนี้เคลียร์ครบแล้ว!</p>
