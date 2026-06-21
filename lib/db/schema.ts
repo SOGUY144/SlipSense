@@ -98,7 +98,8 @@ export const transactions = pgTable("transactions", {
   category: text("category").notNull(),
   amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
   occurredAt: timestamp("occurred_at", { withTimezone: true }).notNull(),
-  counterparty: text("counterparty"),
+  sender: text("sender"),
+  receiver: text("receiver"),
   note: text("note"),
   confidence: confidenceEnum("confidence"),
   createdAt: timestamp("created_at", { withTimezone: true })

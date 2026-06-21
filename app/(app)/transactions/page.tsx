@@ -101,7 +101,7 @@ export default function TransactionsPage() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium">{tx.category}</p>
                   <p className="text-xs text-muted-foreground truncate">
-                    {tx.counterparty ?? "—"} · {formatDate(tx.occurredAt)}
+                    {(tx.type === "income" ? tx.sender : tx.receiver) ?? "—"} · {formatDate(tx.occurredAt)}
                   </p>
                   {tx.note && (
                     <p className="text-xs text-muted-foreground truncate">

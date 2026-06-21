@@ -22,8 +22,11 @@ export async function PATCH(
         ...(parsed.category && { category: parsed.category }),
         ...(parsed.amount && { amount: parsed.amount.toString() }),
         ...(parsed.occurredAt && { occurredAt: new Date(parsed.occurredAt) }),
-        ...(parsed.counterparty !== undefined && {
-          counterparty: parsed.counterparty,
+        ...(parsed.sender !== undefined && {
+          sender: parsed.sender,
+        }),
+        ...(parsed.receiver !== undefined && {
+          receiver: parsed.receiver,
         }),
         ...(parsed.note !== undefined && { note: parsed.note }),
         ...(parsed.confidence && { confidence: parsed.confidence }),

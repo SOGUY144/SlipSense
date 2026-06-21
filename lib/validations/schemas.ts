@@ -5,7 +5,8 @@ export const confidenceSchema = z.enum(["high", "medium", "low"]);
 export const fieldConfidenceSchema = z.object({
   amount: confidenceSchema.optional(),
   occurredAt: confidenceSchema.optional(),
-  counterparty: confidenceSchema.optional(),
+  sender: confidenceSchema.optional(),
+  receiver: confidenceSchema.optional(),
   note: confidenceSchema.optional(),
   type: confidenceSchema.optional(),
   category: confidenceSchema.optional(),
@@ -14,7 +15,8 @@ export const fieldConfidenceSchema = z.object({
 export const extractedSlipSchema = z.object({
   amount: z.number().positive(),
   occurredAt: z.string(),
-  counterparty: z.string().optional(),
+  sender: z.string().optional(),
+  receiver: z.string().optional(),
   note: z.string().optional(),
   type: z.enum(["income", "expense"]),
   category: z.string(),
@@ -31,7 +33,8 @@ export const transactionSchema = z.object({
   category: z.string().min(1, "กรุณาเลือกหมวดหมู่"),
   amount: z.number({ invalid_type_error: "กรุณากรอกตัวเลข" }).positive("กรุณากรอกจำนวนเงินให้มากกว่า 0"),
   occurredAt: z.string(),
-  counterparty: z.string().optional(),
+  sender: z.string().optional(),
+  receiver: z.string().optional(),
   note: z.string().optional(),
   confidence: confidenceSchema.optional(),
 });

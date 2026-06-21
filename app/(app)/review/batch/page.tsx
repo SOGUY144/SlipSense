@@ -26,7 +26,8 @@ interface BatchItem {
   amount: number;
   occurredAt: string;
   confidence?: string;
-  counterparty?: string;
+  sender?: string;
+  receiver?: string;
   note?: string;
   fieldConfidence?: any;
 }
@@ -92,7 +93,8 @@ export default function BatchReviewPage() {
             amount: ex.amount || 0,
             occurredAt: safeParseDate(ex.occurredAt) || new Date().toISOString(),
             confidence: ex.overallConfidence,
-            counterparty: ex.counterparty || "",
+            sender: ex.sender || "",
+            receiver: ex.receiver || "",
             note: ex.note || "",
             fieldConfidence: ex.fieldConfidence || {},
           };
@@ -269,14 +271,24 @@ export default function BatchReviewPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label>ผู้โอน / ผู้รับเงิน</Label>
-                    <ConfidenceBadge level={items[detailedIndex].fieldConfidence?.counterparty} />
-                  </div>
+                  <Label className="flex items-center gap-2">
+                    <span>ผู้โอน</span>
+                    <ConfidenceBadge level={items[detailedIndex].fieldConfidence?.sender} />
+                  </Label>
                   <Input
-                    value={items[detailedIndex].counterparty || ""}
-                    onChange={(e) => updateItem(detailedIndex, "counterparty", e.target.value)}
-                    placeholder="ชื่อผู้โอน หรือ ผู้รับเงิน"
+                    value={items[detailedIndex].sender || ""}
+                    onChange={(e) => updateItem(detailedIndex, "sender", e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <span>ผู้รับเงิน</span>
+                    <ConfidenceBadge level={items[detailedIndex].fieldConfidence?.receiver} />
+                  </Label>
+                  <Input
+                    value={items[detailedIndex].receiver || ""}
+                    onChange={(e) => updateItem(detailedIndex, "receiver", e.target.value)}
                   />
                 </div>
 

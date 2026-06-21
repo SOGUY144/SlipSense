@@ -189,7 +189,16 @@ export function TransactionForm({
               className={cn("h-14 text-base font-medium border-2", form.formState.errors.occurredAt ? "border-destructive" : "border-border/60")}
               value={
                 form.watch("occurredAt")
-                  ? new Date(form.watch("occurredAt")).toISOString().slice(0, 16)
+                  ? (() => {
+                      try {
+                        const d = new Date(form.watch("occurredAt"));
+                        if (isNaN(d.getTime())) return "";
+                        const pad = (n: number) => n.toString().padStart(2, '0');
+                        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+                      } catch {
+                        return "";
+                      }
+                    })()
                   : ""
               }
               onChange={(e) => {
@@ -206,14 +215,27 @@ export function TransactionForm({
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="counterparty" className="text-base font-bold">ผู้โอน/ผู้รับ</Label>
-              {showConfidence && <ConfidenceBadge level={fieldConfidence.counterparty} />}
+              <Label htmlFor="sender" className="text-base font-bold">ผู้โอน (จาก)</Label>
+              {showConfidence && <ConfidenceBadge level={fieldConfidence.sender} />}
             </div>
             <Input 
-              id="counterparty" 
+              id="sender" 
               placeholder="ถ้ามี" 
               className="h-14 text-base font-medium border-2 border-border/60"
-              {...form.register("counterparty")} 
+              {...form.register("sender")} 
+            />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="receiver" className="text-base font-bold">ผู้รับเงิน (ไปยัง)</Label>
+              {showConfidence && <ConfidenceBadge level={fieldConfidence.receiver} />}
+            </div>
+            <Input 
+              id="receiver" 
+              placeholder="ถ้ามี" 
+              className="h-14 text-base font-medium border-2 border-border/60"
+              {...form.register("receiver")} 
             />
           </div>
 

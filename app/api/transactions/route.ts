@@ -53,7 +53,8 @@ export async function POST(request: Request) {
         category: parsed.category,
         amount: parsed.amount.toString(),
         occurredAt: new Date(parsed.occurredAt),
-        counterparty: parsed.counterparty ?? null,
+        sender: parsed.sender ?? null,
+        receiver: parsed.receiver ?? null,
         note: parsed.note ?? null,
         confidence: parsed.confidence ?? null,
       })

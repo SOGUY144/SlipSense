@@ -106,7 +106,7 @@ export default function ReportPage() {
                 <tr key={tx.id} className={`border-b border-gray-100 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
                   <td className="p-3 text-gray-600">{formatDate(tx.occurredAt)}</td>
                   <td className="p-3 font-medium">{tx.category}</td>
-                  <td className="p-3 text-gray-600 truncate max-w-[150px]">{tx.counterparty || '-'}</td>
+                  <td className="p-3 text-gray-600 truncate max-w-[150px]">{tx.type === "income" ? tx.sender || '-' : tx.receiver || '-'}</td>
                   <td className={`p-3 text-right font-bold ${tx.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
                     {tx.type === 'income' ? '+' : '-'}{formatCurrency(parseFloat(tx.amount))}
                   </td>

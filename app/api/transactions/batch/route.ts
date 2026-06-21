@@ -33,7 +33,8 @@ export async function POST(request: Request) {
       category: t.category,
       amount: t.amount.toString(),
       occurredAt: new Date(t.occurredAt),
-      counterparty: t.counterparty ?? null,
+      sender: t.sender ?? null,
+      receiver: t.receiver ?? null,
       note: t.note ?? null,
       confidence: t.confidence ?? null,
     }));

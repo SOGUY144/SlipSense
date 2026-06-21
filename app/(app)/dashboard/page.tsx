@@ -352,11 +352,11 @@ export default function DashboardPage() {
                     {tx.type === 'income' ? <TrendingUp className="w-4 h-4" strokeWidth={2.5}/> : <TrendingDown className="w-4 h-4" strokeWidth={2.5}/>}
                   </div>
                   <div>
-                    <p className="text-base font-bold text-foreground">{tx.category}</p>
-                    <p className="text-xs font-medium text-muted-foreground mt-0.5">
-                      {tx.counterparty ?? "—"} ·{" "}
-                      {formatDate(tx.occurredAt)}
-                    </p>
+                      <div className="text-sm font-medium">{tx.category}</div>
+                      <div className="text-xs text-slate-500">
+                        {(tx.type === "income" ? tx.sender : tx.receiver) ?? "—"} ·{" "}
+                        {formatDate(tx.occurredAt)}
+                      </div>
                   </div>
                 </div>
                 <p

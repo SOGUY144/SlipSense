@@ -94,7 +94,8 @@ export default function ReviewPage({
           category: extracted.category,
           amount: extracted.amount,
           occurredAt: extracted.occurredAt,
-          counterparty: extracted.counterparty ?? "",
+          sender: extracted.sender ?? "",
+          receiver: extracted.receiver ?? "",
           note: extracted.note ?? "",
           confidence: extracted.overallConfidence,
         });

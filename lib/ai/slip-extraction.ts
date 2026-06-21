@@ -20,17 +20,20 @@ export function buildSlipExtractionPrompt(categories: {type: string, name: strin
 1. การแยกแยะประเภท:
    - ถ้าเป็น "สลิปโอนเงินเข้า" = income
    - ถ้าเป็น "สลิปโอนเงินออก" หรือ "ใบเสร็จ/บิลซื้อของ" = expense
-2. กรณีเป็น ใบเสร็จ/บิลซื้อของ (Receipt/Bill):
-   - ให้ดึง "ชื่อร้านค้า/ซัพพลายเออร์" ไปใส่ในช่อง counterparty
+2. กรณีเป็น สลิปโอนเงินเข้า/ออก (Bank Slip):
+   - ดึง "ชื่อผู้โอน / จาก" (Sender) ไปใส่ในช่อง sender
+   - ดึง "ชื่อผู้รับเงิน / ไปยัง" (Receiver) ไปใส่ในช่อง receiver
+3. กรณีเป็น ใบเสร็จ/บิลซื้อของ (Receipt/Bill):
+   - ดึง "ชื่อร้านค้า/ซัพพลายเออร์" ไปใส่ในช่อง receiver (เพราะเราเป็นคนจ่าย) และให้ sender ว่างไว้
    - ยอดรวมทั้งหมด (Total/Grand Total) ไปใส่ในช่อง amount
    - หมวดหมู่ (category): หากบิลมีสินค้าหลายหมวดปนกัน ให้ประเมินว่าสินค้าหมวดใดมีมูลค่ารวมสูงที่สุดในบิลนั้น แล้วจัดบิลเข้าหมวดหมู่นั้น หากก้ำกึ่งแยกยากให้จัดเข้า "ค่าใช้จ่ายอื่นๆ"
    - ให้ดึงรายการสินค้าหลักๆ 1-3 รายการแรก (พร้อมจำนวนและราคา) ไปสรุปไว้ในช่อง note อัตโนมัติ (เช่น "เนื้อหมู 500฿, ผักสด 200฿")
-3. การอ่านวันที่ (สำคัญมาก):
-   - วันที่และเวลา (occurredAt) ให้ดึงจากภาพโดยตรงและแปลงเป็นรูปแบบ YYYY-MM-DDThh:mm:ss เท่านั้น (ไม่ต้องเติม Z ต่อท้าย)
+4. การอ่านวันที่ (สำคัญมาก):
+   - วันที่และเวลา (occurredAt) ให้ดึงจากภาพโดยตรงและแปลงเป็นรูปแบบ YYYY-MM-DDThh:mm:ss เท่านั้น (ไม่ต้องเติม Z ต่อท้าย และห้ามแปลง Timezone เด็ดขาด)
    - แปลงเดือนภาษาไทยให้ถูกต้อง (ม.ค.=01, ... ธ.ค.=12)
    - ปี พ.ศ. ให้ลบด้วย 543 เพื่อเป็นปี ค.ศ.
-   - ตัวอย่าง: "07 มิ.ย. 2569 - 19:04" ต้องส่งค่าเป็น "2026-06-07T19:04:00" เท่านั้น
-4. ถ้าอ่านส่วนใดไม่ชัด ให้ confidence ของฟิลด์นั้นต่ำและเดาอย่างสมเหตุสมผล`;
+   - ตัวอย่าง: "07 มิ.ย. 2569 - 19:04" ต้องส่งค่าเป็น "2026-06-07T19:04:00" เท่านั้น (ห้ามแปลง 19:04 เป็น 12:04 หรืออะไรทั้งสิ้น)
+5. ถ้าอ่านส่วนใดไม่ชัด ให้ confidence ของฟิลด์นั้นต่ำและเดาอย่างสมเหตุสมผล`;
 }
 
 export interface FinancialFacts {
@@ -107,7 +110,8 @@ async function callWithRetry<T>(
 const aiSlipSchema = z.object({
   amount: z.number(),
   occurredAt: z.string(),
-  counterparty: z.string().nullable(),
+  sender: z.string().nullable(),
+  receiver: z.string().nullable(),
   note: z.string().nullable(),
   type: z.enum(["income", "expense"]),
   category: z.string(),
@@ -116,7 +120,8 @@ const aiSlipSchema = z.object({
   fieldConfidence: z.object({
     amount: z.enum(["high", "medium", "low"]).nullable(),
     occurredAt: z.enum(["high", "medium", "low"]).nullable(),
-    counterparty: z.enum(["high", "medium", "low"]).nullable(),
+    sender: z.enum(["high", "medium", "low"]).nullable(),
+    receiver: z.enum(["high", "medium", "low"]).nullable(),
     note: z.enum(["high", "medium", "low"]).nullable(),
     type: z.enum(["high", "medium", "low"]).nullable(),
     category: z.enum(["high", "medium", "low"]).nullable(),
@@ -148,14 +153,16 @@ export async function extractSlipData(
       occurredAt: object.occurredAt,
       type: object.type,
       category: object.category,
-      counterparty: object.counterparty || undefined,
+      sender: object.sender || undefined,
+      receiver: object.receiver || undefined,
       note: object.note || undefined,
       bank: object.bank || undefined,
       overallConfidence: object.overallConfidence,
       fieldConfidence: object.fieldConfidence ? {
         amount: object.fieldConfidence.amount || undefined,
         occurredAt: object.fieldConfidence.occurredAt || undefined,
-        counterparty: object.fieldConfidence.counterparty || undefined,
+        sender: object.fieldConfidence.sender || undefined,
+        receiver: object.fieldConfidence.receiver || undefined,
         note: object.fieldConfidence.note || undefined,
         type: object.fieldConfidence.type || undefined,
         category: object.fieldConfidence.category || undefined,

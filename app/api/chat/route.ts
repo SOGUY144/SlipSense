@@ -26,7 +26,7 @@ export async function POST(req: Request) {
             dateStyle: "short",
           }).format(t.occurredAt);
           const typeStr = t.type === "income" ? "รายรับ" : "รายจ่าย";
-          return `- ${date} | ${typeStr} | ${t.category} | ${t.amount} บาท | รายละเอียด: ${t.counterparty || "-"} / ${t.note || "-"}`;
+          return `- ${date} | ${typeStr} | ${t.category} | ${t.amount} บาท | รายละเอียด: โอนจาก ${t.sender || "-"} ไปยัง ${t.receiver || "-"} / หมายเหตุ: ${t.note || "-"}`;
         })
         .join("\n");
     }
