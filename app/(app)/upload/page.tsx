@@ -31,6 +31,7 @@ interface UploadResult {
 export default function UploadPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
   const [mode, setMode] = useState<"scan" | "manual">("scan");
   const [results, setResults] = useState<UploadResult[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -237,10 +238,18 @@ export default function UploadPage() {
         className="hidden"
         onChange={handleFileChange}
       />
+      <input
+        ref={galleryInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        multiple
+        className="hidden"
+        onChange={handleFileChange}
+      />
 
       <Card
         className="cursor-pointer border-dashed border-4 border-primary/30 bg-primary/5 hover:border-primary/60 hover:bg-primary/10 hover:-translate-y-1 hover:shadow-md transition-all duration-300 rounded-2xl"
-        onClick={() => !isWorking && fileInputRef.current?.click()}
+        onClick={() => !isWorking && galleryInputRef.current?.click()}
       >
         <CardContent className="flex flex-col items-center gap-6 py-16">
           <div className="rounded-full bg-primary/20 p-6">
@@ -267,7 +276,7 @@ export default function UploadPage() {
         <Button
           variant="outline"
           className="flex-1 gap-3 h-16 text-lg rounded-xl border-2 border-primary/30 text-primary font-bold hover:bg-primary/10 hover:scale-[1.02] active:scale-95 transition-all shadow-sm"
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => galleryInputRef.current?.click()}
           disabled={isWorking}
         >
           <Upload className="h-6 w-6" strokeWidth={2.5} />
