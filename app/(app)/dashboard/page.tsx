@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Camera, TrendingUp, TrendingDown, Wallet, Loader2, Sparkles, Bell, Calendar, ChevronRight, CheckCircle2 } from "lucide-react";
+import { Camera, TrendingUp, TrendingDown, Wallet, Loader2, Sparkles, Bell, Calendar, ChevronRight, CheckCircle2, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -178,7 +178,7 @@ export default function DashboardPage() {
       </div>
 
       <Card className="border-none shadow-sm bg-white overflow-hidden rounded-2xl">
-        <div className="p-4 flex items-center justify-between">
+        <div className="p-4 pb-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="p-1.5 bg-primary/10 rounded-md text-primary">
               <Calendar className="w-4 h-4" />
@@ -193,6 +193,14 @@ export default function DashboardPage() {
             <ChevronRight className="w-3 h-3" />
           </Link>
         </div>
+        {alerts.length > 0 && (
+          <div className="px-4 pb-3">
+            <p className="text-[10px] text-muted-foreground flex items-center gap-1.5 bg-primary/5 p-2 rounded-md">
+              <Info className="w-3 h-3 text-primary shrink-0" /> 
+              <span>ถ้าจ่ายแล้วให้กด <strong>"จ่ายแล้ว"</strong> เพื่อบันทึกการชำระเงิน</span>
+            </p>
+          </div>
+        )}
         
         <CardContent className="p-0">
           {alerts.length > 0 ? (
@@ -238,7 +246,7 @@ export default function DashboardPage() {
                       <Button 
                         size="sm" 
                         variant={isOverdue ? "destructive" : isDueSoon ? "default" : "outline"}
-                        className="h-7 text-[11px] px-3 rounded-full font-medium"
+                        className="h-7 text-[10px] px-2.5 rounded-full font-bold"
                         onClick={async () => {
                           const now = new Date();
                           const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -252,8 +260,8 @@ export default function DashboardPage() {
                           }
                         }}
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 mr-1"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        มาร์คว่าจ่ายแล้ว
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 mr-1"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        จ่ายแล้ว
                       </Button>
                     </div>
                   </div>
