@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
-import { Loader2, Plus, ArrowLeft, Calendar, Trash2, Edit } from "lucide-react";
+import { Loader2, Plus, ArrowLeft, Calendar, Trash2, Edit, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -32,6 +32,7 @@ export default function RemindersPage() {
   const [alerts, setAlerts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showPaidSuccess, setShowPaidSuccess] = useState(false);
   
   // Edit Dialog State
   const [isEditing, setIsEditing] = useState(false);
@@ -200,6 +201,10 @@ export default function RemindersPage() {
                               });
                               if (res.ok) {
                                 load(); // Reload to update states
+                                if (!isManuallyPaid) {
+                                  setShowPaidSuccess(true);
+                                  setTimeout(() => setShowPaidSuccess(false), 2000);
+                                }
                               }
                             }}
                             className={`text-xs px-2.5 py-1 rounded-md border flex items-center gap-1.5 transition-colors ${
@@ -285,6 +290,18 @@ export default function RemindersPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Paid Success Overlay */}
+      {showPaidSuccess && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl p-6 flex flex-col items-center gap-4 shadow-2xl animate-in zoom-in-95 duration-200 min-w-[200px]">
+            <div className="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center">
+              <CheckCircle2 className="w-8 h-8 text-success" strokeWidth={3} />
+            </div>
+            <p className="font-bold text-lg text-foreground">บันทึกจ่ายบิลสำเร็จ</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

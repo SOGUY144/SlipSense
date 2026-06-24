@@ -42,6 +42,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [generatingInsights, setGeneratingInsights] = useState(false);
   const [behaviorModalDone, setBehaviorModalDone] = useState(false);
+  const [showPaidSuccess, setShowPaidSuccess] = useState(false);
 
   async function load() {
     const [summaryRes, insightsRes, alertsRes] = await Promise.all([
@@ -257,6 +258,8 @@ export default function DashboardPage() {
                           });
                           if (res.ok) {
                             load();
+                            setShowPaidSuccess(true);
+                            setTimeout(() => setShowPaidSuccess(false), 2000);
                           }
                         }}
                       >
@@ -382,6 +385,18 @@ export default function DashboardPage() {
           ))
         )}
       </div>
+
+      {/* Paid Success Overlay */}
+      {showPaidSuccess && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl p-6 flex flex-col items-center gap-4 shadow-2xl animate-in zoom-in-95 duration-200 min-w-[200px]">
+            <div className="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center">
+              <CheckCircle2 className="w-8 h-8 text-success" strokeWidth={3} />
+            </div>
+            <p className="font-bold text-lg text-foreground">บันทึกจ่ายบิลสำเร็จ</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
