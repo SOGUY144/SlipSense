@@ -237,7 +237,7 @@ export default function DashboardPage() {
                       )}
                       <Button 
                         size="sm" 
-                        variant={isOverdue ? "destructive" : isDueSoon ? "default" : "outline"}
+                        variant={isOverdue ? "destructive" : isDueSoon ? "default" : "secondary"}
                         className="h-7 text-[10px] px-2.5 rounded-full font-bold"
                         onClick={async () => {
                           const now = new Date();
@@ -253,7 +253,7 @@ export default function DashboardPage() {
                         }}
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 mr-1"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        กดเมื่อจ่ายแล้ว
+                        มาร์คว่าจ่ายแล้ว
                       </Button>
                     </div>
                   </div>
