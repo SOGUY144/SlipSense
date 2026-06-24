@@ -253,6 +253,7 @@ export default function DashboardPage() {
                         variant={isOverdue ? "destructive" : isDueSoon ? "default" : "outline"}
                         className="h-7 text-[10px] px-2.5 rounded-full font-bold"
                         onClick={async () => {
+                          triggerHaptic('light');
                           const now = new Date();
                           const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
                           const res = await fetch("/api/reminders/paid", {

@@ -201,6 +201,7 @@ export default function RemindersPage() {
                         <div className="mt-3 flex items-center gap-2">
                           <button
                             onClick={async () => {
+                              triggerHaptic('light');
                               const newPaidMonth = isManuallyPaid ? null : currentMonthStr;
                               const res = await fetch("/api/reminders/paid", {
                                 method: "POST",
