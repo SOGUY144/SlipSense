@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Upload, Camera, Loader2, CheckCircle, XCircle } from "lucide-react";
+import { triggerHaptic } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -100,6 +101,7 @@ export default function UploadPage() {
         if (status === "done") {
           setResults((prev) => prev.map((r, i) => (i === index ? { ...r, status: "done" } : r)));
           clearInterval(interval);
+          triggerHaptic('success');
         } else if (status === "failed") {
           setResults((prev) => prev.map((r, i) => (i === index ? { ...r, status: "error", error: data.job.errorMessage || "ประมวลผลไม่สำเร็จ" } : r)));
           clearInterval(interval);

@@ -9,10 +9,11 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatCurrency, formatDate, formatPercent } from "@/lib/utils";
+import { formatCurrency, formatDate, formatPercent, triggerHaptic } from "@/lib/utils";
 import type { Transaction } from "@/lib/db/schema";
 import { OnboardingReminders } from "@/components/reminders/onboarding-reminders";
 import { SpendingBehaviorModal } from "@/components/onboarding/spending-behavior-modal";
+import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 
 interface Summary {
   shopName: string;
@@ -92,9 +93,12 @@ export default function DashboardPage() {
   const incomePct = totalFlow > 0 ? ((summary?.current.income ?? 0) / totalFlow) * 100 : 50;
   const expensePct = totalFlow > 0 ? ((summary?.current.expense ?? 0) / totalFlow) * 100 : 50;
 
+  const isEmptyState = summary?.current.income === 0 && summary?.current.expense === 0 && (!summary?.recentTransactions || summary.recentTransactions.length === 0);
+
   return (
-    <div className="space-y-6">
-      {behaviorModalDone && <OnboardingReminders onComplete={load} />}
+    <PullToRefresh onRefresh={load}>
+      <div className="space-y-6 pb-20">
+        {behaviorModalDone && <OnboardingReminders onComplete={load} />}
       <SpendingBehaviorModal onComplete={load} onSkipOrDone={() => setBehaviorModalDone(true)} />
       
       <div className="flex items-center justify-between">
@@ -259,6 +263,7 @@ export default function DashboardPage() {
                           if (res.ok) {
                             load();
                             setShowPaidSuccess(true);
+                            triggerHaptic('success');
                             setTimeout(() => setShowPaidSuccess(false), 2000);
                           }
                         }}
@@ -398,5 +403,6 @@ export default function DashboardPage() {
         </div>
       )}
     </div>
+    </PullToRefresh>
   );
 }

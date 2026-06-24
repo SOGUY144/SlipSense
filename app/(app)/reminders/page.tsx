@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, triggerHaptic } from "@/lib/utils";
 import { Loader2, Plus, ArrowLeft, Calendar, Trash2, Edit, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import {
   Card,
   CardContent,
@@ -44,7 +45,7 @@ export default function RemindersPage() {
   }, []);
 
   async function load() {
-    setLoading(true);
+    if (reminders.length === 0) setLoading(true);
     try {
       const [res, alertsRes] = await Promise.all([
         fetch("/api/reminders"),
@@ -131,24 +132,31 @@ export default function RemindersPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        <p className="text-muted-foreground">กำลังโหลด...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-2">
-        <Link href="/dashboard">
-          <Button variant="ghost" size="icon" className="h-8 w-8 -ml-2">
-            <ArrowLeft className="h-4 w-4" />
+    <PullToRefresh onRefresh={load}>
+      <div className="space-y-6 pb-20">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Link href="/dashboard">
+              <Button variant="ghost" size="icon" className="h-8 w-8 -ml-2">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-xl font-bold">บิลประจำเดือน 📅</h1>
+              <p className="text-sm text-muted-foreground">รายการที่ต้องจ่ายเพื่อกันลืม</p>
+            </div>
+          </div>
+          <Button onClick={() => openEdit()} size="sm" className="gap-2">
+            <Plus className="h-4 w-4" />
+            เพิ่มบิล
           </Button>
-        </Link>
-        <div>
-          <h1 className="text-xl font-bold">บิลประจำเดือน 📅</h1>
-          <p className="text-sm text-muted-foreground">รายการที่ต้องจ่ายเพื่อกันลืม</p>
         </div>
-      </div>
 
       <div className="space-y-3">
         {reminders.length === 0 ? (
@@ -203,6 +211,7 @@ export default function RemindersPage() {
                                 load(); // Reload to update states
                                 if (!isManuallyPaid) {
                                   setShowPaidSuccess(true);
+                                  triggerHaptic('success');
                                   setTimeout(() => setShowPaidSuccess(false), 2000);
                                 }
                               }
@@ -233,9 +242,6 @@ export default function RemindersPage() {
                 </Card>
               );
             })}
-            <Button variant="outline" className="w-full mt-4 border-dashed" onClick={() => openEdit()}>
-              <Plus className="h-4 w-4 mr-2" /> เพิ่มบิลใหม่
-            </Button>
           </>
         )}
       </div>
@@ -291,17 +297,18 @@ export default function RemindersPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Paid Success Overlay */}
+      {/* Success Popup Overlay */}
       {showPaidSuccess && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl p-6 flex flex-col items-center gap-4 shadow-2xl animate-in zoom-in-95 duration-200 min-w-[200px]">
-            <div className="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center">
-              <CheckCircle2 className="w-8 h-8 text-success" strokeWidth={3} />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl p-8 flex flex-col items-center justify-center gap-4 shadow-2xl animate-in zoom-in-95 duration-200 scale-110">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-2">
+              <CheckCircle2 className="w-12 h-12 text-green-500" strokeWidth={3} />
             </div>
-            <p className="font-bold text-lg text-foreground">บันทึกจ่ายบิลสำเร็จ</p>
+            <h2 className="text-2xl font-bold text-slate-800">บันทึกจ่ายบิลสำเร็จ</h2>
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </PullToRefresh>
   );
 }
