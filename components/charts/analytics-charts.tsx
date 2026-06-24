@@ -19,7 +19,7 @@ import {
   Legend,
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
-import { TrendingUp, Wallet, Receipt, PieChart as PieIcon, CalendarDays, BarChart4, X } from "lucide-react";
+import { TrendingUp, Wallet, Receipt, PieChart as PieIcon, CalendarDays, BarChart4, X, Info } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const COLORS = [
@@ -321,6 +321,12 @@ export function AnalyticsCharts({
                 <h2 className="text-base font-bold">วันขายดี (รวม 6 เดือน)</h2>
                 <p className="text-xs text-muted-foreground">รายรับรวมตามวันในสัปดาห์</p>
               </div>
+            </div>
+            <div className="px-5 pt-3 -mb-2">
+              <p className="text-[10px] text-muted-foreground flex items-center gap-1.5 bg-primary/5 p-2 rounded-md">
+                <Info className="w-3 h-3 text-primary shrink-0" /> 
+                <span>กดที่แท่งกราฟเพื่อดู <strong>รายละเอียด</strong> ของแต่ละวันได้เลย</span>
+              </p>
             </div>
             <div className="p-5">
               <div className="h-[280px] w-full">
