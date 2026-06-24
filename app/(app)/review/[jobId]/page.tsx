@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
+import { CheckCircle2 } from "lucide-react";
+import { triggerHaptic } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,6 +58,7 @@ export default function ReviewPage({
   const [imageUrl, setImageUrl] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [fieldConfidence, setFieldConfidence] = useState<
     Record<string, string>
   >({});
@@ -121,16 +124,20 @@ export default function ReviewPage({
         throw new Error(errorData?.error || "บันทึกไม่สำเร็จ");
       }
 
-      if (nextJobs.length > 0) {
-        const nextId = nextJobs[0];
-        const remaining = nextJobs.slice(1).join(",");
-        router.push(`/review/${nextId}${remaining ? `?next=${remaining}` : ""}`);
-      } else {
-        router.push("/dashboard");
-      }
+      triggerHaptic('success');
+      setShowSuccess(true);
+      
+      setTimeout(() => {
+        if (nextJobs.length > 0) {
+          const nextId = nextJobs[0];
+          const remaining = nextJobs.slice(1).join(",");
+          router.push(`/review/${nextId}${remaining ? `?next=${remaining}` : ""}`);
+        } else {
+          router.push("/dashboard");
+        }
+      }, 1500);
     } catch (error: any) {
       alert(error.message || "เกิดข้อผิดพลาดในการบันทึก กรุณาลองใหม่");
-    } finally {
       setSaving(false);
     }
   }
@@ -182,6 +189,18 @@ export default function ReviewPage({
         title="ข้อมูลที่ AI อ่านได้"
         showConfidence={true}
       />
+
+      {/* Success Overlay */}
+      {showSuccess && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl p-6 flex flex-col items-center gap-4 shadow-2xl animate-in zoom-in-95 duration-200 min-w-[200px]">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+              <CheckCircle2 className="w-8 h-8 text-green-600" strokeWidth={3} />
+            </div>
+            <p className="font-bold text-lg text-foreground">บันทึกสำเร็จ</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

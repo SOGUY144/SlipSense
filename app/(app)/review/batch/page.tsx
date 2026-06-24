@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from "@/lib/validations/schemas";
-import { Loader2, Maximize2, X } from "lucide-react";
+import { Loader2, Maximize2, X, CheckCircle2 } from "lucide-react";
 
 interface BatchItem {
   slipJobId: string;
@@ -52,6 +52,7 @@ export default function BatchReviewPage() {
   const [items, setItems] = useState<BatchItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [detailedIndex, setDetailedIndex] = useState<number | null>(null);
@@ -132,7 +133,9 @@ export default function BatchReviewPage() {
         body: JSON.stringify({ transactions: items }),
       });
       if (!res.ok) throw new Error("Save failed");
-      router.push("/dashboard");
+      triggerHaptic('success');
+      setShowSuccess(true);
+      setTimeout(() => router.push("/dashboard"), 1500);
     } catch (err) {
       alert("บันทึกข้อมูลไม่สำเร็จ");
       setSaving(false);
@@ -447,6 +450,18 @@ export default function BatchReviewPage() {
           </Button>
         </div>
       </div>
+
+      {/* Success Overlay */}
+      {showSuccess && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl p-6 flex flex-col items-center gap-4 shadow-2xl animate-in zoom-in-95 duration-200 min-w-[200px]">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+              <CheckCircle2 className="w-8 h-8 text-green-600" strokeWidth={3} />
+            </div>
+            <p className="font-bold text-lg text-foreground">บันทึกสำเร็จ</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

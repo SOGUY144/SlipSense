@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Upload, Camera, Loader2, CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle2, Upload, Camera, Loader2, CheckCircle, XCircle } from "lucide-react";
 import { triggerHaptic } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,6 +37,7 @@ export default function UploadPage() {
   const [uploading, setUploading] = useState(false);
   const [savingBatch, setSavingBatch] = useState(false);
   const [savingManual, setSavingManual] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(transactionSchema),
@@ -62,10 +63,11 @@ export default function UploadPage() {
         throw new Error(errorData?.error || "บันทึกไม่สำเร็จ");
       }
 
-      router.push("/dashboard");
+      triggerHaptic('success');
+      setShowSuccess(true);
+      setTimeout(() => router.push("/dashboard"), 1500);
     } catch (error: any) {
       alert(error.message || "เกิดข้อผิดพลาดในการบันทึก กรุณาลองใหม่");
-    } finally {
       setSavingManual(false);
     }
   }
@@ -80,7 +82,9 @@ export default function UploadPage() {
         body: JSON.stringify({ jobIds }),
       });
       if (!res.ok) throw new Error("Batch save failed");
-      router.push("/dashboard");
+      triggerHaptic('success');
+      setShowSuccess(true);
+      setTimeout(() => router.push("/dashboard"), 1500);
     } catch (e) {
       console.error(e);
       alert("ไม่สามารถบันทึกได้ กรุณาลองใหม่");
@@ -358,6 +362,18 @@ export default function UploadPage() {
         </Card>
       )}
         </>
+      )}
+
+      {/* Success Overlay */}
+      {showSuccess && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl p-6 flex flex-col items-center gap-4 shadow-2xl animate-in zoom-in-95 duration-200 min-w-[200px]">
+            <div className="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center">
+              <CheckCircle2 className="w-8 h-8 text-success" strokeWidth={3} />
+            </div>
+            <p className="font-bold text-lg text-foreground">บันทึกสำเร็จ</p>
+          </div>
+        </div>
       )}
     </div>
   );
