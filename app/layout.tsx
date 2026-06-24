@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Prompt, Inter } from "next/font/google";
+import { Noto_Sans_Thai, Inter } from "next/font/google";
 import "./globals.css";
 
-const prompt = Prompt({ 
+const notoSansThai = Noto_Sans_Thai({ 
   subsets: ["latin", "thai"],
   weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-prompt",
+  variable: "--font-noto",
 });
 
 const inter = Inter({
@@ -32,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th" className={`${prompt.variable} ${inter.variable}`}>
+    <html lang="th" className={`${notoSansThai.variable} ${inter.variable}`}>
       <body className="font-sans">{children}</body>
     </html>
   );

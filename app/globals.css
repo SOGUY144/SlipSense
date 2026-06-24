@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @theme inline {
+  --font-sans: var(--font-noto), "Noto Sans Thai", system-ui, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -57,7 +58,7 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: var(--font-prompt), system-ui, -apple-system, sans-serif;
+    font-family: var(--font-noto), system-ui, -apple-system, sans-serif;
   }
   .font-number {
     font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
