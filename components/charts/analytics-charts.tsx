@@ -272,7 +272,7 @@ export function AnalyticsCharts({
                         />
                       ))}
                     </Pie>
-                    <Tooltip content={<CustomPieTooltip />} allowEscapeViewBox={{ x: false, y: true }} />
+                    <Tooltip content={<CustomPieTooltip />} wrapperStyle={{ zIndex: 50 }} allowEscapeViewBox={{ x: false, y: true }} />
                   </PieChart>
                 </ResponsiveContainer>
                 {/* Center Text for Donut */}
