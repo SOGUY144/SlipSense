@@ -130,8 +130,8 @@ export async function GET(request: Request) {
 
     // Calculate Day of Week average income (Last 6 Months)
     const daysOfWeek = ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."];
-    const dowMap = new Map<number, { income: number; count: number }>();
-    for (let i = 0; i < 7; i++) dowMap.set(i, { income: 0, count: 0 });
+    const dowMap = new Map<number, { income: number; count: number; datesMap: Map<string, number> }>();
+    for (let i = 0; i < 7; i++) dowMap.set(i, { income: 0, count: 0, datesMap: new Map() });
 
     const allRecentTxs = await db
       .select()
@@ -144,16 +144,30 @@ export async function GET(request: Request) {
       );
 
     allRecentTxs.filter(t => t.type === "income").forEach((t) => {
-      const dow = new Date(t.occurredAt).getDay();
+      const d = new Date(t.occurredAt);
+      const dow = d.getDay();
+      const dateStr = d.toISOString().split('T')[0];
+      
       const current = dowMap.get(dow)!;
       current.income += parseFloat(t.amount);
       current.count += 1;
+      
+      const existingDateIncome = current.datesMap.get(dateStr) || 0;
+      current.datesMap.set(dateStr, existingDateIncome + parseFloat(t.amount));
     });
 
-    const dayOfWeekTrend = Array.from(dowMap.entries()).map(([dow, data]) => ({
-      dayName: daysOfWeek[dow],
-      income: data.income,
-    }));
+    const dayOfWeekTrend = Array.from(dowMap.entries()).map(([dow, data]) => {
+      const topDates = Array.from(data.datesMap.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([date, income]) => ({ date, income }));
+
+      return {
+        dayName: daysOfWeek[dow],
+        income: data.income,
+        topDates,
+      };
+    });
 
     return apiSuccess({
       monthly: monthlyData,

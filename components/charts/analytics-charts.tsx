@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState } from "react";
 import {
   ComposedChart,
   AreaChart,
@@ -18,7 +19,7 @@ import {
   Legend,
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
-import { TrendingUp, Wallet, Receipt, PieChart as PieIcon, CalendarDays, BarChart4 } from "lucide-react";
+import { TrendingUp, Wallet, Receipt, PieChart as PieIcon, CalendarDays, BarChart4, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const COLORS = [
@@ -53,6 +54,7 @@ interface DailyTrend {
 interface DayOfWeekTrend {
   dayName: string;
   income: number;
+  topDates?: { date: string; income: number }[];
 }
 
 interface AnalyticsChartsProps {
@@ -116,6 +118,8 @@ export function AnalyticsCharts({
   dailyTrend = [],
   dayOfWeekTrend = [],
 }: AnalyticsChartsProps) {
+  const [selectedDow, setSelectedDow] = useState<DayOfWeekTrend | null>(null);
+
   return (
     <div className="space-y-8 pb-8">
       {/* Composed Chart Section (Monthly) */}
@@ -344,6 +348,8 @@ export function AnalyticsCharts({
                       fill="#3b82f6" 
                       radius={[0, 4, 4, 0]} 
                       barSize={24}
+                      onClick={(data) => setSelectedDow(data.payload as DayOfWeekTrend)}
+                      cursor="pointer"
                     >
                       {dayOfWeekTrend.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -356,6 +362,52 @@ export function AnalyticsCharts({
           </Card>
         )}
       </div>
+
+      {/* Dow Details Modal */}
+      {selectedDow && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200 p-4">
+          <div className="bg-white rounded-3xl p-6 flex flex-col gap-4 shadow-2xl animate-in zoom-in-95 duration-200 w-full max-w-sm max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-lg flex items-center gap-2">
+                <BarChart4 className="w-5 h-5 text-primary" />
+                วัน{selectedDow.dayName.replace('.', '')}ที่ขายดี
+              </h3>
+              <button onClick={() => setSelectedDow(null)} className="p-1.5 hover:bg-muted rounded-full transition-colors">
+                <X className="w-5 h-5 text-muted-foreground" />
+              </button>
+            </div>
+            
+            <div className="space-y-3 mt-2">
+              <p className="text-sm text-muted-foreground">วันที่ทำรายรับได้สูงสุด (Top 5):</p>
+              {selectedDow.topDates && selectedDow.topDates.length > 0 ? (
+                <div className="space-y-2">
+                  {selectedDow.topDates.map((d, i) => {
+                    const dateObj = new Date(d.date);
+                    const formattedDate = new Intl.DateTimeFormat("th-TH", { day: "numeric", month: "short", year: "numeric" }).format(dateObj);
+                    return (
+                      <div key={i} className="flex items-center justify-between p-3 bg-muted/30 rounded-xl border border-border/50">
+                        <div className="flex items-center gap-3">
+                          <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">
+                            {i + 1}
+                          </div>
+                          <span className="text-sm font-medium">{formattedDate}</span>
+                        </div>
+                        <span className="font-bold text-success font-number">
+                          {formatCurrency(d.income)}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center p-4 bg-muted/20 rounded-xl text-muted-foreground text-sm">
+                  ไม่มีข้อมูลสำหรับวันนี้
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
