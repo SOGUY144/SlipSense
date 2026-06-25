@@ -442,18 +442,18 @@ export default function BatchReviewPage() {
       <div className="h-32" />
 
       {/* Sticky Bottom Bar */}
-      <div className="fixed bottom-[64px] left-0 right-0 p-4 bg-background/95 backdrop-blur-md border-t shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] z-30 pb-safe">
-        <div className="max-w-md mx-auto space-y-3">
-          <p className="text-center text-sm font-semibold text-primary animate-pulse flex items-center justify-center gap-1.5">
+      <div className="fixed bottom-[80px] md:bottom-6 left-0 right-0 px-4 z-40 pointer-events-none flex justify-center">
+        <div className="w-full max-w-md space-y-3 pointer-events-auto bg-background/80 backdrop-blur-xl p-3 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-border/50">
+          <p className="text-center text-xs font-bold text-primary animate-pulse flex items-center justify-center gap-1.5">
             <Sparkles className="w-4 h-4" /> ตรวจอีกนิด เพื่อกำไรที่เป๊ะขึ้น!
           </p>
-          <div className="flex gap-3">
-            <Button variant="outline" className="flex-1 h-14 text-base font-bold border-2 border-border/60 bg-background" onClick={() => router.push("/upload")} disabled={saving}>
+          <div className="flex gap-2">
+            <Button variant="outline" className="flex-1 h-12 text-sm font-bold border-2 border-border/60 hover:bg-muted/50 rounded-xl" onClick={() => router.push("/upload")} disabled={saving}>
               ยกเลิก
             </Button>
-            <Button className="flex-[2] h-14 text-base font-bold shadow-lg shadow-primary/25 hover:scale-[1.02] active:scale-95 transition-all bg-green-600 hover:bg-green-700 text-white" onClick={handleSaveAll} disabled={saving}>
-              {saving ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <CheckCircle2 className="mr-1 h-5 w-5" />}
-              {saving ? "กำลังบันทึก..." : `บันทึกทั้งหมด (${items.length} รายการ)`}
+            <Button className="flex-[2] h-12 text-sm font-bold shadow-lg shadow-primary/25 bg-green-600 hover:bg-green-700 text-white rounded-xl" onClick={handleSaveAll} disabled={saving}>
+              {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-1 h-4 w-4" />}
+              {saving ? "กำลังบันทึก..." : `บันทึกทั้งหมด (${items.length})`}
             </Button>
           </div>
         </div>
