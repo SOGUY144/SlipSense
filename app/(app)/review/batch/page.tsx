@@ -438,8 +438,11 @@ export default function BatchReviewPage() {
         ))}
       </div>
 
+      {/* Add padding at the bottom so the sticky bar doesn't overlap the last input */}
+      <div className="h-32" />
+
       {/* Sticky Bottom Bar */}
-      <div className="fixed bottom-[64px] left-0 right-0 p-4 bg-background border-t-2 border-border z-30 shadow-[0_-4px_15px_rgba(0,0,0,0.05)]">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t-2 border-border z-30 shadow-[0_-4px_15px_rgba(0,0,0,0.05)] pb-safe">
         <div className="max-w-lg mx-auto flex flex-col gap-2 px-2">
           <p className="text-center text-sm font-bold text-primary animate-pulse flex items-center justify-center gap-1.5 pb-1">
             <Sparkles className="w-4 h-4" /> ตรวจอีกนิด เพื่อกำไรที่เป๊ะขึ้น!
