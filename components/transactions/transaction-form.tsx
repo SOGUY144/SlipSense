@@ -255,35 +255,27 @@ export function TransactionForm({
         </CardContent>
       </Card>
 
-      {/* Add padding at the bottom so the sticky bar doesn't overlap the last input */}
-      <div className="h-32" />
+      {/* Gamification Text */}
+      <div className="pt-4 pb-2">
+        <p className="text-center text-sm font-bold text-primary animate-pulse flex items-center justify-center gap-1.5">
+          <Sparkles className="w-4 h-4" /> ตรวจอีกนิด เพื่อกำไรที่เป๊ะขึ้น!
+        </p>
+      </div>
 
-      {/* Sticky Bottom Bar for Quick Check & Gamification */}
-      <div className="fixed bottom-36 md:bottom-6 left-0 right-0 px-4 z-40 pointer-events-none flex justify-center">
-        <div className="w-full max-w-md space-y-3 pointer-events-auto bg-background/80 backdrop-blur-xl p-3 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-border/50">
-          <p className="text-center text-xs font-bold text-primary animate-pulse flex items-center justify-center gap-1.5">
-            <Sparkles className="w-4 h-4" /> ตรวจอีกนิด เพื่อกำไรที่เป๊ะขึ้น!
-          </p>
-          <div className="flex gap-2">
-            {onCancel && (
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1 h-12 text-sm font-bold border-2 border-border/60 hover:bg-muted/50 rounded-xl"
-                onClick={onCancel}
-              >
-                <X className="w-4 h-4 mr-1 text-muted-foreground" /> ข้าม/ยกเลิก
-              </Button>
-            )}
-            <Button 
-              type="submit" 
-              className="flex-[2] h-12 text-sm font-bold shadow-lg shadow-primary/25 bg-green-600 hover:bg-green-700 text-white rounded-xl" 
-              disabled={saving}
-            >
-              <Check className="w-4 h-4 mr-1" /> {saving ? "กำลังบันทึก..." : "ถูกต้อง บันทึกเลย"}
-            </Button>
-          </div>
-        </div>
+      <div className="flex gap-3">
+        {onCancel && (
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1 h-14 text-lg font-bold border-2 border-border/60 hover:bg-muted/50 hover:scale-[1.02] active:scale-95 transition-all"
+            onClick={onCancel}
+          >
+            ยกเลิก
+          </Button>
+        )}
+        <Button type="submit" className="flex-1 h-14 text-lg font-bold shadow-lg shadow-primary/25 hover:scale-[1.02] active:scale-95 transition-all" disabled={saving}>
+          {saving ? "กำลังบันทึก..." : "บันทึก"}
+        </Button>
       </div>
     </form>
   );
