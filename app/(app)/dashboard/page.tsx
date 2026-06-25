@@ -126,7 +126,14 @@ export default function DashboardPage() {
               </div>
               <span className="font-semibold text-lg text-white/90">กำไรสุทธิ</span>
             </div>
-            <Badge variant={profitUp ? "success" : "destructive"} className="text-sm px-2.5 py-1 shadow-md font-bold border-none">
+            <Badge 
+              variant="outline" 
+              className={`text-sm px-2.5 py-1 shadow-md font-bold border-none ${
+                profitUp 
+                  ? "bg-emerald-400/20 text-emerald-100" 
+                  : "bg-rose-400/20 text-rose-100"
+              }`}
+            >
               {formatPercent(summary?.profitChangePercent ?? 0)}
             </Badge>
           </div>
