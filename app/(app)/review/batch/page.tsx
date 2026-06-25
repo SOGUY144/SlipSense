@@ -91,9 +91,9 @@ export default function BatchReviewPage() {
             imageUrl: d.imageUrl,
             type: ex.type || "expense",
             category: ex.category || "ค่าใช้จ่ายอื่นๆ",
-            amount: ex.amount || 0,
+            amount: Number(ex.amount) || 0,
             occurredAt: safeParseDate(ex.occurredAt) || new Date().toISOString(),
-            confidence: ex.overallConfidence,
+            confidence: ex.overallConfidence || undefined,
             sender: ex.sender || "",
             receiver: ex.receiver || "",
             note: ex.note || "",
@@ -132,12 +132,15 @@ export default function BatchReviewPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ transactions: items }),
       });
-      if (!res.ok) throw new Error("Save failed");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.error || "Save failed");
+      }
       triggerHaptic('success');
       setShowSuccess(true);
       setTimeout(() => router.push("/dashboard"), 1500);
-    } catch (err) {
-      alert("บันทึกข้อมูลไม่สำเร็จ");
+    } catch (err: any) {
+      alert(err.message || "บันทึกข้อมูลไม่สำเร็จ");
       setSaving(false);
     }
   };

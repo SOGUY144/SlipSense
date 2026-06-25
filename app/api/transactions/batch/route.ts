@@ -50,6 +50,7 @@ export async function POST(request: Request) {
       const parsed = batchTransactionSchema.safeParse(body);
       
       if (!parsed.success) {
+        console.error("Batch save validation error:", parsed.error);
         return apiError("Invalid transactions payload", 400);
       }
 
