@@ -30,7 +30,14 @@ export async function PATCH(request: Request) {
 
     const [updated] = await db
       .update(shops)
-      .set({ name: parsed.shopName })
+      .set({ 
+        name: parsed.shopName,
+        preferences: {
+          ...(shop.preferences as any),
+          businessType: parsed.businessType,
+          description: parsed.description,
+        }
+      })
       .where(eq(shops.id, shop.id))
       .returning();
 

@@ -60,4 +60,6 @@ export const ALL_CATEGORIES = [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES];
 export const onboardingSchema = z.object({
   shopName: z.string().min(1, "กรุณากรอกชื่อร้าน"),
   displayName: z.string().optional(),
+  businessType: z.string().optional(),
+  description: z.string().optional(),
 });

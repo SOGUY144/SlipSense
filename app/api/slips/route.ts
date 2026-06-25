@@ -59,6 +59,8 @@ export async function POST(request: Request) {
     processSlipInBackground(job.id, base64, mediaType, activeCategories, {
       name: shop.name,
       ownerName: user.displayName || undefined,
+      businessType: (shop.preferences as any)?.businessType || undefined,
+      description: (shop.preferences as any)?.description || undefined,
     }).catch(console.error);
 
     return apiSuccess({
@@ -77,7 +79,7 @@ async function processSlipInBackground(
   base64: string, 
   mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif",
   categories: {type: string, name: string}[],
-  shopDetails: { name: string, ownerName?: string }
+  shopDetails: { name: string, ownerName?: string, businessType?: string, description?: string }
 ) {
   try {
     const extracted = await extractSlipData(base64, mediaType, categories, shopDetails);

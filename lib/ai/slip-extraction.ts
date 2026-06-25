@@ -8,14 +8,24 @@ import {
 
 export function buildSlipExtractionPrompt(
   categories: {type: string, name: string}[],
-  shopDetails?: { name: string, ownerName?: string }
+  shopDetails?: { name: string, ownerName?: string, businessType?: string, description?: string }
 ): string {
   const incomeCats = categories.filter(c => c.type === 'income').map(c => `"${c.name}"`).join(', ');
   const expenseCats = categories.filter(c => c.type === 'expense').map(c => `"${c.name}"`).join(', ');
 
-  const shopRule = shopDetails 
-    ? `\n\nกฎเด็ดขาด (Override Rule) สำหรับแยกรายรับ/รายจ่ายของร้านนี้:\n   - ร้านนี้ชื่อ "${shopDetails.name}"${shopDetails.ownerName ? ` และเจ้าของร้านชื่อ "${shopDetails.ownerName}"` : ""}\n   - สำคัญมาก: ให้เช็คชื่อผู้โอน (Sender) และผู้รับ (Receiver) ก่อนเสมอ!\n   - ถ้าชื่อ "ผู้โอน (Sender)" มีคำที่ตรงกับชื่อร้านหรือชื่อเจ้าของ ให้บังคับว่าสลิปนี้เป็น "รายจ่าย" (expense) ทันที 100%\n   - ถ้าชื่อ "ผู้รับ (Receiver)" มีคำที่ตรงกับชื่อร้านหรือชื่อเจ้าของ ให้บังคับว่าสลิปนี้เป็น "รายรับ" (income) ทันที 100%`
-    : "";
+  let shopRule = "";
+  if (shopDetails) {
+    shopRule = `\n\nข้อมูลบริบทของธุรกิจและกฎพิเศษ (สำคัญมาก):\n   - ร้านนี้ชื่อ "${shopDetails.name}"${shopDetails.ownerName ? ` และเจ้าของร้านชื่อ "${shopDetails.ownerName}"` : ""}`;
+    if (shopDetails.businessType) {
+      shopRule += `\n   - ประเภทธุรกิจ: "${shopDetails.businessType}" (ใช้ข้อมูลนี้เป็นบริบทหลักในการตีความว่ารายจ่ายไหนเกี่ยวข้องกับธุรกิจ)`;
+    }
+    if (shopDetails.description) {
+      shopRule += `\n   - กฎเฉพาะของร้านนี้: "${shopDetails.description}" (ต้องปฏิบัติตามกฎนี้อย่างเคร่งครัด)`;
+    }
+    shopRule += `\n   - กฎสแกนชื่อ: ให้เช็คชื่อผู้โอน (Sender) และผู้รับ (Receiver) ก่อนเสมอ!
+   - ถ้าชื่อ "ผู้โอน (Sender)" มีคำที่ตรงกับชื่อร้านหรือชื่อเจ้าของ ให้บังคับว่าสลิปนี้เป็น "รายจ่าย" (expense) ทันที 100%
+   - ถ้าชื่อ "ผู้รับ (Receiver)" มีคำที่ตรงกับชื่อร้านหรือชื่อเจ้าของ ให้บังคับว่าสลิปนี้เป็น "รายรับ" (income) ทันที 100%`;
+  }
 
   return `คุณเป็น AI ผู้เชี่ยวชาญในการอ่านสลิปโอนเงินธนาคารไทย และใบเสร็จ/บิลซื้อของ (Receipt/Bill)
 
@@ -140,7 +150,7 @@ export async function extractSlipData(
   imageBase64: string,
   mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif",
   categories: {type: string, name: string}[] = [],
-  shopDetails?: { name: string, ownerName?: string }
+  shopDetails?: { name: string, ownerName?: string, businessType?: string, description?: string }
 ): Promise<ExtractedSlip> {
   return callWithRetry(async () => {
     const { object } = await generateObject({
