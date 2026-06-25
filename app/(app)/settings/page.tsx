@@ -29,43 +29,9 @@ import { Textarea } from "@/components/ui/textarea";
 
 export default function SettingsPage() {
   const router = useRouter();
-  const [shopName, setShopName] = useState("");
-  const [businessType, setBusinessType] = useState("");
-  const [description, setDescription] = useState("");
-  const [saving, setSaving] = useState(false);
   const [generatingInsights, setGeneratingInsights] = useState(false);
   const [seeding, setSeeding] = useState(false);
   const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    async function load() {
-      const res = await fetch("/api/settings");
-      if (res.ok) {
-        const data = await res.json();
-        setShopName(data.shop.name);
-        if (data.shop.preferences) {
-          setBusinessType(data.shop.preferences.businessType || "");
-          setDescription(data.shop.preferences.description || "");
-        }
-      }
-    }
-    load();
-  }, []);
-
-  async function handleSaveShopName() {
-    setSaving(true);
-    setMessage("");
-    const res = await fetch("/api/settings", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ shopName, businessType, description }),
-    });
-    setSaving(false);
-    if (res.ok) {
-      setMessage("บันทึกข้อมูลร้านแล้ว");
-      router.refresh();
-    }
-  }
 
   async function handleClearData() {
     const res = await fetch("/api/settings", { method: "DELETE" });
@@ -114,53 +80,7 @@ export default function SettingsPage() {
         </Card>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">ข้อมูลร้าน (Shop Profile)</CardTitle>
-          <CardDescription>
-            ข้อมูลที่นี่จะช่วยให้ AI เข้าใจธุรกิจคุณและแยกแยะบัญชีได้แม่นยำขึ้น
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="shopName">ชื่อร้านค้า / แบรนด์</Label>
-            <Input
-              id="shopName"
-              value={shopName}
-              onChange={(e) => setShopName(e.target.value)}
-              placeholder="เช่น SlipSense Cafe"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="businessType">ประเภทธุรกิจ</Label>
-            <Input
-              id="businessType"
-              value={businessType}
-              onChange={(e) => setBusinessType(e.target.value)}
-              placeholder="เช่น ร้านกาแฟ, ฟรีแลนซ์, ขายของออนไลน์"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="description">คำแนะนำเพิ่มเติมให้ AI (Custom Rules)</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="เช่น 'ถ้าโอนจ่ายค่าไข่หรือแป้ง ให้จัดเป็น ค่าวัตถุดิบ 100%' หรือ 'รายได้ทั้งหมดมาจากขายสบู่'"
-              className="h-20"
-            />
-            <p className="text-xs text-muted-foreground">
-              อธิบายสั้นๆ ว่าร้านทำอะไร หรือตั้งกฎพิเศษให้ AI อ่านสลิปของร้านคุณโดยเฉพาะ
-            </p>
-          </div>
-          
-          <Button onClick={handleSaveShopName} disabled={saving}>
-            {saving ? "กำลังบันทึก..." : "บันทึกข้อมูลร้าน"}
-          </Button>
-        </CardContent>
-      </Card>
+
 
       <Card>
         <CardHeader>
