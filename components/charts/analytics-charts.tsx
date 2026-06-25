@@ -237,7 +237,7 @@ export function AnalyticsCharts({
         </Card>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-8">
         {/* Category Breakdown Section */}
         {sortedCategoryBreakdown.length > 0 && (
           <Card className="border-none shadow-md bg-gradient-to-b from-card to-muted/20">
