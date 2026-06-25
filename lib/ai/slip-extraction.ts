@@ -6,9 +6,16 @@ import {
   type ExtractedSlip,
 } from "@/lib/validations/schemas";
 
-export function buildSlipExtractionPrompt(categories: {type: string, name: string}[]): string {
+export function buildSlipExtractionPrompt(
+  categories: {type: string, name: string}[],
+  shopDetails?: { name: string, ownerName?: string }
+): string {
   const incomeCats = categories.filter(c => c.type === 'income').map(c => `"${c.name}"`).join(', ');
   const expenseCats = categories.filter(c => c.type === 'expense').map(c => `"${c.name}"`).join(', ');
+
+  const shopRule = shopDetails 
+    ? `\n   - กฎพิเศษสำหรับร้านนี้: ร้านชื่อ "${shopDetails.name}"${shopDetails.ownerName ? ` และเจ้าของร้านชื่อ "${shopDetails.ownerName}"` : ""}\n   - ถ้าชื่อผู้รับเงิน (Receiver) ตรงกับหรือคล้ายกับชื่อร้านหรือชื่อเจ้าของร้าน ให้ถือว่าเป็น "รายรับ" (income)\n   - ถ้าชื่อผู้โอน (Sender) ตรงกับชื่อร้านหรือชื่อเจ้าของร้าน ให้ถือว่าเป็น "รายจ่าย" (expense)`
+    : "";
 
   return `คุณเป็น AI ผู้เชี่ยวชาญในการอ่านสลิปโอนเงินธนาคารไทย และใบเสร็จ/บิลซื้อของ (Receipt/Bill)
 
@@ -19,7 +26,7 @@ export function buildSlipExtractionPrompt(categories: {type: string, name: strin
 กฎ:
 1. การแยกแยะประเภท:
    - ถ้าเป็น "สลิปโอนเงินเข้า" = income
-   - ถ้าเป็น "สลิปโอนเงินออก" หรือ "ใบเสร็จ/บิลซื้อของ" = expense
+   - ถ้าเป็น "สลิปโอนเงินออก" หรือ "ใบเสร็จ/บิลซื้อของ" = expense${shopRule}
 2. กรณีเป็น สลิปโอนเงินเข้า/ออก (Bank Slip):
    - ดึง "ชื่อผู้โอน / จาก" (Sender) ไปใส่ในช่อง sender
    - ดึง "ชื่อผู้รับเงิน / ไปยัง" (Receiver) ไปใส่ในช่อง receiver
@@ -131,7 +138,8 @@ const aiSlipSchema = z.object({
 export async function extractSlipData(
   imageBase64: string,
   mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif",
-  categories: {type: string, name: string}[] = []
+  categories: {type: string, name: string}[] = [],
+  shopDetails?: { name: string, ownerName?: string }
 ): Promise<ExtractedSlip> {
   return callWithRetry(async () => {
     const { object } = await generateObject({
@@ -141,7 +149,7 @@ export async function extractSlipData(
         {
           role: "user",
           content: [
-            { type: "text", text: buildSlipExtractionPrompt(categories) },
+            { type: "text", text: buildSlipExtractionPrompt(categories, shopDetails) },
             { type: "image", image: `data:${mediaType};base64,${imageBase64}` }
           ]
         }

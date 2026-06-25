@@ -56,7 +56,10 @@ export async function POST(request: Request) {
     });
 
     // Process in background
-    processSlipInBackground(job.id, base64, mediaType, activeCategories).catch(console.error);
+    processSlipInBackground(job.id, base64, mediaType, activeCategories, {
+      name: shop.name,
+      ownerName: user.displayName || undefined,
+    }).catch(console.error);
 
     return apiSuccess({
       job,
@@ -73,10 +76,11 @@ async function processSlipInBackground(
   jobId: string, 
   base64: string, 
   mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif",
-  categories: {type: string, name: string}[]
+  categories: {type: string, name: string}[],
+  shopDetails: { name: string, ownerName?: string }
 ) {
   try {
-    const extracted = await extractSlipData(base64, mediaType, categories);
+    const extracted = await extractSlipData(base64, mediaType, categories, shopDetails);
 
     await db
       .update(slipJobs)
