@@ -38,6 +38,8 @@ export default function UploadPage() {
   const [savingBatch, setSavingBatch] = useState(false);
   const [savingManual, setSavingManual] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showConfirmDrawer, setShowConfirmDrawer] = useState(false);
+  const [doNotShowAgain, setDoNotShowAgain] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(transactionSchema),
@@ -70,6 +72,23 @@ export default function UploadPage() {
       alert(error.message || "เกิดข้อผิดพลาดในการบันทึก กรุณาลองใหม่");
       setSavingManual(false);
     }
+  }
+
+  function handleAutoSaveClick(jobIds: string[]) {
+    const skipConfirm = localStorage.getItem("skipAutoSaveConfirm");
+    if (skipConfirm === "true") {
+      handleBatchSave(jobIds);
+    } else {
+      setShowConfirmDrawer(true);
+    }
+  }
+
+  function confirmAutoSave() {
+    if (doNotShowAgain) {
+      localStorage.setItem("skipAutoSaveConfirm", "true");
+    }
+    setShowConfirmDrawer(false);
+    handleBatchSave(doneJobs);
   }
 
   async function handleBatchSave(jobIds: string[]) {
@@ -348,7 +367,7 @@ export default function UploadPage() {
                 <Button
                   variant="secondary"
                   className="w-full border-primary/20 bg-primary/10 hover:bg-primary/20 text-primary"
-                  onClick={() => handleBatchSave(doneJobs)}
+                  onClick={() => handleAutoSaveClick(doneJobs)}
                   disabled={savingBatch}
                 >
                   {savingBatch ? (
@@ -372,6 +391,46 @@ export default function UploadPage() {
               <CheckCircle2 className="w-8 h-8 text-success" strokeWidth={3} />
             </div>
             <p className="font-bold text-lg text-foreground">บันทึกสำเร็จ</p>
+          </div>
+        </div>
+      )}
+
+      {/* Auto Save Confirmation Drawer */}
+      {showConfirmDrawer && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom-1/2 sm:zoom-in-95 duration-200">
+            <h3 className="text-xl font-bold text-center mb-2">ตรวจสอบสลิปเพื่อความแน่ใจ</h3>
+            <p className="text-center text-muted-foreground text-sm mb-6">
+              AI อาจดึงข้อมูลผิดพลาดบางส่วน แนะนำให้ตรวจสอบรายละเอียดก่อนบันทึก
+            </p>
+            
+            <div className="flex gap-3 mb-6">
+              <Button
+                variant="outline"
+                className="flex-1 h-14 text-base font-bold"
+                onClick={() => setShowConfirmDrawer(false)}
+              >
+                ยกเลิก
+              </Button>
+              <Button
+                className="flex-1 h-14 text-base font-bold bg-primary hover:bg-primary/90"
+                onClick={confirmAutoSave}
+              >
+                ตกลง, บันทึกเลย
+              </Button>
+            </div>
+
+            <label className="flex items-center justify-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-muted/50 transition-colors w-fit mx-auto">
+              <input
+                type="checkbox"
+                className="w-5 h-5 rounded border-2 border-primary/30 text-primary focus:ring-primary/50"
+                checked={doNotShowAgain}
+                onChange={(e) => setDoNotShowAgain(e.target.checked)}
+              />
+              <span className="text-sm font-medium text-muted-foreground select-none">
+                ไม่แสดงข้อความนี้อีก
+              </span>
+            </label>
           </div>
         </div>
       )}
