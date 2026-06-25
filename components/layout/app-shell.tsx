@@ -75,13 +75,15 @@ export function AppShell({
       <main className="mx-auto max-w-lg px-4 pb-24 pt-4">{children}</main>
 
       {pathname !== "/chat" && (
-        <Link 
-          href="/chat" 
-          className="fixed bottom-24 right-4 z-50 rounded-full bg-primary p-3.5 text-primary-foreground shadow-lg hover:bg-primary/90 transition-all hover:scale-105 flex items-center justify-center animate-bounce"
-          style={{ animationDuration: '3s' }}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bot"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
-        </Link>
+        <div className="fixed bottom-24 left-0 right-0 z-50 mx-auto max-w-lg pointer-events-none px-4 flex justify-end">
+          <Link 
+            href="/chat" 
+            className="rounded-full bg-primary p-3.5 text-primary-foreground shadow-lg hover:bg-primary/90 transition-all hover:scale-105 flex items-center justify-center animate-bounce pointer-events-auto"
+            style={{ animationDuration: '3s' }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bot"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+          </Link>
+        </div>
       )}
 
       <nav className="fixed bottom-0 left-0 right-0 z-40 mx-auto max-w-lg bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] pb-1" style={{ paddingBottom: 'calc(4px + env(safe-area-inset-bottom))' }}>
