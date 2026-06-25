@@ -120,6 +120,8 @@ export function AnalyticsCharts({
 }: AnalyticsChartsProps) {
   const [selectedDow, setSelectedDow] = useState<DayOfWeekTrend | null>(null);
 
+  const sortedCategoryBreakdown = [...categoryBreakdown].sort((a, b) => b.amount - a.amount);
+
   return (
     <div className="space-y-8 pb-8">
       {/* Composed Chart Section (Monthly) */}
@@ -237,7 +239,7 @@ export function AnalyticsCharts({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Category Breakdown Section */}
-        {categoryBreakdown.length > 0 && (
+        {sortedCategoryBreakdown.length > 0 && (
           <Card className="border-none shadow-md bg-gradient-to-b from-card to-muted/20">
             <div className="p-5 border-b flex items-center gap-2">
               <div className="p-2 bg-primary/10 rounded-lg">
@@ -254,7 +256,7 @@ export function AnalyticsCharts({
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={categoryBreakdown}
+                      data={sortedCategoryBreakdown}
                       dataKey="amount"
                       nameKey="category"
                       cx="50%"
@@ -264,7 +266,7 @@ export function AnalyticsCharts({
                       paddingAngle={5}
                       stroke="none"
                     >
-                      {categoryBreakdown.map((_, index) => (
+                      {sortedCategoryBreakdown.map((_, index) => (
                         <Cell
                           key={`cell-${index}`}
                           fill={COLORS[index % COLORS.length]}
@@ -279,13 +281,13 @@ export function AnalyticsCharts({
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                   <span className="text-xs text-muted-foreground font-medium">รวม</span>
                   <span className="text-sm font-bold text-foreground">
-                    {formatCurrency(categoryBreakdown.reduce((sum, item) => sum + item.amount, 0))}
+                    {formatCurrency(sortedCategoryBreakdown.reduce((sum, item) => sum + item.amount, 0))}
                   </span>
                 </div>
               </div>
 
               <div className="w-full space-y-2">
-                {categoryBreakdown.map((item, i) => (
+                {sortedCategoryBreakdown.map((item, i) => (
                   <div
                     key={item.category}
                     className="group flex items-center justify-between p-2.5 rounded-lg hover:bg-muted/50 transition-colors border border-transparent hover:border-border"
