@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from "@/lib/validations/schemas";
-import { Loader2, Maximize2, X, CheckCircle2 } from "lucide-react";
+import { Loader2, CheckCircle, AlertTriangle, ArrowRight, X, Calendar, User, Tag, FileText, CheckCircle2, Sparkles } from "lucide-react";
 
 interface BatchItem {
   slipJobId: string;
@@ -438,16 +438,24 @@ export default function BatchReviewPage() {
         ))}
       </div>
 
+      {/* Add padding at the bottom so the sticky bar doesn't overlap the last input */}
+      <div className="h-32" />
+
       {/* Sticky Bottom Bar */}
-      <div className="fixed bottom-[64px] left-0 right-0 p-4 bg-background border-t-2 border-border z-30 shadow-[0_-4px_15px_rgba(0,0,0,0.05)]">
-        <div className="max-w-lg mx-auto flex gap-3 px-2">
-          <Button variant="outline" className="flex-1 h-16 text-lg font-bold border-2 border-border/60" onClick={() => router.push("/upload")} disabled={saving}>
-            ยกเลิก
-          </Button>
-          <Button className="flex-1 h-16 text-lg font-bold shadow-md" onClick={handleSaveAll} disabled={saving}>
-            {saving ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
-            {saving ? "กำลังบันทึก..." : `บันทึกทั้งหมด (${items.length} รายการ)`}
-          </Button>
+      <div className="fixed bottom-[64px] left-0 right-0 p-4 bg-background/95 backdrop-blur-md border-t shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] z-30 pb-safe">
+        <div className="max-w-md mx-auto space-y-3">
+          <p className="text-center text-sm font-semibold text-primary animate-pulse flex items-center justify-center gap-1.5">
+            <Sparkles className="w-4 h-4" /> ตรวจอีกนิด เพื่อกำไรที่เป๊ะขึ้น!
+          </p>
+          <div className="flex gap-3">
+            <Button variant="outline" className="flex-1 h-14 text-base font-bold border-2 border-border/60 bg-background" onClick={() => router.push("/upload")} disabled={saving}>
+              ยกเลิก
+            </Button>
+            <Button className="flex-[2] h-14 text-base font-bold shadow-lg shadow-primary/25 hover:scale-[1.02] active:scale-95 transition-all bg-green-600 hover:bg-green-700 text-white" onClick={handleSaveAll} disabled={saving}>
+              {saving ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <CheckCircle2 className="mr-1 h-5 w-5" />}
+              {saving ? "กำลังบันทึก..." : `บันทึกทั้งหมด (${items.length} รายการ)`}
+            </Button>
+          </div>
         </div>
       </div>
 

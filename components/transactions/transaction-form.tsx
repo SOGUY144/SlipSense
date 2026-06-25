@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Check, X, Sparkles } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -254,20 +255,35 @@ export function TransactionForm({
         </CardContent>
       </Card>
 
-      <div className="flex gap-3">
-        {onCancel && (
-          <Button
-            type="button"
-            variant="outline"
-            className="flex-1 h-14 text-lg font-bold border-2 border-border/60 hover:bg-muted/50 hover:scale-[1.02] active:scale-95 transition-all"
-            onClick={onCancel}
-          >
-            ยกเลิก
-          </Button>
-        )}
-        <Button type="submit" className="flex-1 h-14 text-lg font-bold shadow-lg shadow-primary/25 hover:scale-[1.02] active:scale-95 transition-all" disabled={saving}>
-          {saving ? "กำลังบันทึก..." : "บันทึก"}
-        </Button>
+      {/* Add padding at the bottom so the sticky bar doesn't overlap the last input */}
+      <div className="h-32" />
+
+      {/* Sticky Bottom Bar for Quick Check & Gamification */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-md border-t shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] z-40 pb-safe">
+        <div className="max-w-md mx-auto space-y-3">
+          <p className="text-center text-sm font-semibold text-primary animate-pulse flex items-center justify-center gap-1.5">
+            <Sparkles className="w-4 h-4" /> ตรวจอีกนิด เพื่อกำไรที่เป๊ะขึ้น!
+          </p>
+          <div className="flex gap-3">
+            {onCancel && (
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1 h-14 text-base font-bold border-2 border-border/60 hover:bg-muted/50 hover:scale-[1.02] active:scale-95 transition-all bg-background"
+                onClick={onCancel}
+              >
+                <X className="w-5 h-5 mr-1 text-muted-foreground" /> ข้าม/ยกเลิก
+              </Button>
+            )}
+            <Button 
+              type="submit" 
+              className="flex-[2] h-14 text-base font-bold shadow-lg shadow-primary/25 hover:scale-[1.02] active:scale-95 transition-all bg-green-600 hover:bg-green-700 text-white" 
+              disabled={saving}
+            >
+              <Check className="w-5 h-5 mr-1" /> {saving ? "กำลังบันทึก..." : "ถูกต้อง บันทึกเลย"}
+            </Button>
+          </div>
+        </div>
       </div>
     </form>
   );
