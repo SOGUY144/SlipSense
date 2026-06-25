@@ -8,7 +8,7 @@ import {
 
 export function buildSlipExtractionPrompt(
   categories: {type: string, name: string}[],
-  shopDetails?: { name: string, ownerName?: string, businessType?: string, description?: string }
+  shopDetails?: { name: string, ownerName?: string, businessCategory?: string, businessType?: string, description?: string }
 ): string {
   const incomeCats = categories.filter(c => c.type === 'income').map(c => `"${c.name}"`).join(', ');
   const expenseCats = categories.filter(c => c.type === 'expense').map(c => `"${c.name}"`).join(', ');
@@ -16,8 +16,8 @@ export function buildSlipExtractionPrompt(
   let shopRule = "";
   if (shopDetails) {
     shopRule = `\n\nข้อมูลบริบทของธุรกิจและกฎพิเศษ (สำคัญมาก):\n   - ร้านนี้ชื่อ "${shopDetails.name}"${shopDetails.ownerName ? ` และเจ้าของร้านชื่อ "${shopDetails.ownerName}"` : ""}`;
-    if (shopDetails.businessType) {
-      shopRule += `\n   - ประเภทธุรกิจ: "${shopDetails.businessType}" (ใช้ข้อมูลนี้เป็นบริบทหลักในการตีความว่ารายจ่ายไหนเกี่ยวข้องกับธุรกิจ)`;
+    if (shopDetails.businessCategory || shopDetails.businessType) {
+      shopRule += `\n   - ประเภทธุรกิจ: "${[shopDetails.businessCategory, shopDetails.businessType].filter(Boolean).join(" - ")}" (ใช้ข้อมูลนี้เป็นบริบทหลักในการตีความว่ารายจ่ายไหนเกี่ยวข้องกับธุรกิจ)`;
     }
     if (shopDetails.description) {
       shopRule += `\n   - กฎเฉพาะของร้านนี้: "${shopDetails.description}" (ต้องปฏิบัติตามกฎนี้อย่างเคร่งครัด)`;
@@ -150,7 +150,7 @@ export async function extractSlipData(
   imageBase64: string,
   mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif",
   categories: {type: string, name: string}[] = [],
-  shopDetails?: { name: string, ownerName?: string, businessType?: string, description?: string }
+  shopDetails?: { name: string, ownerName?: string, businessCategory?: string, businessType?: string, description?: string }
 ): Promise<ExtractedSlip> {
   return callWithRetry(async () => {
     const { object } = await generateObject({

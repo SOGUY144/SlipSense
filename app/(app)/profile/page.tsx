@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Sparkles, Calendar, UserCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -25,15 +26,30 @@ import { SpendingBehaviorModal } from "@/components/onboarding/spending-behavior
 import { OnboardingReminders } from "@/components/reminders/onboarding-reminders";
 
 const BUSINESS_TYPES = [
-  "ร้านอาหาร",
-  "ร้านกาแฟ / เครื่องดื่ม",
+  "ร้านอาหาร / ร้านข้าว",
+  "ร้านกาแฟ / ชา / เครื่องดื่ม",
   "ร้านขายของชำ / มินิมาร์ท",
-  "ร้านขายเสื้อผ้า / แฟชั่น",
-  "ร้านเสริมสวย / คลินิก",
-  "ฟรีแลนซ์ / รับจ้างทั่วไป",
-  "บริการ / ซ่อมแซม",
-  "ขายของออนไลน์",
-  "อื่นๆ"
+  "ร้านขายเสื้อผ้า / แฟชั่น / รองเท้า",
+  "ร้านเสริมสวย / คลินิกความงาม / สปา",
+  "ร้านขายอุปกรณ์ไอที / มือถือ / ซ่อมมือถือ",
+  "ร้านขายเครื่องสำอาง / สกินแคร์",
+  "ร้านขายหนังสือ / เครื่องเขียน / อุปกรณ์สำนักงาน",
+  "ร้านขายสัตว์เลี้ยง / อุปกรณ์สัตว์เลี้ยง",
+  "คลินิกสัตว์ / โรงพยาบาลสัตว์",
+  "ร้านขายยา / อุปกรณ์การแพทย์",
+  "ร้านขายของเล่น / อุปกรณ์แม่และเด็ก",
+  "ร้านขายเครื่องใช้ไฟฟ้า / อิเล็กทรอนิกส์",
+  "ร้านเฟอร์นิเจอร์ / ของแต่งบ้าน",
+  "ร้านวัสดุก่อสร้าง / เครื่องมือช่าง",
+  "อู่ซ่อมรถ / คาร์แคร์ / ประดับยนต์",
+  "ฟรีแลนซ์ / รับจ้างทั่วไป / กราฟิก",
+  "บริการทำความสะอาด / แม่บ้าน",
+  "บริการ / ซ่อมแซมทั่วไป (แอร์, ประปา)",
+  "ขายของออนไลน์ / พ่อค้าแม่ค้าออนไลน์",
+  "ตัวแทนจำหน่าย / Dropship",
+  "อสังหาริมทรัพย์ / ปล่อยเช่า / หอพัก",
+  "ครีเอเตอร์ / อินฟลูเอนเซอร์ / สตรีมเมอร์",
+  "เกษตรกร / ขายผลผลิตทางการเกษตร",
 ];
 
 export default function ProfilePage() {
@@ -43,8 +59,8 @@ export default function ProfilePage() {
 
   // Shop Profile State
   const [shopName, setShopName] = useState("");
+  const [businessCategory, setBusinessCategory] = useState("");
   const [businessType, setBusinessType] = useState("");
-  const [customBusinessType, setCustomBusinessType] = useState("");
   const [description, setDescription] = useState("");
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -56,13 +72,8 @@ export default function ProfilePage() {
         const data = await res.json();
         setShopName(data.shop.name);
         if (data.shop.preferences) {
-          const type = data.shop.preferences.businessType || "";
-          if (BUSINESS_TYPES.includes(type) || type === "") {
-            setBusinessType(type);
-          } else {
-            setBusinessType("อื่นๆ");
-            setCustomBusinessType(type);
-          }
+          setBusinessCategory(data.shop.preferences.businessCategory || "");
+          setBusinessType(data.shop.preferences.businessType || "");
           setDescription(data.shop.preferences.description || "");
         }
       }
@@ -74,12 +85,10 @@ export default function ProfilePage() {
     setSaving(true);
     setMessage("");
     
-    const finalBusinessType = businessType === "อื่นๆ" ? customBusinessType : businessType;
-    
     const res = await fetch("/api/settings", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ shopName, businessType: finalBusinessType, description }),
+      body: JSON.stringify({ shopName, businessCategory, businessType, description }),
     });
     setSaving(false);
     if (res.ok) {
@@ -123,30 +132,29 @@ export default function ProfilePage() {
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="businessType">ประเภทธุรกิจ</Label>
-            <Select value={businessType} onValueChange={setBusinessType}>
-              <SelectTrigger id="businessType">
-                <SelectValue placeholder="เลือกประเภทธุรกิจ" />
+            <Label htmlFor="businessCategory">หมวดหมู่ธุรกิจ (เลือกหลัก)</Label>
+            <Select value={businessCategory} onValueChange={setBusinessCategory}>
+              <SelectTrigger id="businessCategory">
+                <SelectValue placeholder="เลือกหมวดหมู่ธุรกิจ" />
               </SelectTrigger>
               <SelectContent>
                 {BUSINESS_TYPES.map(type => (
                   <SelectItem key={type} value={type}>{type}</SelectItem>
                 ))}
+                <SelectItem value="อื่นๆ">อื่นๆ</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {businessType === "อื่นๆ" && (
-            <div className="space-y-2">
-              <Label htmlFor="customBusinessType">โปรดระบุประเภทธุรกิจ</Label>
-              <Input
-                id="customBusinessType"
-                value={customBusinessType}
-                onChange={(e) => setCustomBusinessType(e.target.value)}
-                placeholder="พิมพ์ประเภทธุรกิจของคุณ"
-              />
-            </div>
-          )}
+          <div className="space-y-2">
+            <Label htmlFor="businessType">ประเภทธุรกิจแบบเจาะจง (พิมพ์เพิ่มเติมได้เลย)</Label>
+            <Input
+              id="businessType"
+              value={businessType}
+              onChange={(e) => setBusinessType(e.target.value)}
+              placeholder="เช่น ร้านข้าวแกง, ขายเสื้อผ้าวินเทจ"
+            />
+          </div>
           
           <div className="space-y-2">
             <Label htmlFor="description">คำแนะนำเพิ่มเติมให้ AI (Custom Rules)</Label>

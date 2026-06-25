@@ -34,6 +34,7 @@ export async function PATCH(request: Request) {
         name: parsed.shopName,
         preferences: {
           ...(shop.preferences as any),
+          businessCategory: parsed.businessCategory,
           businessType: parsed.businessType,
           description: parsed.description,
         }
