@@ -306,9 +306,21 @@ export default function BatchReviewPage() {
               </CardContent>
             </Card>
             
-            <Button className="w-full" size="lg" onClick={() => setDetailedIndex(null)}>
-              บันทึกการแก้ไขใบนี้
-            </Button>
+            {/* Spacer for sticky button */}
+            <div className="h-24" />
+
+            {/* Sticky Save Button for Modal */}
+            <div className="fixed bottom-0 left-0 right-0 p-4 z-[60] pb-safe pointer-events-none bg-gradient-to-t from-background/90 via-background/50 to-transparent">
+              <div className="max-w-lg mx-auto flex flex-col gap-2 px-2 pointer-events-auto">
+                <Button 
+                  className="w-full h-16 text-lg font-bold shadow-lg shadow-green-600/25 bg-green-600 hover:bg-green-700 text-white" 
+                  onClick={() => setDetailedIndex(null)}
+                >
+                  <CheckCircle2 className="mr-2 h-5 w-5" />
+                  บันทึกการแก้ไขใบนี้
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -442,26 +454,28 @@ export default function BatchReviewPage() {
       <div className="h-32" />
 
       {/* Sticky Bottom Bar */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 z-30 pb-safe pointer-events-none bg-gradient-to-t from-background/90 via-background/50 to-transparent">
-        <div className="max-w-lg mx-auto flex flex-col gap-2 px-2 pointer-events-auto">
-          {/* Gamification Text */}
-          <div className="flex justify-center">
-            <p className="text-center text-xs font-bold text-primary animate-pulse flex items-center justify-center gap-1.5 py-1 px-3 bg-white/90 backdrop-blur-sm border border-slate-200 shadow-sm rounded-full w-fit">
-              <Sparkles className="w-3.5 h-3.5" /> ตรวจอีกนิด เพื่อกำไรที่เป๊ะขึ้น!
-            </p>
-          </div>
+      {detailedIndex === null && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 z-30 pb-safe pointer-events-none bg-gradient-to-t from-background/90 via-background/50 to-transparent">
+          <div className="max-w-lg mx-auto flex flex-col gap-2 px-2 pointer-events-auto">
+            {/* Gamification Text */}
+            <div className="flex justify-center">
+              <p className="text-center text-xs font-bold text-primary animate-pulse flex items-center justify-center gap-1.5 py-1 px-3 bg-white/90 backdrop-blur-sm border border-slate-200 shadow-sm rounded-full w-fit">
+                <Sparkles className="w-3.5 h-3.5" /> ตรวจอีกนิด เพื่อกำไรที่เป๊ะขึ้น!
+              </p>
+            </div>
 
-          <div className="flex gap-3">
-            <Button variant="outline" className="flex-1 h-16 text-lg font-bold border-2 border-border/60 bg-background" onClick={() => router.push("/upload")} disabled={saving}>
-              ยกเลิก
-            </Button>
-            <Button className="flex-1 h-16 text-lg font-bold shadow-lg shadow-green-600/25 bg-green-600 hover:bg-green-700 text-white" onClick={handleSaveAll} disabled={saving}>
-              {saving ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
-              {saving ? "กำลังบันทึก..." : `บันทึกทั้งหมด (${items.length} รายการ)`}
-            </Button>
+            <div className="flex gap-3">
+              <Button variant="outline" className="flex-1 h-16 text-lg font-bold border-2 border-border/60 bg-background" onClick={() => router.push("/upload")} disabled={saving}>
+                ยกเลิก
+              </Button>
+              <Button className="flex-1 h-16 text-lg font-bold shadow-lg shadow-green-600/25 bg-green-600 hover:bg-green-700 text-white" onClick={handleSaveAll} disabled={saving}>
+                {saving ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
+                {saving ? "กำลังบันทึก..." : `บันทึกทั้งหมด (${items.length} รายการ)`}
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Success Overlay */}
       {showSuccess && (
