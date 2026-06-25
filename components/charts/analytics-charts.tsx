@@ -135,6 +135,12 @@ export function AnalyticsCharts({
             <p className="text-xs text-muted-foreground">ย้อนหลัง 6 เดือนล่าสุด</p>
           </div>
         </div>
+        <div className="px-5 pt-3 -mb-2">
+          <p className="text-[10px] text-muted-foreground flex items-center gap-1.5 bg-primary/5 p-2 rounded-md">
+            <Info className="w-3 h-3 text-primary shrink-0" /> 
+            <span>กดที่จุดหรือแท่งกราฟเพื่อดู <strong>รายละเอียด</strong> ของแต่ละเดือนได้เลย</span>
+          </p>
+        </div>
         <div className="p-5">
           <div className="h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -195,6 +201,12 @@ export function AnalyticsCharts({
               <h2 className="text-base font-bold">รายรับ-รายจ่ายรายวัน (เดือนนี้)</h2>
               <p className="text-xs text-muted-foreground">ดูความเคลื่อนไหวรายวัน</p>
             </div>
+          </div>
+          <div className="px-5 pt-3 -mb-2">
+            <p className="text-[10px] text-muted-foreground flex items-center gap-1.5 bg-primary/5 p-2 rounded-md">
+              <Info className="w-3 h-3 text-primary shrink-0" /> 
+              <span>กดที่เส้นกราฟเพื่อดู <strong>รายละเอียด</strong> ของแต่ละวันได้เลย</span>
+            </p>
           </div>
           <div className="p-5">
             <div className="h-64 w-full">
