@@ -17,6 +17,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from "@/lib/validations/schemas";
 import { Loader2, CheckCircle, AlertTriangle, ArrowRight, X, Calendar, User, Tag, FileText, CheckCircle2, Sparkles, Maximize2 } from "lucide-react";
+import { triggerHaptic } from "@/lib/utils";
 
 interface BatchItem {
   slipJobId: string;
