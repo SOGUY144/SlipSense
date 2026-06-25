@@ -259,7 +259,7 @@ export function TransactionForm({
       <div className="h-32" />
 
       {/* Sticky Bottom Bar for Quick Check & Gamification */}
-      <div className="fixed bottom-[110px] md:bottom-6 left-0 right-0 px-4 z-40 pointer-events-none flex justify-center">
+      <div className="fixed bottom-36 md:bottom-6 left-0 right-0 px-4 z-40 pointer-events-none flex justify-center">
         <div className="w-full max-w-md space-y-3 pointer-events-auto bg-background/80 backdrop-blur-xl p-3 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-border/50">
           <p className="text-center text-xs font-bold text-primary animate-pulse flex items-center justify-center gap-1.5">
             <Sparkles className="w-4 h-4" /> ตรวจอีกนิด เพื่อกำไรที่เป๊ะขึ้น!
