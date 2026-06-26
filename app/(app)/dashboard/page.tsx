@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Camera, TrendingUp, TrendingDown, Wallet, Loader2, Sparkles, Bell, Calendar, ChevronRight, CheckCircle2, Info } from "lucide-react";
+import { Camera, TrendingUp, TrendingDown, Wallet, Loader2, Sparkles, Bell, Calendar, ChevronRight, CheckCircle2, Info, AlertTriangle, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -26,6 +26,9 @@ interface Summary {
 interface Insight {
   id: string;
   content: string;
+  metadata?: {
+    type?: string;
+  };
 }
 
 interface Alert {
@@ -323,16 +326,69 @@ export default function DashboardPage() {
           </Button>
         </div>
         {insights.length > 0 ? (
-          insights.slice(0, 2).map((insight) => (
-            <Card key={insight.id} className="border-none shadow-sm bg-white relative overflow-hidden rounded-2xl">
-              <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
-                <Sparkles className="w-24 h-24 text-primary" />
-              </div>
-              <CardContent className="p-5 relative z-10">
-                <p className="text-sm text-foreground/90 leading-relaxed font-medium">{insight.content}</p>
-              </CardContent>
-            </Card>
-          ))
+          <div className="space-y-3">
+            {/* 1. Summary */}
+            {insights.filter(i => i.metadata?.type === 'summary').map((insight) => (
+              <Card key={insight.id} className="border-none shadow-sm bg-indigo-50/50 relative overflow-hidden rounded-2xl">
+                <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                  <Sparkles className="w-24 h-24 text-indigo-600" />
+                </div>
+                <CardContent className="p-5 relative z-10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="w-4 h-4 text-indigo-600" />
+                    <h3 className="font-bold text-sm text-indigo-900">สรุปภาพรวม</h3>
+                  </div>
+                  <p className="text-sm text-indigo-800/90 leading-relaxed font-medium">{insight.content}</p>
+                </CardContent>
+              </Card>
+            ))}
+
+            {/* 2. Risk */}
+            {insights.filter(i => i.metadata?.type === 'risk').map((insight) => (
+              <Card key={insight.id} className="border-none shadow-sm bg-rose-50/50 relative overflow-hidden rounded-2xl">
+                <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                  <AlertTriangle className="w-24 h-24 text-rose-600" />
+                </div>
+                <CardContent className="p-5 relative z-10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertTriangle className="w-4 h-4 text-rose-600" />
+                    <h3 className="font-bold text-sm text-rose-900">ข้อควรระวัง / จุดรั่วไหล</h3>
+                  </div>
+                  <p className="text-sm text-rose-800/90 leading-relaxed font-medium">{insight.content}</p>
+                </CardContent>
+              </Card>
+            ))}
+
+            {/* 3. Action */}
+            {insights.filter(i => i.metadata?.type === 'action').map((insight) => (
+              <Card key={insight.id} className="border-none shadow-sm bg-amber-50/50 relative overflow-hidden rounded-2xl">
+                <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                  <Lightbulb className="w-24 h-24 text-amber-600" />
+                </div>
+                <CardContent className="p-5 relative z-10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Lightbulb className="w-4 h-4 text-amber-600" />
+                    <h3 className="font-bold text-sm text-amber-900">คำแนะนำ / วิธีแก้</h3>
+                  </div>
+                  <div className="text-sm text-amber-800/90 leading-relaxed font-medium whitespace-pre-line">
+                    {insight.content}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+            
+            {/* Fallback for old insights without type */}
+            {insights.filter(i => !i.metadata?.type).slice(0, 2).map((insight) => (
+              <Card key={insight.id} className="border-none shadow-sm bg-white relative overflow-hidden rounded-2xl">
+                <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
+                  <Sparkles className="w-24 h-24 text-primary" />
+                </div>
+                <CardContent className="p-5 relative z-10">
+                  <p className="text-sm text-foreground/90 leading-relaxed font-medium">{insight.content}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         ) : (
           <Card className="border-dashed bg-transparent">
             <CardContent className="p-4 text-center">
