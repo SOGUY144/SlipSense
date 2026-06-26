@@ -50,7 +50,7 @@ ${contextData}
     return result.toTextStreamResponse();
   } catch (error) {
     console.error("Chat API Error:", error);
-    require('fs').writeFileSync('c:/Users/Asus/OneDrive/Desktop/SlipSense/scratch-error.log', String(error) + '\n' + (error?.stack || ''));
+    require('fs').writeFileSync('c:/Users/Asus/OneDrive/Desktop/SlipSense/scratch-error.log', String(error) + '\n' + ((error as any)?.stack || ''));
     if (error instanceof Error && error.message === "Unauthorized") {
       return apiError("Unauthorized", 401);
     }

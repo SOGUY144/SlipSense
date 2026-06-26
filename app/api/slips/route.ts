@@ -49,6 +49,8 @@ export async function POST(request: Request) {
       })
       .returning();
 
+    const uploadType = formData.get("uploadType") as "slip" | "bill" | null || "slip";
+
     const base64 = buffer.toString("base64");
     const mediaType = getMediaType(file.type);
     const activeCategories = await db.query.categories.findMany({
@@ -58,11 +60,11 @@ export async function POST(request: Request) {
     // Process in background
     processSlipInBackground(job.id, base64, mediaType, activeCategories, {
       name: shop.name,
-      ownerName: user.displayName || undefined,
+      ownerName: (user as any).displayName || (user as any).name || undefined,
       businessCategory: (shop.preferences as any)?.businessCategory || undefined,
       businessType: (shop.preferences as any)?.businessType || undefined,
       description: (shop.preferences as any)?.description || undefined,
-    }).catch(console.error);
+    }, uploadType).catch(console.error);
 
     return apiSuccess({
       job,
@@ -80,10 +82,11 @@ async function processSlipInBackground(
   base64: string, 
   mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif",
   categories: {type: string, name: string}[],
-  shopDetails: { name: string, ownerName?: string, businessCategory?: string, businessType?: string, description?: string }
+  shopDetails: { name: string, ownerName?: string, businessCategory?: string, businessType?: string, description?: string },
+  uploadType: "slip" | "bill" = "slip"
 ) {
   try {
-    const extracted = await extractSlipData(base64, mediaType, categories, shopDetails);
+    const extracted = await extractSlipData(base64, mediaType, categories, shopDetails, uploadType);
 
     await db
       .update(slipJobs)

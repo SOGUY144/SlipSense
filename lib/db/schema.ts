@@ -101,6 +101,7 @@ export const transactions = pgTable("transactions", {
   sender: text("sender"),
   receiver: text("receiver"),
   note: text("note"),
+  metadata: jsonb("metadata"),
   confidence: confidenceEnum("confidence"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()

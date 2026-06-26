@@ -100,6 +100,7 @@ export default function ReviewPage({
           sender: extracted.sender ?? "",
           receiver: extracted.receiver ?? "",
           note: extracted.note ?? "",
+          metadata: extracted.metadata ?? undefined,
           confidence: extracted.overallConfidence,
         });
         setFieldConfidence(extracted.fieldConfidence ?? {});

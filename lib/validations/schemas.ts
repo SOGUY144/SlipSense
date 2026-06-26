@@ -21,6 +21,18 @@ export const extractedSlipSchema = z.object({
   type: z.enum(["income", "expense"]),
   category: z.string(),
   bank: z.string().optional(),
+  metadata: z.object({
+    tableNumber: z.string().optional(),
+    receiptNumber: z.string().optional(),
+    lineItems: z.array(z.object({
+      name: z.string(),
+      quantity: z.number(),
+      price: z.number()
+    })).optional(),
+    subTotal: z.number().optional(),
+    tax: z.number().optional(),
+    discount: z.number().optional()
+  }).optional(),
   overallConfidence: confidenceSchema,
   fieldConfidence: fieldConfidenceSchema.optional(),
 });
@@ -36,6 +48,7 @@ export const transactionSchema = z.object({
   sender: z.string().optional(),
   receiver: z.string().optional(),
   note: z.string().optional(),
+  metadata: z.any().optional(), // allow jsonb metadata
   confidence: confidenceSchema.optional(),
 });
 

@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from "@/lib/validations/schemas";
-import { Loader2, CheckCircle, AlertTriangle, ArrowRight, X, Calendar, User, Tag, FileText, CheckCircle2, Sparkles, Maximize2 } from "lucide-react";
+import { Loader2, CheckCircle, AlertTriangle, ArrowRight, X, Calendar, User, Tag, FileText, CheckCircle2, Sparkles, Maximize2, Plus } from "lucide-react";
 import { triggerHaptic } from "@/lib/utils";
 
 interface BatchItem {
@@ -31,6 +31,7 @@ interface BatchItem {
   receiver?: string;
   note?: string;
   fieldConfidence?: any;
+  metadata?: any;
 }
 
 const safeFormatDate = (dateStr: string | undefined | null) => {
@@ -102,6 +103,7 @@ export default function BatchReviewPage() {
             receiver: ex.receiver || "",
             note: ex.note || "",
             fieldConfidence: ex.fieldConfidence || {},
+            metadata: ex.metadata || undefined,
           };
         });
         setItems(loadedItems);
@@ -124,6 +126,47 @@ export default function BatchReviewPage() {
         newItems[index].category = value === "income" ? "รายได้จากการขาย" : "ค่าใช้จ่ายอื่นๆ";
       }
       
+      return newItems;
+    });
+  };
+
+  const updateMetadata = (index: number, field: string, value: any) => {
+    setItems((prev) => {
+      const newItems = [...prev];
+      const meta = newItems[index].metadata || {};
+      newItems[index] = { ...newItems[index], metadata: { ...meta, [field]: value } };
+      return newItems;
+    });
+  };
+
+  const updateLineItem = (index: number, liIndex: number, field: string, value: any) => {
+    setItems((prev) => {
+      const newItems = [...prev];
+      const meta = newItems[index].metadata || {};
+      const lineItems = [...(meta.lineItems || [])];
+      if (!lineItems[liIndex]) lineItems[liIndex] = { name: "", quantity: 1, price: 0 };
+      lineItems[liIndex] = { ...lineItems[liIndex], [field]: value };
+      newItems[index] = { ...newItems[index], metadata: { ...meta, lineItems } };
+      return newItems;
+    });
+  };
+
+  const addLineItem = (index: number) => {
+    setItems((prev) => {
+      const newItems = [...prev];
+      const meta = newItems[index].metadata || {};
+      const lineItems = [...(meta.lineItems || []), { name: "", quantity: 1, price: 0 }];
+      newItems[index] = { ...newItems[index], metadata: { ...meta, lineItems } };
+      return newItems;
+    });
+  };
+
+  const removeLineItem = (index: number, liIndex: number) => {
+    setItems((prev) => {
+      const newItems = [...prev];
+      const meta = newItems[index].metadata || {};
+      const lineItems = (meta.lineItems || []).filter((_: any, i: number) => i !== liIndex);
+      newItems[index] = { ...newItems[index], metadata: { ...meta, lineItems } };
       return newItems;
     });
   };
@@ -300,6 +343,123 @@ export default function BatchReviewPage() {
                     value={items[detailedIndex].receiver || ""}
                     onChange={(e) => updateItem(detailedIndex, "receiver", e.target.value)}
                   />
+                </div>
+
+                <div className="space-y-4 mt-4 bg-muted/30 rounded-xl p-4 border border-border/60">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-bold flex items-center gap-2">
+                      🛒 รายการสินค้า (Line Items)
+                    </Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-8 text-xs font-bold"
+                      onClick={() => addLineItem(detailedIndex)}
+                    >
+                      <Plus className="w-4 h-4 mr-1" /> เพิ่มรายการ
+                    </Button>
+                  </div>
+
+                  {items[detailedIndex].metadata?.lineItems?.length > 0 ? (
+                    <div className="space-y-3">
+                      {items[detailedIndex].metadata.lineItems.map((li: any, idx: number) => (
+                        <div key={idx} className="flex gap-2 items-start bg-white p-2 rounded-lg border shadow-sm">
+                          <div className="flex-1 space-y-2">
+                            <Input
+                              placeholder="ชื่อสินค้า"
+                              className="h-9 text-sm"
+                              value={li.name || ""}
+                              onChange={(e) => updateLineItem(detailedIndex, idx, "name", e.target.value)}
+                            />
+                            <div className="flex gap-2">
+                              <Input
+                                type="number"
+                                placeholder="จำนวน"
+                                className="h-9 text-sm w-20"
+                                value={li.quantity || ""}
+                                onChange={(e) => updateLineItem(detailedIndex, idx, "quantity", parseFloat(e.target.value) || 0)}
+                              />
+                              <Input
+                                type="number"
+                                placeholder="ราคา (รวม)"
+                                className="h-9 text-sm flex-1"
+                                value={li.price || ""}
+                                onChange={(e) => updateLineItem(detailedIndex, idx, "price", parseFloat(e.target.value) || 0)}
+                              />
+                            </div>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:bg-destructive/10 hover:text-destructive h-9 w-9 shrink-0"
+                            onClick={() => removeLineItem(detailedIndex, idx)}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center p-4 text-sm text-muted-foreground border-2 border-dashed rounded-lg">
+                      ไม่มีรายการสินค้า
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-3 pt-2 border-t">
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">ยอดก่อนภาษี</Label>
+                      <Input
+                        type="number"
+                        placeholder="0.00"
+                        className="h-9 text-sm"
+                        value={items[detailedIndex].metadata?.subTotal || ""}
+                        onChange={(e) => updateMetadata(detailedIndex, "subTotal", parseFloat(e.target.value) || undefined)}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">ภาษี (Tax/VAT)</Label>
+                      <Input
+                        type="number"
+                        placeholder="0.00"
+                        className="h-9 text-sm"
+                        value={items[detailedIndex].metadata?.tax || ""}
+                        onChange={(e) => updateMetadata(detailedIndex, "tax", parseFloat(e.target.value) || undefined)}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">ส่วนลด</Label>
+                      <Input
+                        type="number"
+                        placeholder="0.00"
+                        className="h-9 text-sm"
+                        value={items[detailedIndex].metadata?.discount || ""}
+                        onChange={(e) => updateMetadata(detailedIndex, "discount", parseFloat(e.target.value) || undefined)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 pt-2 border-t">
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">เลขโต๊ะ</Label>
+                      <Input
+                        placeholder="เช่น V05"
+                        className="h-9 text-sm"
+                        value={items[detailedIndex].metadata?.tableNumber || ""}
+                        onChange={(e) => updateMetadata(detailedIndex, "tableNumber", e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">รหัสบิล</Label>
+                      <Input
+                        placeholder="เช่น 1000011"
+                        className="h-9 text-sm"
+                        value={items[detailedIndex].metadata?.receiptNumber || ""}
+                        onChange={(e) => updateMetadata(detailedIndex, "receiptNumber", e.target.value)}
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-2">

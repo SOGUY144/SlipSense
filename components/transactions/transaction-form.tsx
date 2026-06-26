@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm, UseFormReturn } from "react-hook-form";
+import { useForm, UseFormReturn, useFieldArray } from "react-hook-form";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Check, X, Sparkles } from "lucide-react";
+import { Check, X, Sparkles, Trash2, Plus } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -50,6 +50,7 @@ interface TransactionFormProps {
   onCancel?: () => void;
   title?: React.ReactNode;
   showConfidence?: boolean;
+  hasBottomNav?: boolean;
 }
 
 import { useEffect, useState } from "react";
@@ -68,9 +69,15 @@ export function TransactionForm({
   onCancel,
   title = "ข้อมูลที่ AI อ่านได้",
   showConfidence = false,
+  hasBottomNav = false,
 }: TransactionFormProps) {
   const watchType = form.watch("type");
   const [dbCategories, setDbCategories] = useState<Category[]>([]);
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "metadata.lineItems"
+  });
 
   useEffect(() => {
     fetch("/api/categories")
@@ -240,7 +247,116 @@ export function TransactionForm({
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-4 mt-4 bg-muted/30 rounded-xl p-4 border-2 border-border/60">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-bold flex items-center gap-2">
+                🛒 รายการสินค้า (Line Items)
+              </Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-8 text-xs font-bold"
+                onClick={() => append({ name: "", quantity: 1, price: 0 })}
+              >
+                <Plus className="w-4 h-4 mr-1" /> เพิ่มรายการ
+              </Button>
+            </div>
+
+            {fields.length > 0 ? (
+              <div className="space-y-3">
+                {fields.map((field, idx) => (
+                  <div key={field.id} className="flex gap-2 items-start bg-white p-2 rounded-lg border shadow-sm">
+                    <div className="flex-1 space-y-2">
+                      <Input
+                        placeholder="ชื่อสินค้า"
+                        className="h-9 text-sm"
+                        {...form.register(`metadata.lineItems.${idx}.name`)}
+                      />
+                      <div className="flex gap-2">
+                        <Input
+                          type="number"
+                          placeholder="จำนวน"
+                          className="h-9 text-sm w-20"
+                          {...form.register(`metadata.lineItems.${idx}.quantity`, { valueAsNumber: true })}
+                        />
+                        <Input
+                          type="number"
+                          placeholder="ราคา (รวม)"
+                          className="h-9 text-sm flex-1"
+                          {...form.register(`metadata.lineItems.${idx}.price`, { valueAsNumber: true })}
+                        />
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive hover:bg-destructive/10 hover:text-destructive h-9 w-9 shrink-0"
+                      onClick={() => remove(idx)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center p-4 text-sm text-muted-foreground border-2 border-dashed rounded-lg">
+                ไม่มีรายการสินค้า
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-3 pt-2 border-t">
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">ยอดก่อนภาษี</Label>
+                <Input
+                  type="number"
+                  placeholder="0.00"
+                  className="h-9 text-sm"
+                  {...form.register("metadata.subTotal", { valueAsNumber: true })}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">ภาษี (Tax/VAT)</Label>
+                <Input
+                  type="number"
+                  placeholder="0.00"
+                  className="h-9 text-sm"
+                  {...form.register("metadata.tax", { valueAsNumber: true })}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">ส่วนลด</Label>
+                <Input
+                  type="number"
+                  placeholder="0.00"
+                  className="h-9 text-sm"
+                  {...form.register("metadata.discount", { valueAsNumber: true })}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 pt-2 border-t">
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">เลขโต๊ะ</Label>
+                <Input
+                  placeholder="เช่น V05"
+                  className="h-9 text-sm"
+                  {...form.register("metadata.tableNumber")}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">รหัสบิล</Label>
+                <Input
+                  placeholder="เช่น 1000011"
+                  className="h-9 text-sm"
+                  {...form.register("metadata.receiptNumber")}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2 mt-4">
             <div className="flex items-center justify-between">
               <Label htmlFor="note" className="text-base font-bold">หมายเหตุ</Label>
               {showConfidence && <ConfidenceBadge level={fieldConfidence.note} />}
@@ -259,7 +375,10 @@ export function TransactionForm({
       <div className="h-32" />
 
       {/* Sticky Bottom Bar */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 z-30 pb-safe pointer-events-none bg-gradient-to-t from-background/90 via-background/50 to-transparent">
+      <div 
+        className="fixed left-0 right-0 p-4 z-30 pb-safe pointer-events-none bg-gradient-to-t from-background/90 via-background/50 to-transparent"
+        style={{ bottom: hasBottomNav ? '72px' : '0px' }}
+      >
         <div className="max-w-md mx-auto flex flex-col gap-2 pointer-events-auto">
           {/* Gamification Text */}
           <div className="flex justify-center">

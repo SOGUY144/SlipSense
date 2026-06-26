@@ -38,6 +38,7 @@ export default function UploadPage() {
   const [savingBatch, setSavingBatch] = useState(false);
   const [savingManual, setSavingManual] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [uploadType, setUploadType] = useState<"slip" | "bill">("slip");
   const [showConfirmDrawer, setShowConfirmDrawer] = useState(false);
   const [doNotShowAgain, setDoNotShowAgain] = useState(false);
 
@@ -158,6 +159,7 @@ export default function UploadPage() {
 
       const formData = new FormData();
       formData.append("file", fileArray[i]);
+      formData.append("uploadType", uploadType);
 
       try {
         const res = await fetch("/api/slips", {
@@ -249,6 +251,7 @@ export default function UploadPage() {
           onSubmit={onManualSubmit}
           saving={savingManual}
           title="กรอกรายละเอียดรายการ"
+          hasBottomNav={true}
         />
       ) : (
         <>
@@ -270,6 +273,29 @@ export default function UploadPage() {
         onChange={handleFileChange}
       />
 
+      <div className="flex gap-2 p-1 bg-muted/50 rounded-xl mb-4 border">
+        <button
+          className={`flex-1 rounded-lg py-2 text-sm font-medium transition-all ${
+            uploadType === "slip"
+              ? "bg-white text-foreground shadow-sm border"
+              : "text-muted-foreground hover:bg-white/50"
+          }`}
+          onClick={() => setUploadType("slip")}
+        >
+          📄 สลิปโอนเงิน
+        </button>
+        <button
+          className={`flex-1 rounded-lg py-2 text-sm font-medium transition-all ${
+            uploadType === "bill"
+              ? "bg-white text-foreground shadow-sm border"
+              : "text-muted-foreground hover:bg-white/50"
+          }`}
+          onClick={() => setUploadType("bill")}
+        >
+          🧾 ใบเสร็จ/บิลซื้อของ
+        </button>
+      </div>
+
       <Card
         className="cursor-pointer border-dashed border-4 border-primary/30 bg-primary/5 hover:border-primary/60 hover:bg-primary/10 hover:-translate-y-1 hover:shadow-md transition-all duration-300 rounded-2xl"
         onClick={() => { triggerHaptic('light'); !isWorking && galleryInputRef.current?.click(); }}
@@ -279,7 +305,7 @@ export default function UploadPage() {
             <Upload className="h-12 w-12 text-primary" strokeWidth={2.5} />
           </div>
           <div className="text-center">
-            <p className="text-xl font-bold">แตะเพื่อเลือกรูปสลิป</p>
+            <p className="text-xl font-bold">แตะเพื่อเลือกรูป{uploadType === "slip" ? "สลิป" : "บิล"}</p>
             <p className="text-base text-muted-foreground mt-2 font-medium">
               หรือถ่ายรูปจากกล้อง · รองรับหลายใบ
             </p>

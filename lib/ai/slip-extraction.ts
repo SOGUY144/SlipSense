@@ -8,7 +8,8 @@ import {
 
 export function buildSlipExtractionPrompt(
   categories: {type: string, name: string}[],
-  shopDetails?: { name: string, ownerName?: string, businessCategory?: string, businessType?: string, description?: string }
+  shopDetails?: { name: string, ownerName?: string, businessCategory?: string, businessType?: string, description?: string },
+  uploadType: "slip" | "bill" = "slip"
 ): string {
   const incomeCats = categories.filter(c => c.type === 'income').map(c => `"${c.name}"`).join(', ');
   const expenseCats = categories.filter(c => c.type === 'expense').map(c => `"${c.name}"`).join(', ');
@@ -22,14 +23,43 @@ export function buildSlipExtractionPrompt(
     if (shopDetails.description) {
       shopRule += `\n   - กฎเฉพาะของร้านนี้: "${shopDetails.description}" (ต้องปฏิบัติตามกฎนี้อย่างเคร่งครัด)`;
     }
-    shopRule += `\n   - กฎสแกนชื่อ: ให้เช็คชื่อผู้โอน (Sender) และผู้รับ (Receiver) ก่อนเสมอ!
+    if (uploadType === "slip") {
+      shopRule += `\n   - กฎสแกนชื่อ: ให้เช็คชื่อผู้โอน (Sender) และผู้รับ (Receiver) ก่อนเสมอ!
    - ถ้าชื่อ "ผู้โอน (Sender)" มีคำที่ตรงกับชื่อร้านหรือชื่อเจ้าของ ให้บังคับว่าสลิปนี้เป็น "รายจ่าย" (expense) ทันที 100%
    - ถ้าชื่อ "ผู้รับ (Receiver)" มีคำที่ตรงกับชื่อร้านหรือชื่อเจ้าของ ให้บังคับว่าสลิปนี้เป็น "รายรับ" (income) ทันที 100%`;
+    }
   }
 
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentYearBuddhist = currentYear + 543;
+
+  if (uploadType === "bill") {
+    return `คุณเป็น AI ผู้เชี่ยวชาญในการอ่านใบเสร็จ/บิลซื้อของ (Receipt/Bill)
+
+วิเคราะห์รูปภาพและส่งคืนข้อมูลตามโครงสร้างที่กำหนด
+หมวดหมู่รายรับที่อนุญาตให้ใช้: ${incomeCats || "รายได้จากการขาย, รายได้อื่นๆ"}
+หมวดหมู่รายจ่ายที่อนุญาตให้ใช้: ${expenseCats || "ค่าวัตถุดิบ, ค่าเช่า, ค่าใช้จ่ายอื่นๆ"}
+
+กฎสำหรับการอ่านบิล (Receipt/Bill):
+1. การแยกแยะประเภท:${shopRule}
+   - บิลซื้อของส่วนใหญ่ถือเป็น "รายจ่าย" (expense) ยกเว้นเป็นใบเสร็จรับเงินที่ร้านเราออกให้ลูกค้า (income)
+2. ข้อมูลร้านค้าและบิล:
+   - ดึง "ชื่อร้านค้า/ซัพพลายเออร์ที่ออกบิล" ไปใส่ในช่อง receiver (เพราะเราเป็นคนจ่าย) และให้ sender ว่างไว้
+   - ยอดรวมทั้งหมด (Total/Grand Total) ไปใส่ในช่อง amount
+   - ถ้ามีระบุ โต๊ะ (Table) ให้ใส่ใน metadata.tableNumber
+   - ถ้ามีระบุ รหัสบิล (Tran ID / Receipt ID / Bill No) ให้ใส่ใน metadata.receiptNumber
+3. การดึงรายการสินค้า (Line Items):
+   - แยกรายการสินค้าแต่ละชิ้น (name), จำนวน (quantity), และราคารวมต่อรายการ (price) ไปใส่ใน metadata.lineItems อย่างละเอียดทุกรายการ
+   - ถ้าระบุส่วนลด (Discount) ให้ใส่ใน metadata.discount
+   - ถ้าระบุภาษี (Tax/VAT) ให้ใส่ใน metadata.tax และยอดก่อนภาษีใส่ใน metadata.subTotal
+4. หมวดหมู่ (category):
+   - ประเมินจากรายการสินค้าหลักในบิลว่าเข้าข่ายหมวดหมู่ไหน หากก้ำกึ่งให้ใช้ "ค่าใช้จ่ายอื่นๆ"
+5. การอ่านวันที่:
+   - วันนี้คือวันที่ ${now.toISOString().split('T')[0]} ปีปัจจุบันคือ ค.ศ. ${currentYear} (พ.ศ. ${currentYearBuddhist})
+   - แปลงวันที่และเวลาไปเป็น YYYY-MM-DDThh:mm:ss
+6. ถ้าอ่านส่วนใดไม่ชัด ให้ confidence ของฟิลด์นั้นต่ำ`;
+  }
 
   return `คุณเป็น AI ผู้เชี่ยวชาญในการอ่านสลิปโอนเงินธนาคารไทย และใบเสร็จ/บิลซื้อของ (Receipt/Bill)
 
@@ -39,17 +69,14 @@ export function buildSlipExtractionPrompt(
 
 กฎ:
 1. การแยกแยะประเภท:${shopRule}
-   - กรณีทั่วไป (ถ้าชื่อไม่ตรงกับกฎด้านบน):
+   - กรณีทั่วไป:
      - ถ้าเป็น "สลิปโอนเงินเข้า" = income
-     - ถ้าเป็น "สลิปโอนเงินออก" หรือ "ใบเสร็จ/บิลซื้อของ" = expense
-2. กรณีเป็น สลิปโอนเงินเข้า/ออก (Bank Slip):
+     - ถ้าเป็น "สลิปโอนเงินออก" = expense
+2. กรณีสลิปโอนเงิน:
    - ดึง "ชื่อผู้โอน / จาก" (Sender) ไปใส่ในช่อง sender
    - ดึง "ชื่อผู้รับเงิน / ไปยัง" (Receiver) ไปใส่ในช่อง receiver
-3. กรณีเป็น ใบเสร็จ/บิลซื้อของ (Receipt/Bill):
-   - ดึง "ชื่อร้านค้า/ซัพพลายเออร์" ไปใส่ในช่อง receiver (เพราะเราเป็นคนจ่าย) และให้ sender ว่างไว้
-   - ยอดรวมทั้งหมด (Total/Grand Total) ไปใส่ในช่อง amount
-   - หมวดหมู่ (category): หากบิลมีสินค้าหลายหมวดปนกัน ให้ประเมินว่าสินค้าหมวดใดมีมูลค่ารวมสูงที่สุดในบิลนั้น แล้วจัดบิลเข้าหมวดหมู่นั้น หากก้ำกึ่งแยกยากให้จัดเข้า "ค่าใช้จ่ายอื่นๆ"
-   - ให้ดึงรายการสินค้าหลักๆ 1-3 รายการแรก (พร้อมจำนวนและราคา) ไปสรุปไว้ในช่อง note อัตโนมัติ (เช่น "เนื้อหมู 500฿, ผักสด 200฿")
+3. กรณีใบเสร็จ:
+   - ดึงชื่อร้านค้าไปใส่ใน receiver, ยอดรวมใน amount
 4. การอ่านวันที่ (สำคัญมาก):
    - วันนี้คือวันที่ ${now.toISOString().split('T')[0]} ปีปัจจุบันคือ ค.ศ. ${currentYear} (พ.ศ. ${currentYearBuddhist}) หากสลิปไม่ระบุปี ให้ตีความว่าเป็นปีปัจจุบันเสมอ
    - วันที่และเวลา (occurredAt) ให้ดึงจากภาพโดยตรงและแปลงเป็นรูปแบบ YYYY-MM-DDThh:mm:ss เท่านั้น (ไม่ต้องเติม Z ต่อท้าย และห้ามแปลง Timezone เด็ดขาด)
@@ -154,13 +181,26 @@ const aiSlipSchema = z.object({
     type: z.enum(["high", "medium", "low"]).nullable(),
     category: z.enum(["high", "medium", "low"]).nullable(),
   }).nullable(),
+  metadata: z.object({
+    tableNumber: z.string().nullable(),
+    receiptNumber: z.string().nullable(),
+    lineItems: z.array(z.object({
+      name: z.string(),
+      quantity: z.number(),
+      price: z.number()
+    })).nullable(),
+    subTotal: z.number().nullable(),
+    tax: z.number().nullable(),
+    discount: z.number().nullable()
+  }).nullable()
 });
 
 export async function extractSlipData(
   imageBase64: string,
   mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif",
   categories: {type: string, name: string}[] = [],
-  shopDetails?: { name: string, ownerName?: string, businessCategory?: string, businessType?: string, description?: string }
+  shopDetails?: { name: string, ownerName?: string, businessCategory?: string, businessType?: string, description?: string },
+  uploadType: "slip" | "bill" = "slip"
 ): Promise<ExtractedSlip> {
   return callWithRetry(async () => {
     const { object } = await generateObject({
@@ -170,7 +210,7 @@ export async function extractSlipData(
         {
           role: "user",
           content: [
-            { type: "text", text: buildSlipExtractionPrompt(categories, shopDetails) },
+            { type: "text", text: buildSlipExtractionPrompt(categories, shopDetails, uploadType) },
             { type: "image", image: `data:${mediaType};base64,${imageBase64}` }
           ]
         }
@@ -186,6 +226,14 @@ export async function extractSlipData(
       receiver: object.receiver || undefined,
       note: object.note || undefined,
       bank: object.bank || undefined,
+      metadata: object.metadata ? {
+        tableNumber: object.metadata.tableNumber || undefined,
+        receiptNumber: object.metadata.receiptNumber || undefined,
+        lineItems: object.metadata.lineItems || undefined,
+        subTotal: object.metadata.subTotal || undefined,
+        tax: object.metadata.tax || undefined,
+        discount: object.metadata.discount || undefined
+      } : undefined,
       overallConfidence: object.overallConfidence,
       fieldConfidence: object.fieldConfidence ? {
         amount: object.fieldConfidence.amount || undefined,
