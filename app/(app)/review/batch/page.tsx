@@ -36,7 +36,10 @@ interface BatchItem {
 const safeFormatDate = (dateStr: string | undefined | null) => {
   if (!dateStr) return "";
   const d = new Date(dateStr);
-  return isNaN(d.getTime()) ? "" : d.toISOString().slice(0, 16);
+  if (isNaN(d.getTime())) return "";
+  
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
 
 const safeParseDate = (dateStr: string) => {
