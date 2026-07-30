@@ -39,20 +39,42 @@ interface Alert {
   daysLeft: number;
 }
 
+interface ForecastData {
+  summary: {
+    currentBalance: number;
+    projected30DayBalance: number;
+    avgDailyIncome: number;
+    avgDailyExpense: number;
+    isShortageRisk: boolean;
+    shortageDate: string | null;
+    shortageAmount: number;
+    recommendation: string;
+  };
+  forecast: Array<{
+    date: string;
+    dayLabel: string;
+    projectedIncome: number;
+    projectedExpense: number;
+    projectedBalance: number;
+  }>;
+}
+
 export default function DashboardPage() {
   const [summary, setSummary] = useState<Summary | null>(null);
   const [insights, setInsights] = useState<Insight[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [forecast, setForecast] = useState<ForecastData | null>(null);
   const [loading, setLoading] = useState(true);
   const [generatingInsights, setGeneratingInsights] = useState(false);
   const [behaviorModalDone, setBehaviorModalDone] = useState(false);
   const [showPaidSuccess, setShowPaidSuccess] = useState(false);
 
   async function load() {
-    const [summaryRes, insightsRes, alertsRes] = await Promise.all([
+    const [summaryRes, insightsRes, alertsRes, forecastRes] = await Promise.all([
       fetch("/api/dashboard/summary"),
       fetch("/api/insights"),
       fetch("/api/dashboard/reminders-alerts"),
+      fetch("/api/analytics/forecast"),
     ]);
 
     if (summaryRes.ok) {
@@ -64,6 +86,9 @@ export default function DashboardPage() {
     if (alertsRes.ok) {
       const data = await alertsRes.json();
       setAlerts(data.alerts || []);
+    }
+    if (forecastRes.ok) {
+      setForecast(await forecastRes.json());
     }
   }
 
@@ -191,6 +216,59 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Early Warning Risk Banner */}
+      {forecast?.summary.isShortageRisk && (
+        <Card className="border-2 border-red-200 bg-red-50/70 shadow-sm overflow-hidden animate-in fade-in duration-300">
+          <CardContent className="p-4 flex items-start gap-3">
+            <div className="p-2 bg-red-100 rounded-full text-red-600 shrink-0">
+              <AlertTriangle className="h-5 w-5" />
+            </div>
+            <div className="space-y-1">
+              <h4 className="font-bold text-sm text-red-900 flex items-center gap-2">
+                เตือนภัยสภาพคล่องการเงิน (AI Forecast)
+              </h4>
+              <p className="text-xs text-red-700 leading-relaxed font-medium">
+                {forecast.summary.recommendation}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* AI 30-Day Cash Flow Forecast Card */}
+      {forecast && (
+        <Card className="border border-border/60 shadow-sm bg-white overflow-hidden">
+          <CardContent className="p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-primary/10 rounded-lg text-primary">
+                  <Sparkles className="h-4 w-4" />
+                </div>
+                <h3 className="font-bold text-sm">คาดการณ์เงินคงเหลือ (อีก 30 วัน)</h3>
+              </div>
+              <Badge variant="outline" className="text-xs font-semibold bg-primary/5 text-primary border-primary/20">
+                คาดการณ์: {formatCurrency(forecast.summary.projected30DayBalance)}
+              </Badge>
+            </div>
+
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {forecast.summary.recommendation}
+            </p>
+
+            <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-border/40">
+              <div className="bg-muted/40 p-2.5 rounded-lg">
+                <p className="text-muted-foreground">รายรับเฉลี่ย/วัน</p>
+                <p className="font-bold text-success text-sm">{formatCurrency(forecast.summary.avgDailyIncome)}</p>
+              </div>
+              <div className="bg-muted/40 p-2.5 rounded-lg">
+                <p className="text-muted-foreground">รายจ่ายเฉลี่ย/วัน</p>
+                <p className="font-bold text-destructive text-sm">{formatCurrency(forecast.summary.avgDailyExpense)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="border-none shadow-sm bg-white overflow-hidden rounded-2xl">
         <div className="p-4 pb-2 flex items-center justify-between">
