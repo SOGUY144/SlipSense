@@ -1,6 +1,6 @@
-import { eq, desc } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { slipJobs, categories as dbCategories } from "@/lib/db/schema";
+import { slipJobs, transactions, categories as dbCategories } from "@/lib/db/schema";
 import { requireAuth } from "@/lib/auth/helpers";
 import { apiError, apiSuccess } from "@/lib/api/response";
 import {
@@ -88,12 +88,54 @@ async function processSlipInBackground(
   try {
     const extracted = await extractSlipData(base64, mediaType, categories, shopDetails, uploadType);
 
+    let riskLevel = extracted.riskLevel || "low";
+    let riskScore = extracted.riskScore || 0;
+    const riskReasons = [...(extracted.riskReasons || [])];
+
+    const [job] = await db
+      .select({ shopId: slipJobs.shopId })
+      .from(slipJobs)
+      .where(eq(slipJobs.id, jobId))
+      .limit(1);
+
+    if (extracted.transRef && job) {
+      const [existingTx] = await db
+        .select({ id: transactions.id })
+        .from(transactions)
+        .where(
+          and(
+            eq(transactions.shopId, job.shopId),
+            eq(transactions.transRef, extracted.transRef)
+          )
+        )
+        .limit(1);
+
+      if (existingTx) {
+        riskLevel = "high";
+        riskScore = 100;
+        if (!riskReasons.includes("สลิปนี้เคยถูกบันทึกในระบบแล้ว")) {
+          riskReasons.push("สลิปนี้เคยถูกบันทึกในระบบแล้ว");
+        }
+      }
+    }
+
+    const updatedExtractedData = {
+      ...extracted,
+      riskLevel,
+      riskScore,
+      riskReasons,
+    };
+
     await db
       .update(slipJobs)
       .set({
         status: "done",
-        extractedData: extracted,
+        extractedData: updatedExtractedData,
         confidence: extracted.overallConfidence,
+        transRef: extracted.transRef || null,
+        riskScore: riskScore,
+        riskLevel: riskLevel,
+        riskReasons: riskReasons,
       })
       .where(eq(slipJobs.id, jobId));
       

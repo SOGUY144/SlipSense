@@ -32,6 +32,10 @@ interface BatchItem {
   note?: string;
   fieldConfidence?: any;
   metadata?: any;
+  transRef?: string;
+  riskLevel?: "low" | "medium" | "high";
+  riskScore?: number;
+  riskReasons?: string[];
 }
 
 const safeFormatDate = (dateStr: string | undefined | null) => {
@@ -104,6 +108,10 @@ export default function BatchReviewPage() {
             note: ex.note || "",
             fieldConfidence: ex.fieldConfidence || {},
             metadata: ex.metadata || undefined,
+            transRef: ex.transRef || d.job.transRef || undefined,
+            riskLevel: ex.riskLevel || d.job.riskLevel || "low",
+            riskScore: ex.riskScore ?? d.job.riskScore ?? 0,
+            riskReasons: ex.riskReasons || d.job.riskReasons || [],
           };
         });
         setItems(loadedItems);
@@ -529,6 +537,21 @@ export default function BatchReviewPage() {
                   สลิปที่ {index + 1}
                 </CardTitle>
                 <div className="flex items-center gap-2">
+                  {item.riskLevel === "high" && (
+                    <span className="bg-red-500/10 text-red-600 border border-red-200 text-xs px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                      <AlertTriangle className="h-3 w-3" /> เสี่ยงสูง/สลิปซ้ำ
+                    </span>
+                  )}
+                  {item.riskLevel === "medium" && (
+                    <span className="bg-amber-500/10 text-amber-600 border border-amber-200 text-xs px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                      <AlertTriangle className="h-3 w-3" /> ควรตรวจสอบ
+                    </span>
+                  )}
+                  {item.riskLevel === "low" && (
+                    <span className="bg-emerald-500/10 text-emerald-600 border border-emerald-200 text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                      <CheckCircle2 className="h-3 w-3" /> ปกติ
+                    </span>
+                  )}
                   <ConfidenceBadge level={item.confidence as any} />
                   <Button variant="ghost" size="icon" className="h-7 w-7 text-primary hover:bg-primary/10 hover:text-primary" onClick={() => setDetailedIndex(index)}>
                     <Maximize2 className="h-4 w-4" />
@@ -536,6 +559,12 @@ export default function BatchReviewPage() {
                 </div>
               </div>
             </CardHeader>
+            {item.riskReasons && item.riskReasons.length > 0 && (
+              <div className="bg-red-50 border-b border-red-200 px-4 py-2 text-xs text-red-700 font-medium flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 shrink-0 text-red-600" />
+                <span>คำเตือนจาก AI: {item.riskReasons.join(", ")}</span>
+              </div>
+            )}
             <CardContent className="p-4 flex gap-4 flex-col sm:flex-row">
               {/* Image Preview */}
               <div 

@@ -72,6 +72,10 @@ export async function POST(request: Request) {
       receiver: t.receiver ?? null,
       note: t.note ?? null,
       confidence: t.confidence ?? null,
+      transRef: t.transRef ?? null,
+      riskScore: t.riskScore ?? 0,
+      riskLevel: t.riskLevel ?? "low",
+      riskReasons: t.riskReasons ?? [],
     }));
 
     const insertedTransactions = await db
