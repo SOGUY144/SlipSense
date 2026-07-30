@@ -1,10 +1,49 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { transactions } from "@/lib/db/schema";
+import { transactions, slipJobs } from "@/lib/db/schema";
 import { requireAuth } from "@/lib/auth/helpers";
 import { apiError, apiSuccess } from "@/lib/api/response";
 import { transactionSchema } from "@/lib/validations/schemas";
 
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { supabase, shop } = await requireAuth();
+    const { id } = await params;
+
+    const result = await db
+      .select()
+      .from(transactions)
+      .leftJoin(slipJobs, eq(transactions.slipJobId, slipJobs.id))
+      .where(and(eq(transactions.id, id), eq(transactions.shopId, shop.id)));
+
+    if (!result || result.length === 0) {
+      return apiError("Transaction not found", 404);
+    }
+
+    let imageUrl = null;
+    if (result[0].slip_jobs?.storagePath) {
+      const { data } = await supabase.storage
+        .from("slips")
+        .createSignedUrl(result[0].slip_jobs.storagePath, 3600);
+      imageUrl = data?.signedUrl || null;
+    }
+
+    const transaction = {
+      ...result[0].transactions,
+      imageUrl,
+    };
+
+    return apiSuccess(transaction);
+  } catch (error) {
+    if (error instanceof Error && error.message === "Unauthorized") {
+      return apiError("Unauthorized", 401);
+    }
+    return apiError("Failed to fetch transaction", 500);
+  }
+}
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
