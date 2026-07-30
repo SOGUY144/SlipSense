@@ -34,6 +34,12 @@ export const confidenceEnum = pgEnum("confidence_level", [
   "low",
 ]);
 
+export const riskLevelEnum = pgEnum("risk_level", [
+  "low",
+  "medium",
+  "high",
+]);
+
 export const shopRoleEnum = pgEnum("shop_role", ["owner", "member"]);
 
 export const profiles = pgTable("profiles", {
@@ -81,6 +87,10 @@ export const slipJobs = pgTable("slip_jobs", {
   extractedData: jsonb("extracted_data"),
   confidence: confidenceEnum("confidence"),
   errorMessage: text("error_message"),
+  transRef: text("trans_ref"),
+  riskScore: integer("risk_score").default(0),
+  riskLevel: riskLevelEnum("risk_level").default("low"),
+  riskReasons: jsonb("risk_reasons"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -103,6 +113,10 @@ export const transactions = pgTable("transactions", {
   note: text("note"),
   metadata: jsonb("metadata"),
   confidence: confidenceEnum("confidence"),
+  transRef: text("trans_ref"),
+  riskScore: integer("risk_score").default(0),
+  riskLevel: riskLevelEnum("risk_level").default("low"),
+  riskReasons: jsonb("risk_reasons"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),

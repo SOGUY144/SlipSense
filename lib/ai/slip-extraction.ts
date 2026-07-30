@@ -75,9 +75,14 @@ export function buildSlipExtractionPrompt(
 2. กรณีสลิปโอนเงิน:
    - ดึง "ชื่อผู้โอน / จาก" (Sender) ไปใส่ในช่อง sender
    - ดึง "ชื่อผู้รับเงิน / ไปยัง" (Receiver) ไปใส่ในช่อง receiver
-3. กรณีใบเสร็จ:
+   - ดึง "เลขรหัสอ้างอิงธุรกรรม / เลขที่รายการ / Transaction Ref / Ref No." บนสลิป ไปใส่ในช่อง transRef (หากมี)
+3. การตรวจความสมบูรณ์และร่องรอยการแก้ไขภาพ (Risk Assessment):
+   - ประเมินว่าสลิปนี้ดูเป็นสลิปจริงหรือน่าสงสัย (เช่น ฟอนต์ไม่สม่ำเสมอ, แนวบรรทัดเบี้ยวผิดปกติ, ร่องรอยตัดต่อตัวเลข)
+   - หากปกติ ให้ riskLevel = "low", riskScore = 0, riskReasons = []
+   - หากน่าสงสัย ให้ riskLevel = "medium" หรือ "high", riskScore = 50-100, และระบุเหตุผลใน riskReasons
+4. กรณีใบเสร็จ:
    - ดึงชื่อร้านค้าไปใส่ใน receiver, ยอดรวมใน amount
-4. การอ่านวันที่ (สำคัญมาก):
+5. การอ่านวันที่ (สำคัญมาก):
    - วันนี้คือวันที่ ${now.toISOString().split('T')[0]} ปีปัจจุบันคือ ค.ศ. ${currentYear} (พ.ศ. ${currentYearBuddhist}) หากสลิปไม่ระบุปี ให้ตีความว่าเป็นปีปัจจุบันเสมอ
    - วันที่และเวลา (occurredAt) ให้ดึงจากภาพโดยตรงและแปลงเป็นรูปแบบ YYYY-MM-DDThh:mm:ss เท่านั้น (ไม่ต้องเติม Z ต่อท้าย และห้ามแปลง Timezone เด็ดขาด)
    - แปลงเดือนภาษาไทยให้ถูกต้อง (ม.ค.=01, ... ธ.ค.=12)
@@ -85,7 +90,7 @@ export function buildSlipExtractionPrompt(
    - ระวังรูปแบบปี 2 หลัก! สลิปมักเขียนแค่ "69" ซึ่งหมายถึง พ.ศ. 2569 (ค.ศ. ${currentYear}) ห้ามแปลงเป็น 1969 หรือ 2069 เด็ดขาด
    - ตัวอย่าง: "07 มิ.ย. 69 19:04" -> "${currentYear}-06-07T19:04:00"
    - ตัวอย่าง: "26/06/69" -> "${currentYear}-06-26T00:00:00"
-5. ถ้าอ่านส่วนใดไม่ชัด ให้ confidence ของฟิลด์นั้นต่ำและเดาอย่างสมเหตุสมผล`;
+6. ถ้าอ่านส่วนใดไม่ชัด ให้ confidence ของฟิลด์นั้นต่ำและเดาอย่างสมเหตุสมผล`;
 }
 
 export interface FinancialFacts {
@@ -192,7 +197,11 @@ const aiSlipSchema = z.object({
     subTotal: z.number().nullable(),
     tax: z.number().nullable(),
     discount: z.number().nullable()
-  }).nullable()
+  }).nullable(),
+  transRef: z.string().nullable(),
+  riskScore: z.number().nullable(),
+  riskLevel: z.enum(["low", "medium", "high"]).nullable(),
+  riskReasons: z.array(z.string()).nullable()
 });
 
 export async function extractSlipData(
@@ -244,6 +253,10 @@ export async function extractSlipData(
         type: object.fieldConfidence.type || undefined,
         category: object.fieldConfidence.category || undefined,
       } : undefined,
+      transRef: object.transRef || undefined,
+      riskScore: object.riskScore ?? 0,
+      riskLevel: object.riskLevel || "low",
+      riskReasons: object.riskReasons || []
     };
   });
 }

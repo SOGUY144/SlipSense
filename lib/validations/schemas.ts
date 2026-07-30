@@ -35,6 +35,10 @@ export const extractedSlipSchema = z.object({
   }).optional(),
   overallConfidence: confidenceSchema,
   fieldConfidence: fieldConfidenceSchema.optional(),
+  transRef: z.string().optional(),
+  riskScore: z.number().optional().default(0),
+  riskLevel: z.enum(["low", "medium", "high"]).optional().default("low"),
+  riskReasons: z.array(z.string()).optional().default([]),
 });
 
 export type ExtractedSlip = z.infer<typeof extractedSlipSchema>;
@@ -50,6 +54,10 @@ export const transactionSchema = z.object({
   note: z.string().optional(),
   metadata: z.any().optional(), // allow jsonb metadata
   confidence: confidenceSchema.optional(),
+  transRef: z.string().optional(),
+  riskScore: z.number().optional(),
+  riskLevel: z.enum(["low", "medium", "high"]).optional(),
+  riskReasons: z.any().optional(),
 });
 
 export type TransactionInput = z.infer<typeof transactionSchema>;
