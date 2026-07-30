@@ -46,3 +46,8 @@ drizzle/meta
 test*.js
 migrate*.js
 *.log
+
+# AI agents & skills
+.agents/
+.gemini/
+
