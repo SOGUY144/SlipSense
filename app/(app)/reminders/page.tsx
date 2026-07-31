@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { formatCurrency, triggerHaptic } from "@/lib/utils";
+import { formatCurrency, triggerHaptic, cn } from "@/lib/utils";
 import { Loader2, Plus, ArrowLeft, Calendar, Trash2, Edit, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
@@ -148,11 +148,11 @@ export default function RemindersPage() {
               </Button>
             </Link>
             <div>
-              <h1 className="text-xl font-bold">บิลประจำเดือน 📅</h1>
+              <h1 className="text-xl font-bold">บิลประจำเดือน</h1>
               <p className="text-sm text-muted-foreground">รายการที่ต้องจ่ายเพื่อกันลืม</p>
             </div>
           </div>
-          <Button onClick={() => openEdit()} size="sm" className="gap-2">
+          <Button onClick={() => openEdit()} size="sm" className="gap-2 rounded-[1rem] bg-[#43936C] hover:bg-[#367a59] text-white font-bold px-4 py-4 h-auto shadow-sm">
             <Plus className="h-4 w-4" />
             เพิ่มบิล
           </Button>
@@ -160,7 +160,7 @@ export default function RemindersPage() {
 
       <div className="space-y-3">
         {reminders.length === 0 ? (
-          <Card className="border-dashed bg-transparent">
+          <Card className="border-dashed border-2 border-slate-200 bg-white rounded-[1.5rem] shadow-sm">
             <CardContent className="p-8 text-center">
               <Calendar className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-50" />
               <p className="text-sm text-muted-foreground mb-4">
@@ -182,14 +182,14 @@ export default function RemindersPage() {
               const isManuallyPaid = (reminder as any).lastPaidMonth === currentMonthStr;
               
               return (
-                <Card key={reminder.id || idx} className={activeAlert ? "border-warning/50 bg-warning/5" : ""}>
-                  <CardContent className="p-4 flex items-center justify-between">
+                <Card key={reminder.id || idx} className={cn("border-none shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] bg-white rounded-[1.5rem] overflow-hidden", activeAlert ? "ring-2 ring-orange-200 bg-orange-50/30" : "")}>
+                  <CardContent className="p-5 flex items-center justify-between">
                     <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold">{reminder.title}</h3>
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <h3 className="font-bold text-slate-800 text-[15px]">{reminder.title}</h3>
                         {activeAlert && (
-                          <span className="bg-warning/20 text-warning-foreground text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                            🔔 ถึงกำหนด
+                          <span className="bg-orange-100 text-orange-600 text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center">
+                            ถึงกำหนด
                           </span>
                         )}
                       </div>
@@ -217,14 +217,14 @@ export default function RemindersPage() {
                                 }
                               }
                             }}
-                            className={`text-xs px-2.5 py-1 rounded-md border flex items-center gap-1.5 transition-colors ${
+                            className={`text-[11px] px-3 py-1.5 rounded-full border flex items-center gap-2 transition-colors font-bold ${
                               isManuallyPaid 
-                                ? "bg-success/10 border-success/30 text-success font-medium" 
-                                : "bg-muted/30 border-border text-muted-foreground hover:bg-muted"
+                                ? "bg-[#43936C]/10 border-[#43936C]/30 text-[#43936C]" 
+                                : "bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100"
                             }`}
                           >
-                            <div className={`w-3.5 h-3.5 rounded-sm border flex items-center justify-center ${isManuallyPaid ? 'bg-success border-success' : 'border-muted-foreground'}`}>
-                              {isManuallyPaid && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-2.5 h-2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                            <div className={`w-4 h-4 rounded-full border-[1.5px] flex items-center justify-center ${isManuallyPaid ? 'bg-[#43936C] border-[#43936C]' : 'border-slate-300 bg-white'}`}>
+                              {isManuallyPaid && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="w-2.5 h-2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>}
                             </div>
                             {isManuallyPaid ? "จ่ายแล้วของเดือนนี้" : "ติ๊กเมื่อจ่ายแล้ว"}
                           </button>
