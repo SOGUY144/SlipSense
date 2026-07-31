@@ -124,8 +124,9 @@ export default function DashboardPage() {
   const isEmptyState = summary?.current.income === 0 && summary?.current.expense === 0 && (!summary?.recentTransactions || summary.recentTransactions.length === 0);
 
   return (
+    <>
     <PullToRefresh onRefresh={load}>
-      <div className="space-y-6 pb-20">
+      <div className="space-y-6 pb-24">
         {behaviorModalDone && <OnboardingReminders onComplete={load} />}
       <SpendingBehaviorModal onComplete={load} onSkipOrDone={() => setBehaviorModalDone(true)} />
       
@@ -456,19 +457,19 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+    </PullToRefresh>
 
       {/* Paid Success Overlay */}
       {showPaidSuccess && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl p-6 flex flex-col items-center gap-4 shadow-2xl animate-in zoom-in-95 duration-200 min-w-[200px]">
-            <div className="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center">
-              <CheckCircle2 className="w-8 h-8 text-success" strokeWidth={3} />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl p-8 flex flex-col items-center gap-4 shadow-2xl animate-in zoom-in-95 duration-200 min-w-[200px]">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+              <CheckCircle2 className="w-12 h-12 text-green-500" strokeWidth={3} />
             </div>
-            <p className="font-bold text-lg text-foreground">บันทึกจ่ายบิลสำเร็จ</p>
+            <p className="font-bold text-xl text-slate-800">บันทึกจ่ายบิลสำเร็จ</p>
           </div>
         </div>
       )}
-    </div>
-    </PullToRefresh>
+    </>
   );
 }

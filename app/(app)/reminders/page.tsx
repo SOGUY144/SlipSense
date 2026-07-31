@@ -138,6 +138,7 @@ export default function RemindersPage() {
   }
 
   return (
+    <>
     <PullToRefresh onRefresh={load}>
       <div className="space-y-6 pb-20">
         <div className="flex items-center justify-between">
@@ -247,6 +248,9 @@ export default function RemindersPage() {
         )}
       </div>
 
+      </div>
+    </PullToRefresh>
+
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -309,7 +313,6 @@ export default function RemindersPage() {
           </div>
         </div>
       )}
-      </div>
-    </PullToRefresh>
+    </>
   );
 }
