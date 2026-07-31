@@ -130,38 +130,43 @@ export default function DashboardPage() {
         {behaviorModalDone && <OnboardingReminders onComplete={load} />}
       <SpendingBehaviorModal onComplete={load} onSkipOrDone={() => setBehaviorModalDone(true)} />
       
-      <div className="flex flex-col items-center justify-center gap-2 pt-2 pb-6 px-1">
-        <p className="text-[11px] text-slate-500 font-medium tracking-wide">ยอดเงินคงเหลือสุทธิ</p>
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-[#43936C]/10 rounded-full flex items-center justify-center">
-            <Wallet className="w-4 h-4 text-[#43936C]" />
+      {/* Top Section with Ambient Gradient */}
+      <div className="relative pt-6 pb-4">
+        <div className="absolute top-[-50px] left-[-50px] right-[-50px] h-[350px] bg-gradient-to-b from-[#43936C]/20 via-[#43936C]/5 to-transparent rounded-[100%] blur-3xl pointer-events-none -z-10" />
+        
+        <div className="flex flex-col items-center justify-center gap-2 px-1 relative z-10">
+          <p className="text-[12px] text-slate-500 font-bold tracking-wide">ยอดเงินคงเหลือสุทธิ</p>
+          <div className="flex items-center gap-3 mt-1">
+            <div className="w-9 h-9 bg-white shadow-sm rounded-full flex items-center justify-center border border-[#43936C]/10">
+              <Wallet className="w-4 h-4 text-[#43936C]" />
+            </div>
+            <p className="text-[38px] font-bold text-slate-900 tracking-tight font-number drop-shadow-sm">
+              {formatCurrency(summary?.current.profit ?? 0)}
+            </p>
           </div>
-          <p className="text-[32px] font-bold text-slate-900 tracking-tight font-number">
-            {formatCurrency(summary?.current.profit ?? 0)}
-          </p>
         </div>
-      </div>
 
-      {/* Quick Actions Restored */}
-      <div className="flex justify-center gap-6 px-4 mb-6 mt-2">
-        <Link href="/upload" className="flex flex-col items-center gap-2 group cursor-pointer">
-          <div className="w-14 h-14 bg-white rounded-[1.25rem] shadow-sm flex items-center justify-center text-slate-700 group-hover:bg-slate-50 transition-colors">
-            <Camera className="w-[22px] h-[22px]" strokeWidth={2} />
-          </div>
-          <span className="text-[11px] font-medium text-slate-600">ถ่ายสลิป</span>
-        </Link>
-        <Link href="/upload?mode=manual" className="flex flex-col items-center gap-2 group cursor-pointer">
-          <div className="w-14 h-14 bg-white rounded-[1.25rem] shadow-sm flex items-center justify-center text-slate-700 group-hover:bg-slate-50 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>
-          </div>
-          <span className="text-[11px] font-medium text-slate-600">จดมือ</span>
-        </Link>
-        <Link href="/analytics" className="flex flex-col items-center gap-2 group cursor-pointer">
-          <div className="w-14 h-14 bg-white rounded-[1.25rem] shadow-sm flex items-center justify-center text-slate-700 group-hover:bg-slate-50 transition-colors">
-            <BarChart3 className="w-[22px] h-[22px]" strokeWidth={2} />
-          </div>
-          <span className="text-[11px] font-medium text-slate-600">วิเคราะห์ (กราฟ)</span>
-        </Link>
+        {/* Quick Actions */}
+        <div className="flex justify-center gap-8 px-4 mt-8 relative z-10">
+          <Link href="/upload" className="flex flex-col items-center gap-2.5 group cursor-pointer">
+            <div className="w-16 h-16 bg-white rounded-[1.5rem] shadow-[0_8px_20px_-4px_rgba(0,0,0,0.08)] flex items-center justify-center text-slate-700 group-hover:scale-105 group-hover:bg-[#43936C] group-hover:text-white group-hover:shadow-[#43936C]/20 transition-all duration-300">
+              <Camera className="w-[24px] h-[24px]" strokeWidth={2} />
+            </div>
+            <span className="text-[12px] font-bold text-slate-600">ถ่ายสลิป</span>
+          </Link>
+          <Link href="/upload?mode=manual" className="flex flex-col items-center gap-2.5 group cursor-pointer">
+            <div className="w-16 h-16 bg-white rounded-[1.5rem] shadow-[0_8px_20px_-4px_rgba(0,0,0,0.08)] flex items-center justify-center text-slate-700 group-hover:scale-105 group-hover:bg-[#43936C] group-hover:text-white group-hover:shadow-[#43936C]/20 transition-all duration-300">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>
+            </div>
+            <span className="text-[12px] font-bold text-slate-600">จดมือ</span>
+          </Link>
+          <Link href="/analytics" className="flex flex-col items-center gap-2.5 group cursor-pointer">
+            <div className="w-16 h-16 bg-white rounded-[1.5rem] shadow-[0_8px_20px_-4px_rgba(0,0,0,0.08)] flex items-center justify-center text-slate-700 group-hover:scale-105 group-hover:bg-[#43936C] group-hover:text-white group-hover:shadow-[#43936C]/20 transition-all duration-300">
+              <BarChart3 className="w-[24px] h-[24px]" strokeWidth={2} />
+            </div>
+            <span className="text-[12px] font-bold text-slate-600">วิเคราะห์</span>
+          </Link>
+        </div>
       </div>
 
       <div className="bg-white rounded-[1.5rem] p-5 shadow-sm mb-6 relative overflow-hidden">
