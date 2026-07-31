@@ -132,7 +132,6 @@ export default function TransactionsPage() {
                   <div className="min-w-0">
                     <p className="text-[14px] font-bold text-slate-800 truncate">{tx.category}</p>
                     <p className="text-[11px] text-slate-500 truncate mt-0.5 flex items-center gap-1">
-                      {tx.type === 'income' ? '📥 ' : '📤 '}
                       {(tx.type === "income" ? tx.sender : tx.receiver) ?? "ไม่มีรายละเอียด"}
                     </p>
                     {tx.note && (
