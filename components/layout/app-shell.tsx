@@ -47,7 +47,7 @@ export function AppShell({
   ];
   
   const navItemsRight = [
-    { href: "/reminders", label: "บิล/แจ้งเตือน", icon: CheckCircle2, badge: 3 },
+    { href: "/chat", label: "แชท AI", icon: Bot },
     { href: "/profile", label: "สมุด", icon: Users },
   ];
 
