@@ -33,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="th" className={`${promptFont.variable} ${inter.variable}`}>
-      <body className="font-sans bg-[#F2F2F6]">{children}</body>
+      <body className="font-sans bg-[#F5F5F7]">{children}</body>
     </html>
   );
 }

@@ -129,69 +129,45 @@ export default function DashboardPage() {
         {behaviorModalDone && <OnboardingReminders onComplete={load} />}
       <SpendingBehaviorModal onComplete={load} onSkipOrDone={() => setBehaviorModalDone(true)} />
       
-      <div className="flex flex-col items-center justify-center pt-4 pb-8">
-        <p className="text-[12px] text-slate-500 font-medium mb-1">ยอดเงินคงเหลือสุทธิ</p>
-        <div className="flex items-center gap-2">
-          <p className="text-[40px] font-bold text-slate-900 tracking-tight font-number">
-            {formatCurrency(summary?.current.profit ?? 0)}
-          </p>
+      <div className="flex items-center gap-3 pt-2 pb-6 px-1">
+        <div className="w-9 h-9 bg-[#43936C]/10 rounded-full flex items-center justify-center">
+          <Wallet className="w-5 h-5 text-[#43936C]" />
         </div>
-        <div className="flex items-center gap-1 mt-1">
-          <div 
-            className={`flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-semibold ${
-              profitUp 
-                ? "bg-emerald-100/50 text-emerald-700" 
-                : "bg-rose-100/50 text-rose-700"
-            }`}
-          >
-            {profitUp ? <TrendingUp className="w-3 h-3" strokeWidth={2.5} /> : <TrendingDown className="w-3 h-3" strokeWidth={2.5} />}
-            <span>{formatPercent(summary?.profitChangePercent ?? 0)} จากเดือนก่อน</span>
-          </div>
-        </div>
-      </div>
-      
-      {/* Quick Actions */}
-      <div className="flex justify-center gap-6 px-4 mb-6">
-        <Link href="/upload" className="flex flex-col items-center gap-2 group cursor-pointer">
-          <div className="w-14 h-14 bg-white rounded-[1.25rem] shadow-sm flex items-center justify-center text-slate-700 group-hover:bg-slate-50 transition-colors">
-            <Camera className="w-[22px] h-[22px]" strokeWidth={2} />
-          </div>
-          <span className="text-[11px] font-medium text-slate-600">ถ่ายสลิป</span>
-        </Link>
-        <Link href="/upload?mode=manual" className="flex flex-col items-center gap-2 group cursor-pointer">
-          <div className="w-14 h-14 bg-white rounded-[1.25rem] shadow-sm flex items-center justify-center text-slate-700 group-hover:bg-slate-50 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>
-          </div>
-          <span className="text-[11px] font-medium text-slate-600">จดมือ</span>
-        </Link>
-        <Link href="/analytics" className="flex flex-col items-center gap-2 group cursor-pointer">
-          <div className="w-14 h-14 bg-white rounded-[1.25rem] shadow-sm flex items-center justify-center text-slate-700 group-hover:bg-slate-50 transition-colors">
-            <BarChart3 className="w-[22px] h-[22px]" strokeWidth={2} />
-          </div>
-          <span className="text-[11px] font-medium text-slate-600">วิเคราะห์</span>
-        </Link>
+        <p className="text-[28px] font-bold text-slate-900 tracking-tight font-number">
+          {formatCurrency(summary?.current.profit ?? 0)}
+        </p>
       </div>
 
-      <div className="bg-white rounded-[1.25rem] shadow-sm overflow-hidden mb-6">
-        <div className="flex divide-x divide-slate-100">
-          <div className="flex-1 p-4 flex flex-col justify-center">
-            <div className="flex items-center gap-1.5 text-slate-500 mb-1">
-              <TrendingUp className="h-3.5 w-3.5 text-emerald-500" strokeWidth={2.5} />
-              <span className="text-[11px] font-medium">รายรับ</span>
-            </div>
-            <p className="text-base font-bold text-slate-800 font-number tracking-tight">
-              {formatCurrency(summary?.current.income ?? 0)}
-            </p>
-          </div>
-          <div className="flex-1 p-4 flex flex-col justify-center">
-            <div className="flex items-center gap-1.5 text-slate-500 mb-1">
-              <TrendingDown className="h-3.5 w-3.5 text-rose-500" strokeWidth={2.5} />
-              <span className="text-[11px] font-medium">รายจ่าย</span>
-            </div>
-            <p className="text-base font-bold text-slate-800 font-number tracking-tight">
-              {formatCurrency(summary?.current.expense ?? 0)}
-            </p>
-          </div>
+      <div className="bg-white rounded-[1.5rem] p-5 shadow-sm mb-6 relative overflow-hidden">
+        <div className="flex justify-between items-center mb-5">
+           <h2 className="text-[15px] font-bold text-slate-800">สรุปเดือนนี้</h2>
+           <Link href="/analytics" className="text-[11px] text-slate-500 font-medium">ดูสรุป</Link>
+        </div>
+        <div className="flex gap-4">
+           <div className="flex-1">
+             <p className="text-[11px] text-slate-500 mb-1">รายรับ</p>
+             <p className="text-[22px] font-bold text-[#43936C] tracking-tight font-number">{formatCurrency(summary?.current.income ?? 0)}</p>
+           </div>
+           <div className="w-[1px] bg-slate-100"></div>
+           <div className="flex-1">
+             <p className="text-[11px] text-slate-500 mb-1">รายจ่าย</p>
+             <p className="text-[22px] font-bold text-slate-900 tracking-tight font-number">{formatCurrency(summary?.current.expense ?? 0)}</p>
+           </div>
+        </div>
+        
+        <div className="mt-6">
+           <div className="flex justify-between text-[10px] mb-2">
+             <span className="text-[#43936C] font-semibold flex items-center gap-1">
+               <TrendingUp className="w-3 h-3" />
+               กำไร {formatCurrency((summary?.current.profit ?? 0))}
+             </span>
+             <span className="text-slate-400">
+               {profitUp ? "เติบโต " : "ลดลง "} {formatPercent(summary?.profitChangePercent ?? 0)}
+             </span>
+           </div>
+           <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+             <div className="h-full bg-[#43936C] rounded-full" style={{ width: `${Math.min(100, Math.max(0, incomePct))}%` }}></div>
+           </div>
         </div>
       </div>
 
@@ -363,122 +339,76 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold">คำแนะนำจาก AI</h2>
-          <Button 
-            variant="outline" 
-            size="sm" 
+      <div className="mb-6">
+        <div className="bg-white rounded-[1.25rem] shadow-sm overflow-hidden relative">
+          <button 
             onClick={handleGenerateInsights} 
             disabled={generatingInsights}
-            className="h-8"
+            className="w-full text-left p-4 flex items-center justify-between"
           >
+            <div className="flex items-center gap-2.5">
+              <span className="text-[18px]">💡</span>
+              <h2 className="text-[14px] font-bold text-slate-800">
+                {insights.length > 0 ? "คำแนะนำจาก AI" : "ให้ AI ช่วยวิเคราะห์"}
+              </h2>
+            </div>
             {generatingInsights ? (
-              <Loader2 className="h-3 w-3 animate-spin mr-1.5" />
+              <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
             ) : (
-              <Sparkles className="h-3 w-3 mr-1.5 text-primary" />
+              <span className="text-[11px] text-slate-400 flex items-center">ทั้งหมด <ChevronRight className="w-3 h-3 ml-0.5" /></span>
             )}
-            {insights.length > 0 ? "วิเคราะห์ใหม่" : "ให้ AI วิเคราะห์"}
-          </Button>
-        </div>
-        {insights.length > 0 ? (
-          <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {/* 1. Summary */}
-            {insights.filter(i => i.metadata?.type === 'summary').map((insight) => (
-              <div key={insight.id} className="min-w-[240px] max-w-[240px] snap-center shrink-0 bg-white rounded-[1.25rem] shadow-sm p-4 flex flex-col h-[130px]">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
-                  <h3 className="font-semibold text-[12px] text-slate-700">สรุปภาพรวม</h3>
-                </div>
-                <p className="text-[12px] text-slate-500 leading-relaxed font-medium line-clamp-4">{insight.content}</p>
-              </div>
-            ))}
-
-            {/* 2. Risk */}
-            {insights.filter(i => i.metadata?.type === 'risk').map((insight) => (
-              <div key={insight.id} className="min-w-[240px] max-w-[240px] snap-center shrink-0 bg-white rounded-[1.25rem] shadow-sm p-4 flex flex-col h-[130px]">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <AlertTriangle className="w-3.5 h-3.5 text-rose-500" />
-                  <h3 className="font-semibold text-[12px] text-slate-700">ข้อควรระวัง</h3>
-                </div>
-                <p className="text-[12px] text-slate-500 leading-relaxed font-medium line-clamp-4">{insight.content}</p>
-              </div>
-            ))}
-
-            {/* 3. Action */}
-            {insights.filter(i => i.metadata?.type === 'action').map((insight) => (
-              <div key={insight.id} className="min-w-[240px] max-w-[240px] snap-center shrink-0 bg-white rounded-[1.25rem] shadow-sm p-4 flex flex-col h-[130px]">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
-                  <h3 className="font-semibold text-[12px] text-slate-700">คำแนะนำ</h3>
-                </div>
-                <div className="text-[12px] text-slate-500 leading-relaxed font-medium line-clamp-4">
-                  {insight.content}
-                </div>
-              </div>
-            ))}
-            
-            {/* Fallback for old insights without type */}
-            {insights.filter(i => !i.metadata?.type).slice(0, 2).map((insight) => (
-              <div key={insight.id} className="min-w-[240px] max-w-[240px] snap-center shrink-0 bg-white rounded-[1.25rem] shadow-sm p-4 flex flex-col h-[130px]">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <Sparkles className="w-3.5 h-3.5 text-slate-500" />
-                  <h3 className="font-semibold text-[12px] text-slate-700">คำแนะนำจาก AI</h3>
-                </div>
-                <p className="text-[12px] text-slate-500 leading-relaxed font-medium line-clamp-4">{insight.content}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <Card className="border-dashed bg-transparent">
-            <CardContent className="p-4 text-center">
-              <p className="text-sm text-muted-foreground">
-                กดปุ่มด้านบนเพื่อให้ AI ช่วยวิเคราะห์การเงินของคุณ
+          </button>
+          
+          {insights.length > 0 && (
+            <div className="px-4 pb-4 border-t border-slate-50 pt-3 bg-slate-50/50">
+              <p className="text-[12px] text-slate-600 line-clamp-2 leading-relaxed">
+                {insights[0]?.content}
               </p>
-            </CardContent>
-          </Card>
-        )}
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="space-y-3 mt-8">
-        <div className="flex items-center justify-between px-1">
-          <h2 className="text-sm font-semibold">รายการล่าสุด</h2>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between px-2">
+          <h2 className="text-[13px] font-medium text-slate-500">รายการล่าสุด</h2>
           <Link
             href="/transactions"
-            className="text-xs font-bold text-primary hover:underline flex items-center"
+            className="text-[11px] font-medium text-slate-400 flex items-center"
           >
-            ดูทั้งหมด <ChevronRight className="w-3 h-3 ml-0.5" />
+            ทั้งหมด <ChevronRight className="w-3 h-3 ml-0.5" />
           </Link>
         </div>
 
         {(summary?.recentTransactions ?? []).length === 0 ? (
-          <div className="bg-white rounded-[1.25rem] p-8 flex flex-col items-center gap-4 text-center shadow-sm">
-            <div className="p-4 bg-[#F2F2F6] rounded-full">
+          <div className="bg-white rounded-[1.5rem] p-8 flex flex-col items-center gap-4 text-center shadow-sm">
+            <div className="p-4 bg-[#F5F5F7] rounded-full">
               <Camera className="h-8 w-8 text-slate-400" strokeWidth={1.5} />
             </div>
             <p className="text-[12px] text-slate-500 font-medium">ยังไม่มีรายการ เริ่มด้วยการถ่ายสลิป</p>
           </div>
         ) : (
-          <div className="bg-white rounded-[1.25rem] shadow-sm overflow-hidden mb-8">
+          <div className="bg-white rounded-[1.5rem] shadow-sm overflow-hidden mb-8 px-4">
             <div className="divide-y divide-slate-100">
               {summary?.recentTransactions.map((tx) => (
-                <div key={tx.id} className="flex items-center justify-between p-4 bg-white active:bg-slate-50 transition-colors">
+                <div key={tx.id} className="flex items-center justify-between py-3.5 bg-white active:bg-slate-50 transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tx.type === 'income' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
-                      {tx.type === 'income' ? <TrendingUp className="w-4 h-4" strokeWidth={2.5}/> : <TrendingDown className="w-4 h-4" strokeWidth={2.5}/>}
+                    <div className={`w-10 h-10 rounded-[0.85rem] flex items-center justify-center ${tx.type === 'income' ? 'bg-[#43936C]/10 text-[#43936C]' : 'bg-[#7364E3]/10 text-[#7364E3]'}`}>
+                      {tx.type === 'income' ? <TrendingUp className="w-4 h-4" strokeWidth={2.5}/> : <Wallet className="w-4 h-4" strokeWidth={2.5}/>}
                     </div>
                     <div>
                         <div className="text-[14px] font-bold text-slate-800">{tx.category}</div>
-                        <div className="text-[11px] text-slate-500 mt-0.5 font-medium line-clamp-1">
-                          {(tx.type === "income" ? tx.sender : tx.receiver) ?? "—"}
+                        <div className="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1 line-clamp-1">
+                          {tx.type === 'income' ? '📥 ' : '📤 '}
+                          {(tx.type === "income" ? tx.sender : tx.receiver) ?? "ไม่มีรายละเอียด"}
                         </div>
                     </div>
                   </div>
                   <div className="text-right shrink-0 ml-4">
-                    <p className={`text-[15px] font-bold tracking-tight font-number ${tx.type === "income" ? "text-slate-900" : "text-slate-900"}`}>
+                    <p className={`text-[15px] font-bold tracking-tight font-number ${tx.type === "income" ? "text-[#43936C]" : "text-slate-900"}`}>
                       {tx.type === "income" ? "+" : "-"}{formatCurrency(parseFloat(tx.amount))}
                     </p>
-                    <p className="text-[10px] text-slate-400 mt-0.5 font-medium">{formatDate(tx.occurredAt)}</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">{formatDate(tx.occurredAt)}</p>
                   </div>
                 </div>
               ))}
