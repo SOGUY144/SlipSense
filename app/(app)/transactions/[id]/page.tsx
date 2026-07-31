@@ -173,16 +173,18 @@ export default function TransactionDetailPage({
       </div>
 
       {/* Amount Card */}
-      <Card className="border-none shadow-sm bg-card overflow-hidden">
+      <Card className="border-none shadow-[0_8px_30px_rgba(0,0,0,0.04)] bg-white overflow-hidden rounded-3xl">
         <CardContent className="p-8 flex items-center justify-center gap-4 relative">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
-          {isIncome ? (
-            <ArrowDownRight className="h-10 w-10 text-success" />
-          ) : (
-            <ArrowUpRight className="h-10 w-10 text-destructive" />
-          )}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" />
+          <div className={`p-4 rounded-2xl shadow-sm z-10 ${isIncome ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}>
+            {isIncome ? (
+              <ArrowDownRight className="h-8 w-8" strokeWidth={2.5} />
+            ) : (
+              <ArrowUpRight className="h-8 w-8" strokeWidth={2.5} />
+            )}
+          </div>
           <div className="flex items-baseline gap-2 z-10">
-            <span className={`text-5xl font-bold ${isIncome ? 'text-success' : 'text-destructive'}`}>
+            <span className={`text-[42px] font-extrabold tracking-tight font-number ${isIncome ? 'text-success' : 'text-destructive'}`}>
               {formatCurrency(parseFloat(transaction.amount))}
             </span>
           </div>
@@ -192,11 +194,11 @@ export default function TransactionDetailPage({
       {/* Actions */}
       <div className="grid grid-cols-1 gap-3">
         {/* Category Edit */}
-        <Card className="overflow-hidden border-2 border-border/50 transition-all hover:border-primary/20">
+        <Card className="overflow-hidden border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] transition-all hover:shadow-md rounded-3xl">
           <CardContent className="p-0">
             {isEditingCategory ? (
-              <div className="p-4 space-y-3 bg-muted/30">
-                <p className="text-sm font-semibold text-muted-foreground">แก้ไขหมวดหมู่</p>
+              <div className="p-5 space-y-4 bg-slate-50/50">
+                <p className="text-sm font-semibold text-slate-700">แก้ไขหมวดหมู่</p>
                 <Select value={editCategory} onValueChange={setEditCategory}>
                   <SelectTrigger className="w-full bg-background border-2">
                     <SelectValue placeholder="เลือกหมวดหมู่" />
@@ -217,7 +219,7 @@ export default function TransactionDetailPage({
             ) : (
               <button 
                 onClick={() => setIsEditingCategory(true)}
-                className="w-full flex items-center gap-4 p-4 text-left hover:bg-muted/50 transition-colors"
+                className="w-full flex items-center gap-4 p-5 text-left hover:bg-slate-50 transition-colors"
               >
                 <div className="bg-primary/10 p-2.5 rounded-xl text-primary">
                   <LayoutGrid className="h-5 w-5" />
@@ -233,11 +235,11 @@ export default function TransactionDetailPage({
         </Card>
 
         {/* Note Edit */}
-        <Card className="overflow-hidden border-2 border-border/50 transition-all hover:border-primary/20">
+        <Card className="overflow-hidden border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] transition-all hover:shadow-md rounded-3xl">
           <CardContent className="p-0">
             {isEditingNote ? (
-              <div className="p-4 space-y-3 bg-muted/30">
-                <p className="text-sm font-semibold text-muted-foreground">แก้ไขโน้ต</p>
+              <div className="p-5 space-y-4 bg-slate-50/50">
+                <p className="text-sm font-semibold text-slate-700">แก้ไขโน้ต</p>
                 <Textarea 
                   value={editNote} 
                   onChange={(e) => setEditNote(e.target.value)}
@@ -252,7 +254,7 @@ export default function TransactionDetailPage({
             ) : (
               <button 
                 onClick={() => setIsEditingNote(true)}
-                className="w-full flex items-center gap-4 p-4 text-left hover:bg-muted/50 transition-colors"
+                className="w-full flex items-center gap-4 p-5 text-left hover:bg-slate-50 transition-colors"
               >
                 <div className="bg-blue-500/10 p-2.5 rounded-xl text-blue-500">
                   <Pencil className="h-5 w-5" />
@@ -269,12 +271,12 @@ export default function TransactionDetailPage({
         </Card>
 
         {/* Tax Information Edit */}
-        <Card className="overflow-hidden border-2 border-border/50 transition-all hover:border-primary/20">
+        <Card className="overflow-hidden border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] transition-all hover:shadow-md rounded-3xl">
           <CardContent className="p-0">
             {isEditingTax ? (
-              <div className="p-4 space-y-4 bg-muted/30">
+              <div className="p-5 space-y-5 bg-slate-50/50">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-semibold text-muted-foreground">ข้อมูลใบกำกับภาษี</p>
+                  <p className="text-sm font-semibold text-slate-700">ข้อมูลใบกำกับภาษี</p>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <span className="text-sm font-medium">จดทะเบียน VAT?</span>
                     <input 
@@ -353,7 +355,7 @@ export default function TransactionDetailPage({
             ) : (
               <button 
                 onClick={() => setIsEditingTax(true)}
-                className="w-full flex items-center gap-4 p-4 text-left hover:bg-muted/50 transition-colors"
+                className="w-full flex items-center gap-4 p-5 text-left hover:bg-slate-50 transition-colors"
               >
                 <div className="bg-purple-500/10 p-2.5 rounded-xl text-purple-600">
                   <Receipt className="h-5 w-5" />
@@ -382,14 +384,16 @@ export default function TransactionDetailPage({
 
       {/* Slip Data */}
       {transaction.imageUrl && (
-        <Card className="border-2 border-border/50 bg-slate-50/50">
+        <Card className="border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] bg-white rounded-3xl">
           <CardContent className="p-5">
-            <h3 className="font-bold mb-4 text-sm text-muted-foreground">ข้อมูลจากสลิป</h3>
+            <h3 className="font-bold mb-5 text-sm text-slate-700 flex items-center gap-2">
+              <Camera className="w-4 h-4 text-slate-400" /> ข้อมูลจากสลิป
+            </h3>
             
             <div className="flex justify-between items-start">
               <div className="space-y-4 flex-1">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs shrink-0">
                     จาก
                   </div>
                   <div className="overflow-hidden">
@@ -402,7 +406,7 @@ export default function TransactionDetailPage({
                 <div className="w-0.5 h-4 bg-border ml-4 border-l-2 border-dashed" />
                 
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold text-xs shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs shrink-0">
                     ถึง
                   </div>
                   <div className="overflow-hidden">
@@ -442,10 +446,10 @@ export default function TransactionDetailPage({
 
       {/* Security Verification & Reference */}
       {transaction && (
-        <Card className="border-2 border-border/50 bg-background">
-          <CardContent className="p-5 space-y-3">
+        <Card className="border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] bg-white rounded-3xl">
+          <CardContent className="p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-sm text-muted-foreground flex items-center gap-2">
+              <h3 className="font-bold text-sm text-slate-700 flex items-center gap-2">
                 {transaction.riskLevel === "high" ? (
                   <ShieldAlert className="h-4 w-4 text-red-600" />
                 ) : (

@@ -142,15 +142,15 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      <Card className="border-none shadow-xl shadow-primary/20 bg-gradient-to-br from-slate-900 via-primary to-blue-600 overflow-hidden relative">
-        <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
-          <Wallet className="w-32 h-32 text-white transform rotate-12" />
+      <Card className="border-none shadow-[0_8px_30px_rgba(52,211,153,0.25)] bg-gradient-to-br from-teal-400 via-primary to-emerald-500 overflow-hidden relative rounded-3xl">
+        <div className="absolute top-0 right-0 p-8 opacity-20 pointer-events-none">
+          <Wallet className="w-32 h-32 text-white transform rotate-12" strokeWidth={1.5} />
         </div>
-        <CardContent className="p-6 relative z-10">
+        <CardContent className="p-7 relative z-10">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <div className="p-2 bg-white/10 rounded-lg backdrop-blur-md">
-                <Wallet className="h-5 w-5 text-white" strokeWidth={2.5} />
+              <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-md">
+                <Wallet className="h-5 w-5 text-white drop-shadow-sm" strokeWidth={2} />
               </div>
               <span className="font-semibold text-lg text-white/90">กำไรสุทธิ</span>
             </div>
@@ -183,34 +183,34 @@ export default function DashboardPage() {
 
           <div className="flex items-center gap-2 mt-4 text-xs font-medium text-white/70">
             <span>เทียบเดือนก่อน</span>
-            <span className="text-white/90 font-semibold font-number">{formatCurrency(summary?.previous.profit ?? 0)}</span>
+            <span className="text-white/90 font-semibold font-number bg-white/10 px-2 py-0.5 rounded-md">{formatCurrency(summary?.previous.profit ?? 0)}</span>
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-2 gap-3">
-        <Card className="border-none shadow-sm bg-white hover:-translate-y-0.5 transition-transform duration-200">
+      <div className="grid grid-cols-2 gap-4">
+        <Card className="border-none shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] bg-white hover:-translate-y-1 transition-transform duration-300 rounded-3xl">
           <CardContent className="p-5 flex flex-col items-center text-center">
-            <div className="flex items-center justify-center gap-1.5 text-success font-bold mb-2">
-              <div className="p-1.5 bg-success/10 rounded-full shadow-sm shadow-success/20">
+            <div className="flex items-center justify-center gap-1.5 text-success font-bold mb-3">
+              <div className="p-2 bg-success/10 rounded-xl shadow-[0_4px_10px_rgba(52,211,153,0.15)]">
                 <TrendingUp className="h-4 w-4" strokeWidth={2.5} />
               </div>
               <span className="text-sm">รายรับ</span>
             </div>
-            <p className="text-2xl font-bold text-foreground font-number">
+            <p className="text-2xl font-bold text-slate-800 font-number tracking-tight">
               {formatCurrency(summary?.current.income ?? 0)}
             </p>
           </CardContent>
         </Card>
-        <Card className="border-none shadow-sm bg-white hover:-translate-y-0.5 transition-transform duration-200">
+        <Card className="border-none shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] bg-white hover:-translate-y-1 transition-transform duration-300 rounded-3xl">
           <CardContent className="p-5 flex flex-col items-center text-center">
-            <div className="flex items-center justify-center gap-1.5 text-destructive font-bold mb-2">
-              <div className="p-1.5 bg-destructive/10 rounded-full shadow-sm shadow-destructive/20">
+            <div className="flex items-center justify-center gap-1.5 text-destructive font-bold mb-3">
+              <div className="p-2 bg-destructive/10 rounded-xl shadow-[0_4px_10px_rgba(244,63,94,0.15)]">
                 <TrendingDown className="h-4 w-4" strokeWidth={2.5} />
               </div>
               <span className="text-sm">รายจ่าย</span>
             </div>
-            <p className="text-2xl font-bold text-foreground font-number">
+            <p className="text-2xl font-bold text-slate-800 font-number tracking-tight">
               {formatCurrency(summary?.current.expense ?? 0)}
             </p>
           </CardContent>
@@ -270,13 +270,13 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      <Card className="border-none shadow-sm bg-white overflow-hidden rounded-2xl">
-        <div className="p-4 pb-2 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-primary/10 rounded-md text-primary">
-              <Calendar className="w-4 h-4" />
+      <Card className="border-none shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] bg-white overflow-hidden rounded-3xl">
+        <div className="p-5 pb-3 flex items-center justify-between border-b border-slate-50">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 bg-primary/10 rounded-xl text-primary">
+              <Calendar className="w-4 h-4" strokeWidth={2} />
             </div>
-            <h2 className="text-sm font-bold text-foreground">บิลประจำเดือน</h2>
+            <h2 className="text-[15px] font-bold text-slate-800">บิลประจำเดือน</h2>
           </div>
           <Link
             href="/reminders"
@@ -490,28 +490,30 @@ export default function DashboardPage() {
         </div>
 
         {(summary?.recentTransactions ?? []).length === 0 ? (
-          <Card className="border-none shadow-sm bg-white rounded-2xl">
-            <CardContent className="flex flex-col items-center gap-3 py-8">
-              <Camera className="h-10 w-10 text-muted-foreground/50" />
-              <p className="text-sm text-muted-foreground font-medium">
+          <Card className="border-none shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] bg-white rounded-3xl">
+            <CardContent className="flex flex-col items-center gap-4 py-12">
+              <div className="p-4 bg-primary/5 rounded-full">
+                <Camera className="h-10 w-10 text-primary/40" strokeWidth={1.5} />
+              </div>
+              <p className="text-sm text-slate-500 font-medium">
                 ยังไม่มีธุรกรรม — เริ่มด้วยการถ่ายสลิป
               </p>
               <Link href="/upload">
-                <Button size="sm" className="shadow-md rounded-xl">ถ่ายสลิปแรก</Button>
+                <Button size="sm" className="shadow-md rounded-xl mt-2 font-bold px-6">ถ่ายสลิปแรก</Button>
               </Link>
             </CardContent>
           </Card>
         ) : (
           summary?.recentTransactions.map((tx) => (
-            <Card key={tx.id} className="border-none shadow-sm bg-white hover:shadow-md transition-all hover:-translate-y-0.5 rounded-2xl">
-              <CardContent className="flex items-center justify-between p-4">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2.5 rounded-full shadow-sm ${tx.type === 'income' ? 'bg-success/15 text-success shadow-success/20' : 'bg-destructive/15 text-destructive shadow-destructive/20'}`}>
+            <Card key={tx.id} className="border-none shadow-[0_2px_10px_-2px_rgba(0,0,0,0.03)] bg-white hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] transition-all hover:-translate-y-1 rounded-3xl">
+              <CardContent className="flex items-center justify-between p-4 px-5">
+                <div className="flex items-center gap-3.5">
+                  <div className={`p-3 rounded-2xl shadow-sm ${tx.type === 'income' ? 'bg-success/10 text-success shadow-[0_4px_10px_rgba(52,211,153,0.15)]' : 'bg-destructive/10 text-destructive shadow-[0_4px_10px_rgba(244,63,94,0.15)]'}`}>
                     {tx.type === 'income' ? <TrendingUp className="w-4 h-4" strokeWidth={2.5}/> : <TrendingDown className="w-4 h-4" strokeWidth={2.5}/>}
                   </div>
                   <div>
-                      <div className="text-sm font-medium">{tx.category}</div>
-                      <div className="text-xs text-slate-500">
+                      <div className="text-[15px] font-semibold text-slate-800">{tx.category}</div>
+                      <div className="text-xs text-slate-400 mt-0.5">
                         {(tx.type === "income" ? tx.sender : tx.receiver) ?? "—"} ·{" "}
                         {formatDate(tx.occurredAt)}
                       </div>

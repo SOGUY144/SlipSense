@@ -222,22 +222,22 @@ export default function UploadPage() {
         </p>
       </div>
 
-      <div className="flex rounded-xl bg-muted p-1.5 shadow-sm border-2 border-border/50">
+      <div className="flex rounded-2xl bg-white shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] p-1.5 border border-slate-100">
         <button
-          className={`flex-1 rounded-lg py-3 text-base font-bold transition-all ${
+          className={`flex-1 rounded-xl py-3.5 text-base font-bold transition-all duration-300 ${
             mode === "scan"
-              ? "bg-background text-foreground shadow-md border-2 border-border"
-              : "text-muted-foreground hover:bg-background/50"
+              ? "bg-primary text-primary-foreground shadow-[0_4px_10px_rgba(52,211,153,0.2)]"
+              : "text-slate-500 hover:bg-slate-50"
           }`}
           onClick={() => setMode("scan")}
         >
           📸 สแกนสลิป
         </button>
         <button
-          className={`flex-1 rounded-lg py-3 text-base font-bold transition-all ${
+          className={`flex-1 rounded-xl py-3.5 text-base font-bold transition-all duration-300 ${
             mode === "manual"
-              ? "bg-background text-foreground shadow-md border-2 border-border"
-              : "text-muted-foreground hover:bg-background/50"
+              ? "bg-primary text-primary-foreground shadow-[0_4px_10px_rgba(52,211,153,0.2)]"
+              : "text-slate-500 hover:bg-slate-50"
           }`}
           onClick={() => setMode("manual")}
         >
@@ -273,22 +273,22 @@ export default function UploadPage() {
         onChange={handleFileChange}
       />
 
-      <div className="flex gap-2 p-1 bg-muted/50 rounded-xl mb-4 border">
+      <div className="flex gap-2 p-1.5 bg-white shadow-[0_2px_10px_-2px_rgba(0,0,0,0.03)] rounded-2xl mb-5 border border-slate-100">
         <button
-          className={`flex-1 rounded-lg py-2 text-sm font-medium transition-all ${
+          className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all duration-300 ${
             uploadType === "slip"
-              ? "bg-white text-foreground shadow-sm border"
-              : "text-muted-foreground hover:bg-white/50"
+              ? "bg-slate-100 text-slate-800 shadow-sm"
+              : "text-slate-400 hover:bg-slate-50"
           }`}
           onClick={() => setUploadType("slip")}
         >
           📄 สลิปโอนเงิน
         </button>
         <button
-          className={`flex-1 rounded-lg py-2 text-sm font-medium transition-all ${
+          className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all duration-300 ${
             uploadType === "bill"
-              ? "bg-white text-foreground shadow-sm border"
-              : "text-muted-foreground hover:bg-white/50"
+              ? "bg-slate-100 text-slate-800 shadow-sm"
+              : "text-slate-400 hover:bg-slate-50"
           }`}
           onClick={() => setUploadType("bill")}
         >
@@ -297,16 +297,16 @@ export default function UploadPage() {
       </div>
 
       <Card
-        className="cursor-pointer border-dashed border-4 border-primary/30 bg-primary/5 hover:border-primary/60 hover:bg-primary/10 hover:-translate-y-1 hover:shadow-md transition-all duration-300 rounded-2xl"
+        className="cursor-pointer border-dashed border-[3px] border-primary/40 bg-gradient-to-br from-primary/5 to-teal-400/5 hover:border-primary/60 hover:from-primary/10 hover:to-teal-400/10 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(52,211,153,0.15)] transition-all duration-500 rounded-3xl"
         onClick={() => { triggerHaptic('light'); !isWorking && galleryInputRef.current?.click(); }}
       >
-        <CardContent className="flex flex-col items-center gap-6 py-16">
-          <div className="rounded-full bg-primary/20 p-6">
-            <Upload className="h-12 w-12 text-primary" strokeWidth={2.5} />
+        <CardContent className="flex flex-col items-center gap-5 py-16">
+          <div className="rounded-full bg-white shadow-[0_4px_20px_rgba(52,211,153,0.15)] p-5 animate-pulse-slow">
+            <Upload className="h-10 w-10 text-primary" strokeWidth={2} />
           </div>
           <div className="text-center">
-            <p className="text-xl font-bold">แตะเพื่อเลือกรูป{uploadType === "slip" ? "สลิป" : "บิล"}</p>
-            <p className="text-base text-muted-foreground mt-2 font-medium">
+            <p className="text-xl font-bold text-slate-700">แตะเพื่อเลือกรูป{uploadType === "slip" ? "สลิป" : "บิล"}</p>
+            <p className="text-sm text-slate-500 mt-2 font-medium">
               หรือถ่ายรูปจากกล้อง · รองรับหลายใบ
             </p>
           </div>
@@ -315,53 +315,53 @@ export default function UploadPage() {
 
       <div className="flex gap-4">
         <Button
-          className="flex-1 gap-3 h-16 text-lg rounded-xl shadow-lg shadow-primary/25 font-bold hover:scale-[1.02] active:scale-95 transition-all"
+          className="flex-1 gap-3 h-16 text-lg rounded-2xl shadow-[0_4px_15px_rgba(52,211,153,0.25)] font-bold hover:scale-[1.03] active:scale-95 transition-all duration-300 border-none"
           onClick={() => { triggerHaptic('light'); fileInputRef.current?.click(); }}
           disabled={isWorking}
         >
-          <Camera className="h-6 w-6" strokeWidth={2.5} />
+          <Camera className="h-6 w-6" strokeWidth={2} />
           ถ่ายรูป
         </Button>
         <Button
           variant="outline"
-          className="flex-1 gap-3 h-16 text-lg rounded-xl border-2 border-primary/30 text-primary font-bold hover:bg-primary/10 hover:scale-[1.02] active:scale-95 transition-all shadow-sm"
+          className="flex-1 gap-3 h-16 text-lg rounded-2xl border-2 border-primary/20 text-primary font-bold hover:bg-primary/5 hover:scale-[1.03] active:scale-95 transition-all duration-300 bg-white shadow-sm"
           onClick={() => { triggerHaptic('light'); galleryInputRef.current?.click(); }}
           disabled={isWorking}
         >
-          <Upload className="h-6 w-6" strokeWidth={2.5} />
+          <Upload className="h-6 w-6" strokeWidth={2} />
           เลือกไฟล์
         </Button>
       </div>
 
       {results.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">สถานะการอัปโหลด</CardTitle>
+        <Card className="border-none shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] bg-white rounded-3xl mt-4">
+          <CardHeader className="pb-3 border-b border-slate-50">
+            <CardTitle className="text-base text-slate-800">สถานะการอัปโหลด</CardTitle>
             <CardDescription>
               {isWorking
-                ? "กำลังประมวลผล..."
+                ? "กำลังประมวลผลด้วย AI..."
                 : `สำเร็จ ${doneCount}/${results.length} ใบ`}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="space-y-3 pt-4">
             {results.map((r, i) => (
-              <div key={i} className="flex flex-col rounded-lg border p-3">
+              <div key={i} className="flex flex-col rounded-2xl border border-slate-100 bg-slate-50/50 p-3.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm truncate max-w-[200px] font-medium">
+                  <span className="text-sm truncate max-w-[200px] font-semibold text-slate-700">
                     {r.fileName}
                   </span>
                   {(r.status === "uploading" || r.status === "processing") && (
                     <Loader2 className="h-4 w-4 animate-spin text-primary" />
                   )}
                   {r.status === "done" && (
-                    <CheckCircle className="h-4 w-4 text-success" />
+                    <CheckCircle className="h-5 w-5 text-success drop-shadow-sm" />
                   )}
                   {r.status === "error" && (
-                    <XCircle className="h-4 w-4 text-destructive" />
+                    <XCircle className="h-5 w-5 text-destructive drop-shadow-sm" />
                   )}
                 </div>
                 {r.status === "error" && r.error && (
-                  <div className="mt-2 text-xs text-destructive bg-destructive/10 p-2 rounded border border-destructive/20">
+                  <div className="mt-2 text-xs text-destructive bg-destructive/10 p-2.5 rounded-xl border border-destructive/20 font-medium">
                     {r.error}
                   </div>
                 )}
@@ -369,9 +369,9 @@ export default function UploadPage() {
             ))}
 
             {!isWorking && doneJobs.length > 0 && (
-              <div className="flex flex-col gap-2 mt-4">
+              <div className="flex flex-col gap-2.5 mt-5">
                 <Button
-                  className="w-full"
+                  className="w-full rounded-xl h-11 font-bold shadow-sm"
                   onClick={() =>
                     router.push(`/review/batch?jobIds=${doneJobs.join(",")}`)
                   }
@@ -381,7 +381,7 @@ export default function UploadPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full"
+                  className="w-full rounded-xl h-11 font-bold shadow-sm"
                   onClick={() => {
                     const nextParams = doneJobs.length > 1 ? `?next=${doneJobs.slice(1).join(",")}` : "";
                     router.push(`/review/${doneJobs[0]}${nextParams}`);
@@ -392,7 +392,7 @@ export default function UploadPage() {
                 </Button>
                 <Button
                   variant="secondary"
-                  className="w-full border-primary/20 bg-primary/10 hover:bg-primary/20 text-primary"
+                  className="w-full rounded-xl h-11 font-bold border border-primary/20 bg-primary/10 hover:bg-primary/20 text-primary transition-colors"
                   onClick={() => handleAutoSaveClick(doneJobs)}
                   disabled={savingBatch}
                 >

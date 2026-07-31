@@ -100,37 +100,51 @@ export default function TransactionsPage() {
       </div>
 
       {loading ? (
-        <p className="text-center text-muted-foreground py-10">กำลังโหลด...</p>
+        <div className="flex flex-col items-center justify-center py-20 text-muted-foreground animate-pulse">
+          <div className="h-8 w-8 rounded-full border-4 border-primary/20 border-t-primary animate-spin mb-4" />
+          <p className="text-sm font-medium">กำลังโหลดข้อมูล...</p>
+        </div>
       ) : transactions.length === 0 ? (
-        <Card>
-          <CardContent className="py-10 text-center text-muted-foreground">
-            ไม่มีรายการ
+        <Card className="border-none shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] bg-white rounded-3xl mt-8">
+          <CardContent className="py-16 text-center text-slate-500 flex flex-col items-center">
+            <div className="p-5 bg-slate-50 rounded-full mb-4">
+              <List className="h-12 w-12 text-slate-300" strokeWidth={1.5} />
+            </div>
+            <p className="font-semibold text-slate-700">ยังไม่มีรายการในหมวดนี้</p>
+            <p className="text-sm mt-1">ลองเปลี่ยนตัวกรอง หรือเพิ่มรายการใหม่</p>
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {transactions.map((tx) => (
             <Card 
               key={tx.id} 
-              className="cursor-pointer hover:bg-muted/50 transition-colors"
+              className="border-none shadow-[0_2px_10px_-2px_rgba(0,0,0,0.03)] bg-white hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer rounded-3xl group"
               onClick={() => router.push(`/transactions/${tx.id}`)}
             >
-              <CardContent className="flex items-center justify-between p-4">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium">{tx.category}</p>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {(tx.type === "income" ? tx.sender : tx.receiver) ?? "—"} · {formatDate(tx.occurredAt)}
-                  </p>
-                  {tx.note && (
-                    <p className="text-xs text-muted-foreground truncate">
-                      {tx.note}
+              <CardContent className="flex items-center justify-between p-4 px-5">
+                <div className="flex-1 min-w-0 flex items-center gap-3.5">
+                  <div className={`p-3 rounded-2xl shrink-0 transition-colors ${tx.type === 'income' ? 'bg-success/10 text-success group-hover:bg-success/20' : 'bg-destructive/10 text-destructive group-hover:bg-destructive/20'}`}>
+                    <div className="w-5 h-5 flex items-center justify-center font-bold text-lg leading-none">
+                      {tx.type === 'income' ? '+' : '-'}
+                    </div>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[15px] font-semibold text-slate-800 truncate">{tx.category}</p>
+                    <p className="text-xs text-slate-400 truncate mt-0.5">
+                      {(tx.type === "income" ? tx.sender : tx.receiver) ?? "—"} · {formatDate(tx.occurredAt)}
                     </p>
-                  )}
+                    {tx.note && (
+                      <p className="text-[11px] text-slate-400 truncate mt-1 bg-slate-50 inline-block px-2 py-0.5 rounded-md">
+                        {tx.note}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 ml-2">
+                <div className="flex items-center gap-2 ml-3 shrink-0">
                   <div className="flex flex-col items-end">
                     <p
-                      className={`font-semibold whitespace-nowrap ${
+                      className={`font-bold tracking-tight font-number ${
                         tx.type === "income"
                           ? "text-success"
                           : "text-destructive"
@@ -139,21 +153,10 @@ export default function TransactionsPage() {
                       {tx.type === "income" ? "+" : "-"}
                       {formatCurrency(parseFloat(tx.amount))}
                     </p>
-                    <div className="flex items-center text-[10px] text-muted-foreground mt-0.5 font-medium">
+                    <div className="flex items-center text-[10px] text-primary mt-1 font-semibold opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0">
                       ดูรายละเอียด <ChevronRight className="h-3 w-3 ml-0.5" />
                     </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-muted-foreground hover:text-destructive z-10 relative ml-1"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(tx.id);
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
                 </div>
               </CardContent>
             </Card>

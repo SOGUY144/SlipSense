@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Noto_Sans_Thai, Inter } from "next/font/google";
+import { Prompt, Inter } from "next/font/google";
 import "./globals.css";
 
-const notoSansThai = Noto_Sans_Thai({ 
+const promptFont = Prompt({ 
   subsets: ["latin", "thai"],
   weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-noto",
+  variable: "--font-prompt",
 });
 
 const inter = Inter({
@@ -23,7 +23,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#2563eb",
+  themeColor: "#34d399", // emerald-400
 };
 
 export default function RootLayout({
@@ -32,8 +32,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th" className={`${notoSansThai.variable} ${inter.variable}`}>
-      <body className="font-sans">{children}</body>
+    <html lang="th" className={`${promptFont.variable} ${inter.variable}`}>
+      <body className="font-sans bg-slate-50">{children}</body>
     </html>
   );
 }
