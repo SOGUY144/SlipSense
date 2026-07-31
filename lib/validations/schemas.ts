@@ -58,6 +58,12 @@ export const transactionSchema = z.object({
   riskScore: z.number().optional(),
   riskLevel: z.enum(["low", "medium", "high"]).optional(),
   riskReasons: z.any().optional(),
+  taxId: z.string().optional().nullable(),
+  taxInvoiceNo: z.string().optional().nullable(),
+  taxInvoiceDate: z.string().optional().nullable(),
+  partnerName: z.string().optional().nullable(),
+  partnerAddress: z.string().optional().nullable(),
+  isVatRegistered: z.boolean().optional(),
 });
 
 export type TransactionInput = z.infer<typeof transactionSchema>;

@@ -69,6 +69,12 @@ export async function PATCH(
         }),
         ...(parsed.note !== undefined && { note: parsed.note }),
         ...(parsed.confidence && { confidence: parsed.confidence }),
+        ...(parsed.taxId !== undefined && { taxId: parsed.taxId }),
+        ...(parsed.taxInvoiceNo !== undefined && { taxInvoiceNo: parsed.taxInvoiceNo }),
+        ...(parsed.taxInvoiceDate !== undefined && { taxInvoiceDate: parsed.taxInvoiceDate ? new Date(parsed.taxInvoiceDate) : null }),
+        ...(parsed.partnerName !== undefined && { partnerName: parsed.partnerName }),
+        ...(parsed.partnerAddress !== undefined && { partnerAddress: parsed.partnerAddress }),
+        ...(parsed.isVatRegistered !== undefined && { isVatRegistered: parsed.isVatRegistered }),
       })
       .where(and(eq(transactions.id, id), eq(transactions.shopId, shop.id)))
       .returning();

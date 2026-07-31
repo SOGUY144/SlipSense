@@ -13,9 +13,10 @@ export async function POST(request: Request) {
     const { supabase, user, shop } = await requireAuth();
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
+    const uploadType = formData.get("uploadType") as "slip" | "bill" | null || "slip";
 
     if (!file) {
-      return apiError("No file provided");
+      return apiError("No file uploaded", 400);
     }
 
     const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -23,8 +24,17 @@ export async function POST(request: Request) {
       return apiError("Invalid file type. Use JPEG, PNG, or WebP.");
     }
 
-    const ext = file.name.split(".").pop() ?? "jpg";
-    const storagePath = `${user.id}/${shop.id}/${Date.now()}.${ext}`;
+    // Map MIME type to safe extension
+    const mimeMap: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+      'image/gif': 'gif'
+    };
+    const ext = mimeMap[file.type] || 'jpg';
+    
+    // Secure filename generation
+    const storagePath = `${user.id}/${shop.id}/${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
@@ -49,7 +59,6 @@ export async function POST(request: Request) {
       })
       .returning();
 
-    const uploadType = formData.get("uploadType") as "slip" | "bill" | null || "slip";
 
     const base64 = buffer.toString("base64");
     const mediaType = getMediaType(file.type);

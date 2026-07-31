@@ -10,11 +10,11 @@
 
 ## 2. เปิดใช้งานการเข้าสู่ระบบด้วยเบอร์โทร (Enable Phone Auth)
 
-1. ไปที่เมนู **Authentication → Providers**
+1. ไปที่เมนู **Authentication →    **
 2. เปิดการใช้งาน **Phone**
 3. ตั้งค่าผู้ให้บริการ SMS (แนะนำให้ใช้ Twilio สำหรับใช้งานจริง; หรือใช้ Test OTP ของ Supabase สำหรับตอนพัฒนา)
 4. สำหรับช่วงพัฒนา/ทดสอบ ให้เพิ่มเบอร์โทรศัพท์จำลอง (Test phone numbers) ในเมนู **Authentication → Phone Auth**
-
+    
 ## 3. รัน Database Migration (สร้างตารางในฐานข้อมูล)
 
 1. ไปที่เมนู **SQL Editor**

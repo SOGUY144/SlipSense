@@ -9,6 +9,7 @@ import {
   primaryKey,
   integer,
   boolean,
+  index,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -113,14 +114,23 @@ export const transactions = pgTable("transactions", {
   note: text("note"),
   metadata: jsonb("metadata"),
   confidence: confidenceEnum("confidence"),
-  transRef: text("trans_ref"),
+  transRef: text("trans_ref").unique(),
   riskScore: integer("risk_score").default(0),
   riskLevel: riskLevelEnum("risk_level").default("low"),
   riskReasons: jsonb("risk_reasons"),
+  taxId: text("tax_id"),
+  taxInvoiceNo: text("tax_invoice_no"),
+  taxInvoiceDate: timestamp("tax_invoice_date", { withTimezone: true }),
+  partnerName: text("partner_name"),
+  partnerAddress: text("partner_address"),
+  isVatRegistered: boolean("is_vat_registered").default(false),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
-});
+}, (t) => [
+  index("transactions_shop_id_idx").on(t.shopId),
+  index("transactions_shop_date_idx").on(t.shopId, t.occurredAt),
+]);
 
 export const categories = pgTable("categories", {
   id: uuid("id").primaryKey().defaultRandom(),

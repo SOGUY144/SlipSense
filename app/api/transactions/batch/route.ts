@@ -81,6 +81,7 @@ export async function POST(request: Request) {
     const insertedTransactions = await db
       .insert(transactions)
       .values(insertData)
+      .onConflictDoNothing({ target: transactions.transRef })
       .returning();
 
     return apiSuccess(insertedTransactions, 201);

@@ -51,3 +51,6 @@ migrate*.js
 .agents/
 .gemini/
 
+
+.agent/
+.agents/

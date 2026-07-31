@@ -1,4 +1,4 @@
-import { eq, and, gte } from "drizzle-orm";
+import { eq, and, gte, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { transactions, billReminders } from "@/lib/db/schema";
 import { requireAuth } from "@/lib/auth/helpers";
@@ -41,17 +41,20 @@ export async function GET(request: Request) {
       .from(billReminders)
       .where(and(eq(billReminders.shopId, shop.id), eq(billReminders.isActive, true)));
 
-    // 4. Calculate current running net balance from all historical transactions
-    const allTxs = await db
-      .select()
+    // 4. Calculate current running net balance using database aggregation
+    const balanceResult = await db
+      .select({
+        type: transactions.type,
+        total: sql<number>`SUM(CAST(${transactions.amount} AS NUMERIC))`.mapWith(Number),
+      })
       .from(transactions)
-      .where(eq(transactions.shopId, shop.id));
+      .where(eq(transactions.shopId, shop.id))
+      .groupBy(transactions.type);
 
     let currentBalance = 0;
-    allTxs.forEach((tx) => {
-      const amt = parseFloat(tx.amount);
-      if (tx.type === "income") currentBalance += amt;
-      else currentBalance -= amt;
+    balanceResult.forEach((b) => {
+      if (b.type === "income") currentBalance += b.total;
+      else currentBalance -= b.total;
     });
 
     // 5. Generate 30-day forecast projection

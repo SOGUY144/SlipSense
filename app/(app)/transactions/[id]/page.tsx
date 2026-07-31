@@ -13,7 +13,8 @@ import {
   X,
   ShieldCheck,
   ShieldAlert,
-  AlertTriangle
+  AlertTriangle,
+  Receipt
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,6 +29,8 @@ import {
 } from "@/components/ui/select";
 import { ALL_CATEGORIES } from "@/lib/validations/schemas";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 
 export default function TransactionDetailPage({
@@ -51,8 +54,17 @@ export default function TransactionDetailPage({
   // Edit states
   const [isEditingCategory, setIsEditingCategory] = useState(false);
   const [isEditingNote, setIsEditingNote] = useState(false);
+  const [isEditingTax, setIsEditingTax] = useState(false);
   const [editCategory, setEditCategory] = useState("");
   const [editNote, setEditNote] = useState("");
+  const [taxData, setTaxData] = useState({
+    isVatRegistered: false,
+    taxId: "",
+    taxInvoiceNo: "",
+    taxInvoiceDate: "",
+    partnerName: "",
+    partnerAddress: "",
+  });
 
   // Fullscreen image state
   const [showFullImage, setShowFullImage] = useState(false);
@@ -65,6 +77,14 @@ export default function TransactionDetailPage({
         setTransaction(data);
         setEditCategory(data.category);
         setEditNote(data.note || "");
+        setTaxData({
+          isVatRegistered: data.isVatRegistered || false,
+          taxId: data.taxId || "",
+          taxInvoiceNo: data.taxInvoiceNo || "",
+          taxInvoiceDate: data.taxInvoiceDate ? data.taxInvoiceDate.split('T')[0] : "",
+          partnerName: data.partnerName || "",
+          partnerAddress: data.partnerAddress || "",
+        });
       }
       setLoading(false);
     }
@@ -95,6 +115,20 @@ export default function TransactionDetailPage({
     if (res.ok) {
       setTransaction(prev => prev ? { ...prev, note: editNote } : null);
       setIsEditingNote(false);
+    }
+    setSaving(false);
+  }
+
+  async function handleSaveTax() {
+    setSaving(true);
+    const res = await fetch(`/api/transactions/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(taxData),
+    });
+    if (res.ok) {
+      setTransaction(prev => prev ? { ...prev, ...taxData } : null);
+      setIsEditingTax(false);
     }
     setSaving(false);
   }
@@ -229,6 +263,117 @@ export default function TransactionDetailPage({
                     {transaction.note || "เพิ่มโน้ต"}
                   </p>
                 </div>
+              </button>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Tax Information Edit */}
+        <Card className="overflow-hidden border-2 border-border/50 transition-all hover:border-primary/20">
+          <CardContent className="p-0">
+            {isEditingTax ? (
+              <div className="p-4 space-y-4 bg-muted/30">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-muted-foreground">ข้อมูลใบกำกับภาษี</p>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <span className="text-sm font-medium">จดทะเบียน VAT?</span>
+                    <input 
+                      type="checkbox" 
+                      className="w-4 h-4 rounded text-primary focus:ring-primary"
+                      checked={taxData.isVatRegistered}
+                      onChange={(e) => setTaxData({...taxData, isVatRegistered: e.target.checked})}
+                    />
+                  </label>
+                </div>
+                
+                {taxData.isVatRegistered && (!taxData.taxId || taxData.taxId.length !== 13) && (
+                  <div className="bg-orange-50 border border-orange-200 p-2.5 rounded-lg flex items-start gap-2">
+                    <AlertTriangle className="h-4 w-4 text-orange-500 shrink-0 mt-0.5" />
+                    <p className="text-xs text-orange-700">คุณเปิดตั้งค่า VAT แต่เลขประจำตัวผู้เสียภาษียังไม่ครบถ้วน อาจส่งผลต่อการเคลมภาษี</p>
+                  </div>
+                )}
+
+                <div className="grid gap-3">
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="taxId" className="text-xs">เลขประจำตัวผู้เสียภาษี (13 หลัก)</Label>
+                    <Input 
+                      id="taxId" 
+                      placeholder="1234567890123" 
+                      value={taxData.taxId}
+                      onChange={(e) => setTaxData({...taxData, taxId: e.target.value})}
+                      maxLength={13}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="grid gap-1.5">
+                      <Label htmlFor="taxInvoiceNo" className="text-xs">เลขที่ใบกำกับภาษี</Label>
+                      <Input 
+                        id="taxInvoiceNo" 
+                        placeholder="INV-001" 
+                        value={taxData.taxInvoiceNo}
+                        onChange={(e) => setTaxData({...taxData, taxInvoiceNo: e.target.value})}
+                      />
+                    </div>
+                    <div className="grid gap-1.5">
+                      <Label htmlFor="taxInvoiceDate" className="text-xs">วันที่ออกบิล</Label>
+                      <Input 
+                        id="taxInvoiceDate" 
+                        type="date"
+                        value={taxData.taxInvoiceDate}
+                        onChange={(e) => setTaxData({...taxData, taxInvoiceDate: e.target.value})}
+                      />
+                    </div>
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="partnerName" className="text-xs">ชื่อคู่ค้า (บริษัท/ร้านค้า)</Label>
+                    <Input 
+                      id="partnerName" 
+                      placeholder="บจก. บริษัทตัวอย่าง" 
+                      value={taxData.partnerName}
+                      onChange={(e) => setTaxData({...taxData, partnerName: e.target.value})}
+                    />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="partnerAddress" className="text-xs">ที่อยู่คู่ค้า</Label>
+                    <Textarea 
+                      id="partnerAddress" 
+                      placeholder="ที่อยู่สำหรับออกใบกำกับภาษี" 
+                      value={taxData.partnerAddress}
+                      onChange={(e) => setTaxData({...taxData, partnerAddress: e.target.value})}
+                      className="resize-none h-16"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <Button size="sm" variant="outline" className="flex-1" onClick={() => setIsEditingTax(false)}>ยกเลิก</Button>
+                  <Button size="sm" className="flex-1" onClick={handleSaveTax} disabled={saving}>บันทึก</Button>
+                </div>
+              </div>
+            ) : (
+              <button 
+                onClick={() => setIsEditingTax(true)}
+                className="w-full flex items-center gap-4 p-4 text-left hover:bg-muted/50 transition-colors"
+              >
+                <div className="bg-purple-500/10 p-2.5 rounded-xl text-purple-600">
+                  <Receipt className="h-5 w-5" />
+                </div>
+                <div className="flex-1 overflow-hidden">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <p className="text-sm text-muted-foreground">ข้อมูลใบกำกับภาษี</p>
+                    {transaction.isVatRegistered ? (
+                      <span className="bg-purple-100 text-purple-700 text-[10px] px-1.5 py-0.5 rounded font-bold">VAT</span>
+                    ) : (
+                      <span className="bg-gray-100 text-gray-500 text-[10px] px-1.5 py-0.5 rounded font-bold">No VAT</span>
+                    )}
+                  </div>
+                  <p className={`font-medium truncate ${transaction.taxInvoiceNo ? '' : 'text-muted-foreground italic'}`}>
+                    {transaction.taxInvoiceNo 
+                      ? `${transaction.taxInvoiceNo} (${transaction.partnerName || 'ไม่ระบุชื่อ'})` 
+                      : "เพิ่มข้อมูลภาษี"}
+                  </p>
+                </div>
+                <Pencil className="h-4 w-4 text-muted-foreground opacity-50" />
               </button>
             )}
           </CardContent>

@@ -204,12 +204,22 @@ const aiSlipSchema = z.object({
   riskReasons: z.array(z.string()).nullable()
 });
 
+/**
+ * Extract structured transaction data from a slip or bill image using Google's Gemini AI.
+ * 
+ * @param base64Image - Base64 encoded image string
+ * @param mediaType - MIME type of the image (e.g. image/jpeg)
+ * @param activeCategories - List of user-defined categories to match against
+ * @param shopDetails - Context about the shop (name, business type) to help AI categorize accurately
+ * @param documentType - Type of document being processed ('slip' or 'bill')
+ * @returns Parsed and validated transaction data including risk assessment
+ */
 export async function extractSlipData(
-  imageBase64: string,
+  base64Image: string,
   mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif",
-  categories: {type: string, name: string}[] = [],
-  shopDetails?: { name: string, ownerName?: string, businessCategory?: string, businessType?: string, description?: string },
-  uploadType: "slip" | "bill" = "slip"
+  activeCategories: { type: string; name: string }[],
+  shopDetails: { name: string; ownerName?: string; businessCategory?: string; businessType?: string; description?: string },
+  documentType: "slip" | "bill" = "slip"
 ): Promise<ExtractedSlip> {
   return callWithRetry(async () => {
     const { object } = await generateObject({
@@ -219,8 +229,8 @@ export async function extractSlipData(
         {
           role: "user",
           content: [
-            { type: "text", text: buildSlipExtractionPrompt(categories, shopDetails, uploadType) },
-            { type: "image", image: `data:${mediaType};base64,${imageBase64}` }
+            { type: "text", text: buildSlipExtractionPrompt(activeCategories, shopDetails, documentType) },
+            { type: "image", image: `data:${mediaType};base64,${base64Image}` }
           ]
         }
       ]
@@ -287,6 +297,10 @@ export async function generateInsights(
   });
 }
 
+/**
+ * Helper to determine MIME type from common image file extensions or content types.
+ * Maps standard image types to the subset supported by Gemini API.
+ */
 export function getMediaType(
   mimeType: string
 ): "image/jpeg" | "image/png" | "image/webp" | "image/gif" {

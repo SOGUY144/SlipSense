@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Trash2, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,11 +16,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ExportButton } from "@/components/export/export-button";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { ALL_CATEGORIES } from "@/lib/validations/schemas";
 import type { Transaction } from "@/lib/db/schema";
 
 export default function TransactionsPage() {
+  const router = useRouter();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filterType, setFilterType] = useState<string>("all");
   const [filterCategory, setFilterCategory] = useState<string>("all");
@@ -51,11 +55,21 @@ export default function TransactionsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-bold">รายการธุรกรรม</h1>
-        <p className="text-sm text-muted-foreground">
-          {transactions.length} รายการ
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold">รายการธุรกรรม</h1>
+          <p className="text-sm text-muted-foreground">
+            {transactions.length} รายการ
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <ExportButton />
+          <Button asChild className="rounded-xl font-medium shadow-sm hover:scale-105 active:scale-95 transition-all">
+            <Link href="/transactions/new">
+              <Plus className="mr-2 h-4 w-4" /> เพิ่มรายการ
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <div className="flex gap-2">
@@ -96,7 +110,11 @@ export default function TransactionsPage() {
       ) : (
         <div className="space-y-2">
           {transactions.map((tx) => (
-            <Card key={tx.id}>
+            <Card 
+              key={tx.id} 
+              className="cursor-pointer hover:bg-muted/50 transition-colors"
+              onClick={() => router.push(`/transactions/${tx.id}`)}
+            >
               <CardContent className="flex items-center justify-between p-4">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium">{tx.category}</p>
@@ -110,21 +128,29 @@ export default function TransactionsPage() {
                   )}
                 </div>
                 <div className="flex items-center gap-2 ml-2">
-                  <p
-                    className={`font-semibold whitespace-nowrap ${
-                      tx.type === "income"
-                        ? "text-success"
-                        : "text-destructive"
-                    }`}
-                  >
-                    {tx.type === "income" ? "+" : "-"}
-                    {formatCurrency(parseFloat(tx.amount))}
-                  </p>
+                  <div className="flex flex-col items-end">
+                    <p
+                      className={`font-semibold whitespace-nowrap ${
+                        tx.type === "income"
+                          ? "text-success"
+                          : "text-destructive"
+                      }`}
+                    >
+                      {tx.type === "income" ? "+" : "-"}
+                      {formatCurrency(parseFloat(tx.amount))}
+                    </p>
+                    <div className="flex items-center text-[10px] text-muted-foreground mt-0.5 font-medium">
+                      ดูรายละเอียด <ChevronRight className="h-3 w-3 ml-0.5" />
+                    </div>
+                  </div>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                    onClick={() => handleDelete(tx.id)}
+                    className="h-8 w-8 text-muted-foreground hover:text-destructive z-10 relative ml-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(tx.id);
+                    }}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
