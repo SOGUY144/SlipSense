@@ -366,11 +366,7 @@ export default function DashboardPage() {
 
       <div className="mb-6">
         <div className="bg-white rounded-[1.25rem] shadow-sm overflow-hidden relative">
-          <button 
-            onClick={handleGenerateInsights} 
-            disabled={generatingInsights}
-            className="w-full text-left p-4 flex items-center justify-between"
-          >
+          <div className="w-full p-4 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div className="p-1.5 bg-amber-50 rounded-lg text-amber-500">
                 <Lightbulb className="w-4 h-4" />
@@ -379,18 +375,36 @@ export default function DashboardPage() {
                 {insights.length > 0 ? "คำแนะนำจาก AI" : "ให้ AI ช่วยวิเคราะห์"}
               </h2>
             </div>
-            {generatingInsights ? (
-              <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+            {!insights.length ? (
+              <button 
+                onClick={handleGenerateInsights} 
+                disabled={generatingInsights}
+                className="text-[11px] font-bold bg-[#43936C] text-white px-3 py-1.5 rounded-full hover:bg-[#367a59] transition-colors flex items-center gap-1"
+              >
+                {generatingInsights ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                วิเคราะห์เลย
+              </button>
             ) : (
-              <span className="text-[11px] text-slate-400 flex items-center">ทั้งหมด <ChevronRight className="w-3 h-3 ml-0.5" /></span>
+              <Link href="/chat" className="text-[11px] text-slate-400 flex items-center hover:text-primary transition-colors">
+                คุยกับ AI <ChevronRight className="w-3 h-3 ml-0.5" />
+              </Link>
             )}
-          </button>
+          </div>
           
           {insights.length > 0 && (
-            <div className="px-4 pb-4 border-t border-slate-50 pt-3 bg-slate-50/50">
-              <p className="text-[12px] text-slate-600 line-clamp-2 leading-relaxed">
+            <div className="px-4 pb-4 pt-1">
+              <p className="text-[12px] text-slate-600 leading-relaxed">
                 {insights[0]?.content}
               </p>
+              <div className="mt-3 flex justify-end">
+                <button 
+                  onClick={handleGenerateInsights} 
+                  disabled={generatingInsights}
+                  className="text-[10px] font-medium text-slate-400 hover:text-slate-600 flex items-center gap-1"
+                >
+                  {generatingInsights ? <Loader2 className="h-3 w-3 animate-spin" /> : "อัปเดตคำแนะนำใหม่"}
+                </button>
+              </div>
             </div>
           )}
         </div>
