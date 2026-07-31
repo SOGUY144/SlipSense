@@ -14,6 +14,7 @@ import type { Transaction } from "@/lib/db/schema";
 import { OnboardingReminders } from "@/components/reminders/onboarding-reminders";
 import { SpendingBehaviorModal } from "@/components/onboarding/spending-behavior-modal";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
+import { AiStoryViewer } from "@/components/dashboard/ai-story-viewer";
 
 interface Summary {
   shopName: string;
@@ -375,49 +376,11 @@ export default function DashboardPage() {
       </Card>
 
       <div className="mb-6">
-        <div className="bg-white rounded-[1.25rem] shadow-sm overflow-hidden relative">
-          <div className="w-full p-4 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="p-1.5 bg-amber-50 rounded-lg text-amber-500">
-                <Lightbulb className="w-4 h-4" />
-              </div>
-              <h2 className="text-[14px] font-bold text-slate-800">
-                {insights.length > 0 ? "คำแนะนำจาก AI" : "ให้ AI ช่วยวิเคราะห์"}
-              </h2>
-            </div>
-            {!insights.length ? (
-              <button 
-                onClick={handleGenerateInsights} 
-                disabled={generatingInsights}
-                className="text-[11px] font-bold bg-[#43936C] text-white px-3 py-1.5 rounded-full hover:bg-[#367a59] transition-colors flex items-center gap-1"
-              >
-                {generatingInsights ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
-                วิเคราะห์เลย
-              </button>
-            ) : (
-              <Link href="/chat" className="text-[11px] text-slate-400 flex items-center hover:text-primary transition-colors">
-                คุยกับ AI <ChevronRight className="w-3 h-3 ml-0.5" />
-              </Link>
-            )}
-          </div>
-          
-          {insights.length > 0 && (
-            <div className="px-4 pb-4 pt-1">
-              <p className="text-[12px] text-slate-600 leading-relaxed">
-                {insights[0]?.content}
-              </p>
-              <div className="mt-3 flex justify-end">
-                <button 
-                  onClick={handleGenerateInsights} 
-                  disabled={generatingInsights}
-                  className="text-[10px] font-medium text-slate-400 hover:text-slate-600 flex items-center gap-1"
-                >
-                  {generatingInsights ? <Loader2 className="h-3 w-3 animate-spin" /> : "อัปเดตคำแนะนำใหม่"}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+        <AiStoryViewer 
+          insights={insights} 
+          onRefresh={handleGenerateInsights} 
+          isRefreshing={generatingInsights} 
+        />
       </div>
 
       <div className="space-y-3">
