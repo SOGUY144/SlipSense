@@ -129,17 +129,8 @@ export default function DashboardPage() {
         {behaviorModalDone && <OnboardingReminders onComplete={load} />}
       <SpendingBehaviorModal onComplete={load} onSkipOrDone={() => setBehaviorModalDone(true)} />
       
-      <div className="flex items-center gap-3 pt-2 pb-6 px-1">
-        <div className="w-9 h-9 bg-[#43936C]/10 rounded-full flex items-center justify-center">
-          <Wallet className="w-5 h-5 text-[#43936C]" />
-        </div>
-        <p className="text-[28px] font-bold text-slate-900 tracking-tight font-number">
-          {formatCurrency(summary?.current.profit ?? 0)}
-        </p>
-      </div>
-
       {/* Quick Actions Restored */}
-      <div className="flex justify-center gap-6 px-4 mb-6 mt-[-10px]">
+      <div className="flex justify-center gap-6 px-4 mb-6 mt-4">
         <Link href="/upload" className="flex flex-col items-center gap-2 group cursor-pointer">
           <div className="w-14 h-14 bg-white rounded-[1.25rem] shadow-sm flex items-center justify-center text-slate-700 group-hover:bg-slate-50 transition-colors">
             <Camera className="w-[22px] h-[22px]" strokeWidth={2} />
@@ -158,6 +149,18 @@ export default function DashboardPage() {
           </div>
           <span className="text-[11px] font-medium text-slate-600">วิเคราะห์ (กราฟ)</span>
         </Link>
+      </div>
+
+      <div className="flex flex-col items-center justify-center gap-2 pt-2 pb-6 px-1">
+        <p className="text-[11px] text-slate-500 font-medium tracking-wide">ยอดเงินคงเหลือสุทธิ</p>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-[#43936C]/10 rounded-full flex items-center justify-center">
+            <Wallet className="w-4 h-4 text-[#43936C]" />
+          </div>
+          <p className="text-[32px] font-bold text-slate-900 tracking-tight font-number">
+            {formatCurrency(summary?.current.profit ?? 0)}
+          </p>
+        </div>
       </div>
 
       <div className="bg-white rounded-[1.5rem] p-5 shadow-sm mb-6 relative overflow-hidden">
