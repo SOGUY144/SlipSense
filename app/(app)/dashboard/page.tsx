@@ -457,6 +457,7 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+    </div>
     </PullToRefresh>
 
       {/* Paid Success Overlay */}
