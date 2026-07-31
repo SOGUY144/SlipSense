@@ -92,15 +92,12 @@ export function AppShell({
                 <Link
                   key={href}
                   href={href}
-                  className={cn(
-                    "flex flex-col items-center justify-center flex-1 min-w-0 transition-all duration-300",
-                    active ? "text-primary" : "text-slate-400 hover:text-slate-600"
-                  )}
+                  className="flex flex-col items-center justify-center flex-1 min-w-0 transition-all duration-300 py-1"
                 >
-                  <div className={cn("p-1.5 rounded-2xl transition-all duration-300", active ? "bg-primary/10 scale-110" : "bg-transparent scale-100")}>
-                    <Icon className={cn("h-5 w-5")} strokeWidth={active ? 2.5 : 2} />
+                  <div className={cn("transition-all duration-300 mb-1", active ? "text-primary scale-105" : "text-slate-400")}>
+                    <Icon className="h-6 w-6" strokeWidth={active ? 2.5 : 2} />
                   </div>
-                  <span className={cn("text-[10px] leading-none transition-all duration-300 mt-1 truncate max-w-[50px] text-center", active ? "opacity-100 font-bold" : "opacity-80 font-medium")}>{label}</span>
+                  <span className={cn("text-[10px] leading-none transition-all duration-300 mt-0.5", active ? "text-primary font-bold" : "text-slate-500 font-medium")}>{label}</span>
                 </Link>
               );
             })}

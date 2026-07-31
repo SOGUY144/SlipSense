@@ -224,7 +224,7 @@ export default function UploadPage() {
 
       <div className="flex rounded-[10px] bg-[#E3E3E8] p-1">
         <button
-          className={`flex-1 rounded-[8px] py-1.5 text-[13px] font-semibold transition-all duration-300 ${
+          className={`flex-1 rounded-[8px] py-2 text-[13px] font-semibold transition-all duration-300 ${
             mode === "scan"
               ? "bg-white text-slate-900 shadow-sm"
               : "text-slate-500 hover:text-slate-700"
@@ -234,7 +234,7 @@ export default function UploadPage() {
           สแกนสลิป
         </button>
         <button
-          className={`flex-1 rounded-[8px] py-1.5 text-[13px] font-semibold transition-all duration-300 ${
+          className={`flex-1 rounded-[8px] py-2 text-[13px] font-semibold transition-all duration-300 ${
             mode === "manual"
               ? "bg-white text-slate-900 shadow-sm"
               : "text-slate-500 hover:text-slate-700"
@@ -275,7 +275,7 @@ export default function UploadPage() {
 
       <div className="flex rounded-[10px] bg-[#E3E3E8] p-1 mb-6">
         <button
-          className={`flex-1 rounded-[8px] py-1.5 text-[13px] font-semibold transition-all duration-300 ${
+          className={`flex-1 rounded-[8px] py-2 text-[13px] font-semibold transition-all duration-300 ${
             uploadType === "slip"
               ? "bg-white text-slate-900 shadow-sm"
               : "text-slate-500 hover:text-slate-700"
@@ -285,7 +285,7 @@ export default function UploadPage() {
           สลิปโอนเงิน
         </button>
         <button
-          className={`flex-1 rounded-[8px] py-1.5 text-[13px] font-semibold transition-all duration-300 ${
+          className={`flex-1 rounded-[8px] py-2 text-[13px] font-semibold transition-all duration-300 ${
             uploadType === "bill"
               ? "bg-white text-slate-900 shadow-sm"
               : "text-slate-500 hover:text-slate-700"
