@@ -14,7 +14,7 @@ import type { Transaction } from "@/lib/db/schema";
 import { OnboardingReminders } from "@/components/reminders/onboarding-reminders";
 import { SpendingBehaviorModal } from "@/components/onboarding/spending-behavior-modal";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
-import { AiStoryViewer } from "@/components/dashboard/ai-story-viewer";
+import { AiFeedViewer } from "@/components/dashboard/ai-feed-viewer";
 
 interface Summary {
   shopName: string;
@@ -376,7 +376,7 @@ export default function DashboardPage() {
       </Card>
 
       <div className="mb-6">
-        <AiStoryViewer 
+        <AiFeedViewer 
           insights={insights} 
           onRefresh={handleGenerateInsights} 
           isRefreshing={generatingInsights} 
