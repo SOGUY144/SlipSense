@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Camera, TrendingUp, TrendingDown, Wallet, Loader2, Sparkles, Bell, Calendar, ChevronRight, CheckCircle2, Info, AlertTriangle, Lightbulb } from "lucide-react";
+import { Camera, TrendingUp, TrendingDown, Wallet, Loader2, Sparkles, Bell, Calendar, ChevronRight, CheckCircle2, Info, AlertTriangle, Lightbulb, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
