@@ -115,27 +115,27 @@ export default function TransactionsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-3">
-          {transactions.map((tx) => (
-            <Card 
-              key={tx.id} 
-              className="border-none shadow-[0_2px_10px_-2px_rgba(0,0,0,0.03)] bg-white hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer rounded-3xl group"
-              onClick={() => router.push(`/transactions/${tx.id}`)}
-            >
-              <CardContent className="flex items-center justify-between p-4 px-5">
+        <div className="bg-white rounded-[1.5rem] border border-slate-100 shadow-[0_2px_10px_-2px_rgba(0,0,0,0.03)] overflow-hidden">
+          <div className="divide-y divide-slate-50">
+            {transactions.map((tx) => (
+              <div 
+                key={tx.id} 
+                className="flex items-center justify-between p-4 px-5 hover:bg-slate-50/50 transition-colors cursor-pointer group"
+                onClick={() => router.push(`/transactions/${tx.id}`)}
+              >
                 <div className="flex-1 min-w-0 flex items-center gap-3.5">
-                  <div className={`p-3 rounded-2xl shrink-0 transition-colors ${tx.type === 'income' ? 'bg-success/10 text-success group-hover:bg-success/20' : 'bg-destructive/10 text-destructive group-hover:bg-destructive/20'}`}>
+                  <div className={`p-2.5 rounded-xl shrink-0 transition-colors ${tx.type === 'income' ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100/50' : 'bg-rose-50 text-rose-600 group-hover:bg-rose-100/50'}`}>
                     <div className="w-5 h-5 flex items-center justify-center font-bold text-lg leading-none">
                       {tx.type === 'income' ? '+' : '-'}
                     </div>
                   </div>
                   <div className="min-w-0">
                     <p className="text-[15px] font-semibold text-slate-800 truncate">{tx.category}</p>
-                    <p className="text-xs text-slate-400 truncate mt-0.5">
+                    <p className="text-[11px] text-slate-400 truncate mt-0.5 font-medium">
                       {(tx.type === "income" ? tx.sender : tx.receiver) ?? "—"} · {formatDate(tx.occurredAt)}
                     </p>
                     {tx.note && (
-                      <p className="text-[11px] text-slate-400 truncate mt-1 bg-slate-50 inline-block px-2 py-0.5 rounded-md">
+                      <p className="text-[10px] text-slate-500 truncate mt-1 bg-slate-50 inline-block px-2 py-0.5 rounded-md border border-slate-100">
                         {tx.note}
                       </p>
                     )}
@@ -146,21 +146,21 @@ export default function TransactionsPage() {
                     <p
                       className={`font-bold tracking-tight font-number ${
                         tx.type === "income"
-                          ? "text-success"
-                          : "text-destructive"
+                          ? "text-emerald-600"
+                          : "text-slate-800"
                       }`}
                     >
                       {tx.type === "income" ? "+" : "-"}
                       {formatCurrency(parseFloat(tx.amount))}
                     </p>
                     <div className="flex items-center text-[10px] text-primary mt-1 font-semibold opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0">
-                      ดูรายละเอียด <ChevronRight className="h-3 w-3 ml-0.5" />
+                      รายละเอียด <ChevronRight className="h-3 w-3 ml-0.5" />
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

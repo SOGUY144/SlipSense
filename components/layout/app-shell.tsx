@@ -4,12 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
-  Camera,
+  PlusCircle,
   List,
   BarChart3,
   Settings,
   LogOut,
   UserCircle,
+  Bot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -20,7 +21,7 @@ import { NotificationBell } from "@/components/reminders/notification-bell";
 const navItems = [
   { href: "/dashboard", label: "หน้าหลัก", icon: LayoutDashboard },
   { href: "/transactions", label: "รายการ", icon: List },
-  { href: "/upload", label: "ถ่ายสลิป", icon: Camera },
+  { href: "/upload", label: "เพิ่มรายการ", icon: PlusCircle },
   { href: "/analytics", label: "วิเคราะห์", icon: BarChart3 },
   { href: "/profile", label: "โปรไฟล์", icon: UserCircle },
 ];
@@ -44,26 +45,34 @@ export function AppShell({
 
   return (
     <div className="min-h-screen bg-slate-50 relative">
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md shadow-[0_2px_10px_rgba(0,0,0,0.03)] border-b border-slate-100">
-        <div className="mx-auto flex h-14 max-w-lg items-center justify-between px-4">
+      <header className="sticky top-0 z-40 bg-slate-50/90 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-lg items-center justify-between px-4">
           <div>
-            <p className="text-xs text-muted-foreground font-medium">SlipSense</p>
-            <p className="text-sm font-semibold truncate max-w-[200px] text-slate-800">
+            <p className="text-[11px] text-slate-500 font-medium tracking-wider uppercase">SlipSense</p>
+            <p className="text-sm font-bold truncate max-w-[150px] text-slate-800">
               {shopName}
             </p>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
+            <Link
+              href="/chat"
+              className="rounded-full bg-teal-50 p-2 text-teal-600 hover:bg-teal-100 transition-colors flex items-center justify-center gap-1.5 shadow-sm border border-teal-100/50"
+              aria-label="AI Chat"
+            >
+              <Bot className="h-4 w-4" strokeWidth={2} />
+              <span className="text-[10px] font-bold">AI</span>
+            </Link>
             <NotificationBell />
             <Link
               href="/settings"
-              className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-primary transition-colors"
+              className="rounded-full p-2 text-slate-500 hover:bg-slate-200 transition-colors"
               aria-label="ตั้งค่า"
             >
               <Settings className="h-5 w-5" strokeWidth={1.75} />
             </Link>
             <button
               onClick={handleLogout}
-              className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-destructive transition-colors"
+              className="rounded-full p-2 text-slate-500 hover:bg-red-50 hover:text-red-500 transition-colors"
               aria-label="ออกจากระบบ"
             >
               <LogOut className="h-5 w-5" strokeWidth={1.75} />
@@ -72,47 +81,26 @@ export function AppShell({
         </div>
       </header>
 
-      <main className="mx-auto max-w-lg px-4 pb-24 pt-6">{children}</main>
-
-      {!pathname.startsWith("/review") && pathname !== "/chat" && (
-        <div className="fixed bottom-24 left-0 right-0 z-50 mx-auto max-w-lg pointer-events-none px-4 flex justify-end">
-          <Link 
-            href="/chat" 
-            className="rounded-full bg-white border border-slate-100 p-3.5 text-primary shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:shadow-[0_8px_30px_rgba(52,211,153,0.3)] hover:text-white hover:bg-primary transition-all duration-300 hover:scale-110 flex items-center justify-center animate-bounce pointer-events-auto"
-            style={{ animationDuration: '3s' }}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bot"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
-          </Link>
-        </div>
-      )}
+      <main className="mx-auto max-w-lg px-4 pb-28 pt-2">{children}</main>
 
       {!pathname.startsWith("/review") && (
-        <nav className="fixed bottom-0 left-0 right-0 z-40 mx-auto max-w-lg bg-white/90 backdrop-blur-lg border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] pb-1" style={{ paddingBottom: 'calc(4px + env(safe-area-inset-bottom))' }}>
-          <div className="flex h-16 items-center justify-around px-2">
+        <nav className="fixed bottom-0 left-0 right-0 z-40 mx-auto max-w-lg bg-white/95 backdrop-blur-xl border-t border-slate-100/50 pb-1" style={{ paddingBottom: 'calc(8px + env(safe-area-inset-bottom))', paddingTop: '8px' }}>
+          <div className="flex items-center justify-around px-2">
             {navItems.map(({ href, label, icon: Icon }) => {
               const active = pathname.startsWith(href) && (href !== "/dashboard" || pathname === "/dashboard");
-              const isUpload = href === "/upload";
               return (
                 <Link
                   key={href}
                   href={href}
                   className={cn(
-                    "relative flex flex-col items-center justify-center flex-1 min-w-0 h-full transition-all duration-300",
-                    !isUpload && active ? "text-primary -translate-y-1" : !isUpload ? "text-slate-400 hover:text-primary hover:-translate-y-0.5" : ""
+                    "flex flex-col items-center justify-center flex-1 min-w-0 transition-all duration-300",
+                    active ? "text-primary" : "text-slate-400 hover:text-slate-600"
                   )}
                 >
-                  {isUpload ? (
-                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 h-14 w-14 rounded-full bg-gradient-to-tr from-teal-300 to-primary text-primary-foreground shadow-[0_8px_20px_rgba(52,211,153,0.4)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300">
-                      <Icon className="h-6 w-6 text-white drop-shadow-sm" strokeWidth={2} />
-                    </div>
-                  ) : (
-                    <>
-                      <div className={cn("p-1.5 rounded-xl transition-colors duration-300", active ? "bg-primary/10" : "bg-transparent")}>
-                        <Icon className={cn("h-5 w-5 transition-all duration-300")} strokeWidth={1.75} />
-                      </div>
-                      <span className={cn("text-[10px] leading-none transition-all duration-300 mt-0.5 truncate max-w-[50px] text-center", active ? "opacity-100 font-semibold" : "opacity-80 font-medium")}>{label}</span>
-                    </>
-                  )}
+                  <div className={cn("p-1.5 rounded-2xl transition-all duration-300", active ? "bg-primary/10 scale-110" : "bg-transparent scale-100")}>
+                    <Icon className={cn("h-5 w-5")} strokeWidth={active ? 2.5 : 2} />
+                  </div>
+                  <span className={cn("text-[10px] leading-none transition-all duration-300 mt-1 truncate max-w-[50px] text-center", active ? "opacity-100 font-bold" : "opacity-80 font-medium")}>{label}</span>
                 </Link>
               );
             })}
