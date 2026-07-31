@@ -107,6 +107,8 @@ async function processSlipInBackground(
       .where(eq(slipJobs.id, jobId))
       .limit(1);
 
+    let isDuplicate = false;
+    
     if (extracted.transRef && job) {
       const [existingTx] = await db
         .select({ id: transactions.id })
@@ -119,12 +121,32 @@ async function processSlipInBackground(
         )
         .limit(1);
 
-      if (existingTx) {
-        riskLevel = "high";
-        riskScore = 100;
-        if (!riskReasons.includes("สลิปนี้เคยถูกบันทึกในระบบแล้ว")) {
-          riskReasons.push("สลิปนี้เคยถูกบันทึกในระบบแล้ว");
-        }
+      if (existingTx) isDuplicate = true;
+    }
+
+    // Secondary duplicate check if transRef is missing or not caught
+    if (!isDuplicate && job && extracted.amount && extracted.occurredAt) {
+      // Find transaction with exact same amount and exact same minute
+      const [duplicateTx] = await db
+        .select({ id: transactions.id })
+        .from(transactions)
+        .where(
+          and(
+            eq(transactions.shopId, job.shopId),
+            eq(transactions.amount, extracted.amount.toString()),
+            eq(transactions.occurredAt, new Date(extracted.occurredAt))
+          )
+        )
+        .limit(1);
+        
+      if (duplicateTx) isDuplicate = true;
+    }
+
+    if (isDuplicate) {
+      riskLevel = "high";
+      riskScore = 100;
+      if (!riskReasons.includes("สลิปนี้น่าจะเคยถูกบันทึกในระบบแล้ว (พบข้อมูลซ้ำ)")) {
+        riskReasons.push("สลิปนี้น่าจะเคยถูกบันทึกในระบบแล้ว (พบข้อมูลซ้ำ)");
       }
     }
 
