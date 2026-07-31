@@ -99,17 +99,17 @@ export function TransactionForm({
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center justify-between">
+      <Card className="border-none shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] bg-white rounded-3xl overflow-hidden">
+        <CardHeader className="border-b border-slate-50 pb-4">
+          <CardTitle className="text-[15px] font-bold text-slate-800 flex items-center justify-between">
             {title}
             {showConfidence && <ConfidenceBadge level={form.watch("confidence")} />}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-5 pt-5">
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-base font-bold">ประเภท</Label>
+            <div className="flex items-center justify-between px-1">
+              <Label className="text-[13px] font-bold text-slate-700">ประเภท</Label>
               {showConfidence && <ConfidenceBadge level={fieldConfidence.type} />}
             </div>
             <Select
@@ -124,7 +124,7 @@ export function TransactionForm({
                 form.clearErrors("category");
               }}
             >
-              <SelectTrigger className={cn("h-14 text-lg font-bold border-2", form.formState.errors.type ? "border-destructive" : "border-border/60")}>
+              <SelectTrigger className={cn("h-14 text-[15px] font-bold bg-[#F5F5F7] border-none rounded-[1.25rem] px-5", form.formState.errors.type ? "ring-2 ring-destructive" : "")}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -138,8 +138,8 @@ export function TransactionForm({
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-base font-bold">หมวดหมู่</Label>
+            <div className="flex items-center justify-between px-1">
+              <Label className="text-[13px] font-bold text-slate-700">หมวดหมู่</Label>
               {showConfidence && <ConfidenceBadge level={fieldConfidence.category} />}
             </div>
             <Select
@@ -149,7 +149,7 @@ export function TransactionForm({
                 form.clearErrors("category");
               }}
             >
-              <SelectTrigger className={cn("h-14 text-base font-medium border-2", form.formState.errors.category ? "border-destructive" : "border-border/60")}>
+              <SelectTrigger className={cn("h-14 text-[15px] font-semibold bg-[#F5F5F7] border-none rounded-[1.25rem] px-5", form.formState.errors.category ? "ring-2 ring-destructive" : "")}>
                 <SelectValue placeholder="เลือกหมวดหมู่" />
               </SelectTrigger>
               <SelectContent>
@@ -170,15 +170,15 @@ export function TransactionForm({
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="amount" className="text-base font-bold">จำนวนเงิน (บาท)</Label>
+            <div className="flex items-center justify-between px-1">
+              <Label htmlFor="amount" className="text-[13px] font-bold text-slate-700">จำนวนเงิน (บาท)</Label>
               {showConfidence && <ConfidenceBadge level={fieldConfidence.amount} />}
             </div>
             <Input
               id="amount"
               type="number"
               step="0.01"
-              className={cn("h-14 text-xl font-bold border-2", form.formState.errors.amount ? "border-destructive" : "border-border/60")}
+              className={cn("h-14 text-lg font-bold bg-[#F5F5F7] border-none rounded-[1.25rem] px-5", form.formState.errors.amount ? "ring-2 ring-destructive" : "")}
               {...form.register("amount", { valueAsNumber: true })}
             />
             {form.formState.errors.amount && (
@@ -187,14 +187,14 @@ export function TransactionForm({
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="occurredAt" className="text-base font-bold">วันที่</Label>
+            <div className="flex items-center justify-between px-1">
+              <Label htmlFor="occurredAt" className="text-[13px] font-bold text-slate-700">วันที่</Label>
               {showConfidence && <ConfidenceBadge level={fieldConfidence.occurredAt} />}
             </div>
             <Input
               id="occurredAt"
               type="datetime-local"
-              className={cn("h-14 text-base font-medium border-2", form.formState.errors.occurredAt ? "border-destructive" : "border-border/60")}
+              className={cn("h-14 text-[15px] font-semibold bg-[#F5F5F7] border-none rounded-[1.25rem] px-5", form.formState.errors.occurredAt ? "ring-2 ring-destructive" : "")}
               value={
                 form.watch("occurredAt")
                   ? (() => {
@@ -222,34 +222,34 @@ export function TransactionForm({
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="sender" className="text-base font-bold">ผู้โอน (จาก)</Label>
+            <div className="flex items-center justify-between px-1">
+              <Label htmlFor="sender" className="text-[13px] font-bold text-slate-700">ผู้โอน (จาก)</Label>
               {showConfidence && <ConfidenceBadge level={fieldConfidence.sender} />}
             </div>
             <Input 
               id="sender" 
               placeholder="ถ้ามี" 
-              className="h-14 text-base font-medium border-2 border-border/60"
+              className="h-14 text-[15px] font-semibold bg-[#F5F5F7] border-none rounded-[1.25rem] px-5"
               {...form.register("sender")} 
             />
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="receiver" className="text-base font-bold">ผู้รับเงิน (ไปยัง)</Label>
+            <div className="flex items-center justify-between px-1">
+              <Label htmlFor="receiver" className="text-[13px] font-bold text-slate-700">ผู้รับเงิน (ไปยัง)</Label>
               {showConfidence && <ConfidenceBadge level={fieldConfidence.receiver} />}
             </div>
             <Input 
               id="receiver" 
               placeholder="ถ้ามี" 
-              className="h-14 text-base font-medium border-2 border-border/60"
+              className="h-14 text-[15px] font-semibold bg-[#F5F5F7] border-none rounded-[1.25rem] px-5"
               {...form.register("receiver")} 
             />
           </div>
 
-          <div className="space-y-4 mt-4 bg-muted/30 rounded-xl p-4 border-2 border-border/60">
+          <div className="space-y-4 mt-6 bg-[#F5F5F7] rounded-[1.5rem] p-5">
             <div className="flex items-center justify-between">
-              <Label className="text-base font-bold flex items-center gap-2">
+              <Label className="text-[13px] font-bold flex items-center gap-2 text-slate-700">
                 🛒 รายการสินค้า (Line Items)
               </Label>
               <Button
@@ -356,15 +356,15 @@ export function TransactionForm({
             </div>
           </div>
 
-          <div className="space-y-2 mt-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="note" className="text-base font-bold">หมายเหตุ</Label>
+          <div className="space-y-2 mt-6">
+            <div className="flex items-center justify-between px-1">
+              <Label htmlFor="note" className="text-[13px] font-bold text-slate-700">หมายเหตุ</Label>
               {showConfidence && <ConfidenceBadge level={fieldConfidence.note} />}
             </div>
             <Textarea 
               id="note" 
               placeholder="ถ้ามี" 
-              className="text-base font-medium border-2 border-border/60 min-h-[100px]"
+              className="text-[15px] font-semibold bg-[#F5F5F7] border-none rounded-[1.25rem] p-5 min-h-[100px]"
               {...form.register("note")} 
             />
           </div>

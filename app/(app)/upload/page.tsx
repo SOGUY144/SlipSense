@@ -222,9 +222,9 @@ export default function UploadPage() {
         </p>
       </div>
 
-      <div className="flex rounded-[10px] bg-[#E3E3E8] p-1">
+      <div className="flex rounded-2xl bg-slate-100/80 p-1 mt-4">
         <button
-          className={`flex-1 rounded-[8px] py-2 text-[13px] font-semibold transition-all duration-300 ${
+          className={`flex-1 rounded-[14px] py-2.5 text-[14px] font-bold transition-all duration-300 ${
             mode === "scan"
               ? "bg-white text-slate-900 shadow-sm"
               : "text-slate-500 hover:text-slate-700"
@@ -234,7 +234,7 @@ export default function UploadPage() {
           สแกนสลิป
         </button>
         <button
-          className={`flex-1 rounded-[8px] py-2 text-[13px] font-semibold transition-all duration-300 ${
+          className={`flex-1 rounded-[14px] py-2.5 text-[14px] font-bold transition-all duration-300 ${
             mode === "manual"
               ? "bg-white text-slate-900 shadow-sm"
               : "text-slate-500 hover:text-slate-700"
@@ -273,9 +273,9 @@ export default function UploadPage() {
         onChange={handleFileChange}
       />
 
-      <div className="flex rounded-[10px] bg-[#E3E3E8] p-1 mb-6">
+      <div className="flex rounded-2xl bg-slate-100/80 p-1 mb-6">
         <button
-          className={`flex-1 rounded-[8px] py-2 text-[13px] font-semibold transition-all duration-300 ${
+          className={`flex-1 rounded-[14px] py-2.5 text-[14px] font-bold transition-all duration-300 ${
             uploadType === "slip"
               ? "bg-white text-slate-900 shadow-sm"
               : "text-slate-500 hover:text-slate-700"
@@ -285,7 +285,7 @@ export default function UploadPage() {
           สลิปโอนเงิน
         </button>
         <button
-          className={`flex-1 rounded-[8px] py-2 text-[13px] font-semibold transition-all duration-300 ${
+          className={`flex-1 rounded-[14px] py-2.5 text-[14px] font-bold transition-all duration-300 ${
             uploadType === "bill"
               ? "bg-white text-slate-900 shadow-sm"
               : "text-slate-500 hover:text-slate-700"
@@ -297,7 +297,7 @@ export default function UploadPage() {
       </div>
 
       <Card
-        className="cursor-pointer border-dashed border-2 border-slate-300 bg-white hover:border-slate-400 transition-all duration-300 rounded-3xl shadow-sm"
+        className="cursor-pointer border-dashed border-2 border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50 transition-all duration-300 rounded-[2rem] shadow-sm"
         onClick={() => { triggerHaptic('light'); !isWorking && galleryInputRef.current?.click(); }}
       >
         <CardContent className="flex flex-col items-center gap-4 py-12">
@@ -315,20 +315,20 @@ export default function UploadPage() {
 
       <div className="flex gap-3">
         <Button
-          className="flex-1 gap-2 h-14 text-[15px] rounded-2xl shadow-sm font-semibold transition-all bg-slate-900 hover:bg-slate-800 text-white"
+          className="flex-1 gap-2 h-14 text-[15px] rounded-[1.25rem] shadow-sm font-bold transition-all bg-[#43936C] hover:bg-[#367a59] text-white"
           onClick={() => { triggerHaptic('light'); fileInputRef.current?.click(); }}
           disabled={isWorking}
         >
-          <Camera className="h-5 w-5" strokeWidth={2} />
+          <Camera className="h-5 w-5" strokeWidth={2.5} />
           ถ่ายรูป
         </Button>
         <Button
           variant="outline"
-          className="flex-1 gap-2 h-14 text-[15px] rounded-2xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 bg-white shadow-sm"
+          className="flex-1 gap-2 h-14 text-[15px] rounded-[1.25rem] border-slate-200 text-slate-700 font-bold hover:bg-slate-50 bg-white shadow-sm border"
           onClick={() => { triggerHaptic('light'); galleryInputRef.current?.click(); }}
           disabled={isWorking}
         >
-          <Upload className="h-5 w-5" strokeWidth={2} />
+          <Upload className="h-5 w-5" strokeWidth={2.5} />
           เลือกไฟล์
         </Button>
       </div>
