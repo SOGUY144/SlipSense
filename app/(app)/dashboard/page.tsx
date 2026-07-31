@@ -174,36 +174,59 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-[1.5rem] p-5 shadow-sm mb-6 relative overflow-hidden">
-        <div className="flex justify-between items-center mb-5">
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-3 px-1">
            <h2 className="text-[15px] font-bold text-slate-800">สรุปเดือนนี้</h2>
-           <Link href="/analytics" className="text-[11px] text-slate-500 font-medium">ดูสรุป</Link>
-        </div>
-        <div className="flex gap-4">
-           <div className="flex-1">
-             <p className="text-[11px] text-slate-500 mb-1">รายรับ</p>
-             <p className="text-[22px] font-bold text-[#43936C] tracking-tight font-number">{formatCurrency(summary?.current.income ?? 0)}</p>
-           </div>
-           <div className="w-[1px] bg-slate-100"></div>
-           <div className="flex-1">
-             <p className="text-[11px] text-slate-500 mb-1">รายจ่าย</p>
-             <p className="text-[22px] font-bold text-slate-900 tracking-tight font-number">{formatCurrency(summary?.current.expense ?? 0)}</p>
-           </div>
+           <Link href="/analytics" className="text-[11px] text-slate-500 font-medium hover:text-slate-800 transition-colors">ดูสรุปละเอียด</Link>
         </div>
         
-        <div className="mt-6">
-           <div className="flex justify-between text-[10px] mb-2">
-             <span className="text-[#43936C] font-semibold flex items-center gap-1">
-               <TrendingUp className="w-3 h-3" />
-               กำไร {formatCurrency((summary?.current.profit ?? 0))}
-             </span>
-             <span className="text-slate-400">
-               {profitUp ? "เติบโต " : "ลดลง "} {formatPercent(summary?.profitChangePercent ?? 0)}
-             </span>
-           </div>
-           <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-             <div className="h-full bg-[#43936C] rounded-full" style={{ width: `${Math.min(100, Math.max(0, incomePct))}%` }}></div>
-           </div>
+        <div className="grid grid-cols-2 gap-2.5">
+          {/* Income Box */}
+          <div className="bg-emerald-50/70 rounded-[1.25rem] p-4 border border-emerald-100/50">
+            <p className="text-[11px] font-semibold text-emerald-600 mb-1">รายรับ</p>
+            <p className="text-[20px] font-bold text-emerald-700 tracking-tight font-number">
+              {formatCurrency(summary?.current.income ?? 0)}
+            </p>
+          </div>
+          
+          {/* Expense Box */}
+          <div className="bg-orange-50/70 rounded-[1.25rem] p-4 border border-orange-100/50">
+            <p className="text-[11px] font-semibold text-orange-600 mb-1">รายจ่าย</p>
+            <p className="text-[20px] font-bold text-orange-700 tracking-tight font-number">
+              {formatCurrency(summary?.current.expense ?? 0)}
+            </p>
+          </div>
+          
+          {/* Profit Box (Full width) */}
+          <div className="col-span-2 bg-slate-900 rounded-[1.25rem] p-4 relative overflow-hidden flex items-center justify-between shadow-sm">
+            {/* Sparkline decoration background */}
+            <div className="absolute right-0 bottom-0 opacity-20 pointer-events-none">
+              <svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 40C20 40 25 15 45 15C65 15 75 30 95 30C105 30 115 10 120 0V40H0Z" fill="url(#paint0_linear)"/>
+                <defs>
+                  <linearGradient id="paint0_linear" x1="60" y1="0" x2="60" y2="40" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#4ADE80"/>
+                    <stop offset="1" stopColor="#4ADE80" stopOpacity="0"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            
+            <div className="z-10 w-full flex items-center justify-between">
+              <div>
+                <p className="text-[11px] text-slate-400 mb-0.5">กำไรสุทธิ</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-[22px] font-bold text-white tracking-tight font-number">
+                    {formatCurrency(summary?.current.profit ?? 0)}
+                  </p>
+                </div>
+              </div>
+              <div className={`px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 ${profitUp ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
+                {profitUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                {formatPercent(summary?.profitChangePercent ?? 0)}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
