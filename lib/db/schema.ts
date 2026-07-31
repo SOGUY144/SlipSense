@@ -19,6 +19,11 @@ export const slipJobStatusEnum = pgEnum("slip_job_status", [
   "failed",
 ]);
 
+export const transactionSourceEnum = pgEnum("transaction_source", [
+  "manual",
+  "line",
+]);
+
 export const transactionTypeEnum = pgEnum("transaction_type", [
   "income",
   "expense",
@@ -56,6 +61,9 @@ export const shops = pgTable("shops", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   preferences: jsonb("preferences"),
+  lineChannelSecret: text("line_channel_secret"),
+  lineAccessToken: text("line_access_token"),
+  isLineActive: boolean("is_line_active").default(false),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -92,6 +100,7 @@ export const slipJobs = pgTable("slip_jobs", {
   riskScore: integer("risk_score").default(0),
   riskLevel: riskLevelEnum("risk_level").default("low"),
   riskReasons: jsonb("risk_reasons"),
+  source: transactionSourceEnum("source").default("manual"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -124,6 +133,7 @@ export const transactions = pgTable("transactions", {
   partnerName: text("partner_name"),
   partnerAddress: text("partner_address"),
   isVatRegistered: boolean("is_vat_registered").default(false),
+  source: transactionSourceEnum("source").default("manual"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
