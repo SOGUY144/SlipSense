@@ -105,33 +105,33 @@ export default function TransactionsPage() {
           <p className="text-sm font-medium">กำลังโหลดข้อมูล...</p>
         </div>
       ) : transactions.length === 0 ? (
-        <Card className="border-none shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] bg-white rounded-3xl mt-8">
+        <Card className="border-none shadow-sm bg-white rounded-[1.25rem] mt-8">
           <CardContent className="py-16 text-center text-slate-500 flex flex-col items-center">
-            <div className="p-5 bg-slate-50 rounded-full mb-4">
-              <List className="h-12 w-12 text-slate-300" strokeWidth={1.5} />
+            <div className="p-5 bg-[#F2F2F6] rounded-full mb-4">
+              <List className="h-12 w-12 text-slate-400" strokeWidth={1.5} />
             </div>
             <p className="font-semibold text-slate-700">ยังไม่มีรายการในหมวดนี้</p>
-            <p className="text-sm mt-1">ลองเปลี่ยนตัวกรอง หรือเพิ่มรายการใหม่</p>
+            <p className="text-[12px] mt-1">ลองเปลี่ยนตัวกรอง หรือเพิ่มรายการใหม่</p>
           </CardContent>
         </Card>
       ) : (
-        <div className="bg-white rounded-[1.5rem] border border-slate-100 shadow-[0_2px_10px_-2px_rgba(0,0,0,0.03)] overflow-hidden">
-          <div className="divide-y divide-slate-50">
+        <div className="bg-white rounded-[1.25rem] shadow-sm overflow-hidden mb-8">
+          <div className="divide-y divide-slate-100">
             {transactions.map((tx) => (
               <div 
                 key={tx.id} 
-                className="flex items-center justify-between p-4 px-5 hover:bg-slate-50/50 transition-colors cursor-pointer group"
+                className="flex items-center justify-between p-4 px-5 bg-white active:bg-slate-50 transition-colors cursor-pointer group"
                 onClick={() => router.push(`/transactions/${tx.id}`)}
               >
-                <div className="flex-1 min-w-0 flex items-center gap-3.5">
-                  <div className={`p-2.5 rounded-xl shrink-0 transition-colors ${tx.type === 'income' ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100/50' : 'bg-rose-50 text-rose-600 group-hover:bg-rose-100/50'}`}>
+                <div className="flex-1 min-w-0 flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${tx.type === 'income' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
                     <div className="w-5 h-5 flex items-center justify-center font-bold text-lg leading-none">
                       {tx.type === 'income' ? '+' : '-'}
                     </div>
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[15px] font-semibold text-slate-800 truncate">{tx.category}</p>
-                    <p className="text-[11px] text-slate-400 truncate mt-0.5 font-medium">
+                    <p className="text-[14px] font-bold text-slate-800 truncate">{tx.category}</p>
+                    <p className="text-[11px] text-slate-500 truncate mt-0.5 font-medium">
                       {(tx.type === "income" ? tx.sender : tx.receiver) ?? "—"} · {formatDate(tx.occurredAt)}
                     </p>
                     {tx.note && (
@@ -144,19 +144,17 @@ export default function TransactionsPage() {
                 <div className="flex items-center gap-2 ml-3 shrink-0">
                   <div className="flex flex-col items-end">
                     <p
-                      className={`font-bold tracking-tight font-number ${
+                      className={`text-[15px] font-bold tracking-tight font-number ${
                         tx.type === "income"
-                          ? "text-emerald-600"
-                          : "text-slate-800"
+                          ? "text-slate-900"
+                          : "text-slate-900"
                       }`}
                     >
                       {tx.type === "income" ? "+" : "-"}
                       {formatCurrency(parseFloat(tx.amount))}
                     </p>
-                    <div className="flex items-center text-[10px] text-primary mt-1 font-semibold opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0">
-                      รายละเอียด <ChevronRight className="h-3 w-3 ml-0.5" />
-                    </div>
                   </div>
+                  <ChevronRight className="h-4 w-4 text-slate-300" />
                 </div>
               </div>
             ))}

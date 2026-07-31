@@ -44,8 +44,8 @@ export function AppShell({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 relative">
-      <header className="sticky top-0 z-40 bg-slate-50/90 backdrop-blur-md">
+    <div className="min-h-screen bg-[#F2F2F6] relative">
+      <header className="sticky top-0 z-40 bg-[#F2F2F6]/90 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-lg items-center justify-between px-4">
           <div>
             <p className="text-[11px] text-slate-500 font-medium tracking-wider uppercase">SlipSense</p>

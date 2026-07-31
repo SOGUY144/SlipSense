@@ -222,26 +222,26 @@ export default function UploadPage() {
         </p>
       </div>
 
-      <div className="flex rounded-2xl bg-white shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] p-1.5 border border-slate-100">
+      <div className="flex rounded-[10px] bg-[#E3E3E8] p-1">
         <button
-          className={`flex-1 rounded-xl py-3.5 text-base font-bold transition-all duration-300 ${
+          className={`flex-1 rounded-[8px] py-1.5 text-[13px] font-semibold transition-all duration-300 ${
             mode === "scan"
-              ? "bg-primary text-primary-foreground shadow-[0_4px_10px_rgba(52,211,153,0.2)]"
-              : "text-slate-500 hover:bg-slate-50"
+              ? "bg-white text-slate-900 shadow-sm"
+              : "text-slate-500 hover:text-slate-700"
           }`}
           onClick={() => setMode("scan")}
         >
-          📸 สแกนสลิป
+          สแกนสลิป
         </button>
         <button
-          className={`flex-1 rounded-xl py-3.5 text-base font-bold transition-all duration-300 ${
+          className={`flex-1 rounded-[8px] py-1.5 text-[13px] font-semibold transition-all duration-300 ${
             mode === "manual"
-              ? "bg-primary text-primary-foreground shadow-[0_4px_10px_rgba(52,211,153,0.2)]"
-              : "text-slate-500 hover:bg-slate-50"
+              ? "bg-white text-slate-900 shadow-sm"
+              : "text-slate-500 hover:text-slate-700"
           }`}
           onClick={() => setMode("manual")}
         >
-          ✍️ กรอกข้อมูลเอง
+          กรอกข้อมูลเอง
         </button>
       </div>
 
@@ -273,62 +273,62 @@ export default function UploadPage() {
         onChange={handleFileChange}
       />
 
-      <div className="flex gap-2 p-1.5 bg-white shadow-[0_2px_10px_-2px_rgba(0,0,0,0.03)] rounded-2xl mb-5 border border-slate-100">
+      <div className="flex rounded-[10px] bg-[#E3E3E8] p-1 mb-6">
         <button
-          className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all duration-300 ${
+          className={`flex-1 rounded-[8px] py-1.5 text-[13px] font-semibold transition-all duration-300 ${
             uploadType === "slip"
-              ? "bg-slate-100 text-slate-800 shadow-sm"
-              : "text-slate-400 hover:bg-slate-50"
+              ? "bg-white text-slate-900 shadow-sm"
+              : "text-slate-500 hover:text-slate-700"
           }`}
           onClick={() => setUploadType("slip")}
         >
-          📄 สลิปโอนเงิน
+          สลิปโอนเงิน
         </button>
         <button
-          className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all duration-300 ${
+          className={`flex-1 rounded-[8px] py-1.5 text-[13px] font-semibold transition-all duration-300 ${
             uploadType === "bill"
-              ? "bg-slate-100 text-slate-800 shadow-sm"
-              : "text-slate-400 hover:bg-slate-50"
+              ? "bg-white text-slate-900 shadow-sm"
+              : "text-slate-500 hover:text-slate-700"
           }`}
           onClick={() => setUploadType("bill")}
         >
-          🧾 ใบเสร็จ/บิลซื้อของ
+          ใบเสร็จ/บิลซื้อของ
         </button>
       </div>
 
       <Card
-        className="cursor-pointer border-dashed border-[3px] border-primary/40 bg-gradient-to-br from-primary/5 to-teal-400/5 hover:border-primary/60 hover:from-primary/10 hover:to-teal-400/10 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(52,211,153,0.15)] transition-all duration-500 rounded-3xl"
+        className="cursor-pointer border-dashed border-2 border-slate-300 bg-white hover:border-slate-400 transition-all duration-300 rounded-3xl shadow-sm"
         onClick={() => { triggerHaptic('light'); !isWorking && galleryInputRef.current?.click(); }}
       >
-        <CardContent className="flex flex-col items-center gap-5 py-16">
-          <div className="rounded-full bg-white shadow-[0_4px_20px_rgba(52,211,153,0.15)] p-5 animate-pulse-slow">
-            <Upload className="h-10 w-10 text-primary" strokeWidth={2} />
+        <CardContent className="flex flex-col items-center gap-4 py-12">
+          <div className="rounded-full bg-slate-50 p-4">
+            <Upload className="h-8 w-8 text-slate-400" strokeWidth={1.5} />
           </div>
           <div className="text-center">
-            <p className="text-xl font-bold text-slate-700">แตะเพื่อเลือกรูป{uploadType === "slip" ? "สลิป" : "บิล"}</p>
-            <p className="text-sm text-slate-500 mt-2 font-medium">
-              หรือถ่ายรูปจากกล้อง · รองรับหลายใบ
+            <p className="text-[15px] font-semibold text-slate-700">แตะเพื่อเลือกรูป{uploadType === "slip" ? "สลิป" : "บิล"}</p>
+            <p className="text-[12px] text-slate-500 mt-1 font-medium">
+              หรือถ่ายรูปจากกล้อง
             </p>
           </div>
         </CardContent>
       </Card>
 
-      <div className="flex gap-4">
+      <div className="flex gap-3">
         <Button
-          className="flex-1 gap-3 h-16 text-lg rounded-2xl shadow-[0_4px_15px_rgba(52,211,153,0.25)] font-bold hover:scale-[1.03] active:scale-95 transition-all duration-300 border-none"
+          className="flex-1 gap-2 h-14 text-[15px] rounded-2xl shadow-sm font-semibold transition-all bg-slate-900 hover:bg-slate-800 text-white"
           onClick={() => { triggerHaptic('light'); fileInputRef.current?.click(); }}
           disabled={isWorking}
         >
-          <Camera className="h-6 w-6" strokeWidth={2} />
+          <Camera className="h-5 w-5" strokeWidth={2} />
           ถ่ายรูป
         </Button>
         <Button
           variant="outline"
-          className="flex-1 gap-3 h-16 text-lg rounded-2xl border-2 border-primary/20 text-primary font-bold hover:bg-primary/5 hover:scale-[1.03] active:scale-95 transition-all duration-300 bg-white shadow-sm"
+          className="flex-1 gap-2 h-14 text-[15px] rounded-2xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 bg-white shadow-sm"
           onClick={() => { triggerHaptic('light'); galleryInputRef.current?.click(); }}
           disabled={isWorking}
         >
-          <Upload className="h-6 w-6" strokeWidth={2} />
+          <Upload className="h-5 w-5" strokeWidth={2} />
           เลือกไฟล์
         </Button>
       </div>
