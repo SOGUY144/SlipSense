@@ -130,43 +130,45 @@ export default function DashboardPage() {
         {behaviorModalDone && <OnboardingReminders onComplete={load} />}
       <SpendingBehaviorModal onComplete={load} onSkipOrDone={() => setBehaviorModalDone(true)} />
       
-      {/* Top Section with Wallet Card */}
-      <div className="relative pt-2 pb-6">
-        <div className="mx-4 bg-gradient-to-br from-[#43936C] to-[#2a5c43] rounded-[2rem] px-6 pt-8 pb-12 shadow-[0_12px_40px_-10px_rgba(67,147,108,0.5)] relative overflow-hidden">
-          {/* Decorative Elements */}
-          <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[150%] bg-white/10 rounded-full blur-3xl transform rotate-12 pointer-events-none" />
-          <div className="absolute bottom-[-20%] left-[-10%] w-[50%] h-[100%] bg-black/10 rounded-full blur-2xl pointer-events-none" />
+      {/* Top Section with Glassmorphism */}
+      <div className="relative pt-4 pb-6">
+        {/* Colorful Blurred Orbs in Background */}
+        <div className="absolute top-[10%] left-[10%] w-[120px] h-[120px] bg-[#43936C]/40 rounded-full blur-[40px] pointer-events-none -z-10 animate-pulse" />
+        <div className="absolute top-[-10px] right-[10%] w-[140px] h-[140px] bg-[#3b82f6]/30 rounded-full blur-[45px] pointer-events-none -z-10 animate-pulse delay-1000" />
+        <div className="absolute bottom-[20%] left-[40%] w-[100px] h-[100px] bg-[#8b5cf6]/20 rounded-full blur-[40px] pointer-events-none -z-10 animate-pulse delay-700" />
+
+        <div className="mx-4 bg-white/70 backdrop-blur-2xl border border-white rounded-[2rem] px-6 pt-8 pb-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col items-center justify-center relative overflow-hidden">
           
-          <div className="relative z-10 flex flex-col items-center justify-center gap-1">
-            <div className="flex items-center gap-1.5 mb-1 opacity-90">
-              <Wallet className="w-4 h-4 text-white" />
-              <p className="text-[13px] text-white font-medium tracking-wide">ยอดเงินคงเหลือสุทธิ</p>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="bg-white/80 p-1.5 rounded-full shadow-sm">
+              <Wallet className="w-4 h-4 text-[#43936C]" />
             </div>
-            <p className="text-[42px] font-bold text-white tracking-tight font-number drop-shadow-md">
-              {formatCurrency(summary?.current.profit ?? 0)}
-            </p>
+            <p className="text-[13px] text-slate-600 font-bold tracking-wide">ยอดเงินคงเหลือสุทธิ</p>
           </div>
+          <p className="text-[44px] font-extrabold text-slate-800 tracking-tighter font-number drop-shadow-sm">
+            {formatCurrency(summary?.current.profit ?? 0)}
+          </p>
         </div>
 
-        {/* Quick Actions (Overlapping) */}
-        <div className="flex justify-center gap-5 px-4 -mt-8 relative z-20">
+        {/* Quick Actions (Overlapping the glass card) */}
+        <div className="flex justify-center gap-5 px-4 -mt-6 relative z-20">
           <Link href="/upload" className="flex flex-col items-center gap-2 group cursor-pointer w-[72px]">
-            <div className="w-16 h-16 bg-white rounded-[1.5rem] shadow-[0_8px_20px_-4px_rgba(0,0,0,0.12)] flex items-center justify-center text-slate-700 group-hover:scale-105 group-hover:bg-[#43936C] group-hover:text-white group-hover:shadow-[#43936C]/30 transition-all duration-300">
-              <Camera className="w-[26px] h-[26px]" strokeWidth={2.5} />
+            <div className="w-[64px] h-[64px] bg-white rounded-2xl shadow-[0_8px_20px_-4px_rgba(0,0,0,0.1)] border border-slate-50 flex items-center justify-center text-slate-700 group-hover:-translate-y-1 transition-all duration-300">
+              <Camera className="w-[26px] h-[26px]" strokeWidth={2} />
             </div>
-            <span className="text-[12px] font-bold text-slate-700">ถ่ายสลิป</span>
+            <span className="text-[12px] font-bold text-slate-600">ถ่ายสลิป</span>
           </Link>
           <Link href="/upload?mode=manual" className="flex flex-col items-center gap-2 group cursor-pointer w-[72px]">
-            <div className="w-16 h-16 bg-white rounded-[1.5rem] shadow-[0_8px_20px_-4px_rgba(0,0,0,0.12)] flex items-center justify-center text-slate-700 group-hover:scale-105 group-hover:bg-[#43936C] group-hover:text-white group-hover:shadow-[#43936C]/30 transition-all duration-300">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>
+            <div className="w-[64px] h-[64px] bg-white rounded-2xl shadow-[0_8px_20px_-4px_rgba(0,0,0,0.1)] border border-slate-50 flex items-center justify-center text-slate-700 group-hover:-translate-y-1 transition-all duration-300">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>
             </div>
-            <span className="text-[12px] font-bold text-slate-700">จดมือ</span>
+            <span className="text-[12px] font-bold text-slate-600">จดมือ</span>
           </Link>
           <Link href="/analytics" className="flex flex-col items-center gap-2 group cursor-pointer w-[72px]">
-            <div className="w-16 h-16 bg-white rounded-[1.5rem] shadow-[0_8px_20px_-4px_rgba(0,0,0,0.12)] flex items-center justify-center text-slate-700 group-hover:scale-105 group-hover:bg-[#43936C] group-hover:text-white group-hover:shadow-[#43936C]/30 transition-all duration-300">
-              <BarChart3 className="w-[26px] h-[26px]" strokeWidth={2.5} />
+            <div className="w-[64px] h-[64px] bg-white rounded-2xl shadow-[0_8px_20px_-4px_rgba(0,0,0,0.1)] border border-slate-50 flex items-center justify-center text-slate-700 group-hover:-translate-y-1 transition-all duration-300">
+              <BarChart3 className="w-[26px] h-[26px]" strokeWidth={2} />
             </div>
-            <span className="text-[12px] font-bold text-slate-700">วิเคราะห์</span>
+            <span className="text-[12px] font-bold text-slate-600">วิเคราะห์</span>
           </Link>
         </div>
       </div>
