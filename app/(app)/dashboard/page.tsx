@@ -198,15 +198,18 @@ export default function DashboardPage() {
           </div>
           
           {/* Profit Box (Full width) */}
-          <div className="col-span-2 bg-slate-900 rounded-[1.25rem] p-4 relative overflow-hidden flex items-center justify-between shadow-sm">
+          <div className="col-span-2 bg-white border border-emerald-100 shadow-sm rounded-[1.25rem] p-4 relative overflow-hidden flex items-center justify-between">
+            {/* Soft gradient background overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 to-transparent pointer-events-none" />
+            
             {/* Sparkline decoration background */}
-            <div className="absolute right-0 bottom-0 opacity-20 pointer-events-none">
+            <div className="absolute right-0 bottom-0 opacity-[0.15] pointer-events-none">
               <svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M0 40C20 40 25 15 45 15C65 15 75 30 95 30C105 30 115 10 120 0V40H0Z" fill="url(#paint0_linear)"/>
                 <defs>
                   <linearGradient id="paint0_linear" x1="60" y1="0" x2="60" y2="40" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#4ADE80"/>
-                    <stop offset="1" stopColor="#4ADE80" stopOpacity="0"/>
+                    <stop stopColor="#10b981"/>
+                    <stop offset="1" stopColor="#10b981" stopOpacity="0"/>
                   </linearGradient>
                 </defs>
               </svg>
@@ -214,14 +217,14 @@ export default function DashboardPage() {
             
             <div className="z-10 w-full flex items-center justify-between">
               <div>
-                <p className="text-[11px] text-slate-400 mb-0.5">กำไรสุทธิ</p>
+                <p className="text-[11px] text-slate-500 font-medium mb-0.5">กำไรสุทธิ</p>
                 <div className="flex items-center gap-2">
-                  <p className="text-[22px] font-bold text-white tracking-tight font-number">
+                  <p className="text-[22px] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500 tracking-tight font-number drop-shadow-sm">
                     {formatCurrency(summary?.current.profit ?? 0)}
                   </p>
                 </div>
               </div>
-              <div className={`px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 ${profitUp ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
+              <div className={`px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-sm border border-white/50 backdrop-blur-sm ${profitUp ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
                 {profitUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                 {formatPercent(summary?.profitChangePercent ?? 0)}
               </div>
