@@ -14,6 +14,7 @@ import {
   Bot,
   Camera,
   Image as ImageIcon,
+  Receipt,
   Mic,
   Keyboard,
   ScanLine,
@@ -120,10 +121,10 @@ export function AppShell({
               <span className="text-[10px] font-medium text-slate-600">ถ่ายสลิป</span>
             </button>
             <button onClick={() => { setIsFabOpen(false); router.push('/upload'); }} className="flex flex-col items-center gap-2">
-              <div className="w-12 h-12 rounded-[1rem] bg-slate-50 flex items-center justify-center text-slate-500 hover:bg-[#43936C]/10 hover:text-[#43936C] transition-colors border border-slate-100">
-                <ImageIcon className="w-5 h-5" />
+              <div className="w-12 h-12 rounded-[1rem] bg-emerald-50 flex items-center justify-center text-emerald-600 hover:bg-emerald-100 transition-colors border border-emerald-200/50">
+                <Receipt className="w-5 h-5" />
               </div>
-              <span className="text-[10px] font-medium text-slate-600">คลังภาพ</span>
+              <span className="text-[10px] font-medium text-slate-600">บิลวัตถุดิบ</span>
             </button>
             <button onClick={() => { setIsFabOpen(false); alert('ระบบพูดกำลังมา!'); }} className="flex flex-col items-center gap-2">
               <div className="w-12 h-12 rounded-[1rem] bg-[#43936C] flex items-center justify-center text-white hover:bg-[#367a59] transition-colors shadow-md shadow-[#43936C]/30">
