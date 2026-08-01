@@ -18,6 +18,7 @@ import {
   Keyboard,
   ScanLine,
   BookOpen,
+  ChefHat,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -111,7 +112,7 @@ export function AppShell({
             <p className="text-[11px] text-slate-500 mt-1">ถ่ายสลิป พูด หรือสแกน QR แล้วแอปจดให้อัตโนมัติ</p>
           </div>
           
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <button onClick={() => { setIsFabOpen(false); router.push('/upload'); }} className="flex flex-col items-center gap-2">
               <div className="w-12 h-12 rounded-[1rem] bg-slate-50 flex items-center justify-center text-slate-500 hover:bg-[#43936C]/10 hover:text-[#43936C] transition-colors border border-slate-100">
                 <Camera className="w-5 h-5" />
@@ -124,11 +125,11 @@ export function AppShell({
               </div>
               <span className="text-[10px] font-medium text-slate-600">คลังภาพ</span>
             </button>
-            <button onClick={() => { setIsFabOpen(false); alert('ระบบพูดกำลังมา!'); }} className="flex flex-col items-center gap-2 col-span-2">
-              <div className="w-full h-12 rounded-[1rem] bg-[#43936C] flex items-center justify-center text-white hover:bg-[#367a59] transition-colors shadow-md shadow-[#43936C]/30">
-                <Mic className="w-5 h-5 mr-1.5" />
-                <span className="text-[13px] font-bold">พูด</span>
+            <button onClick={() => { setIsFabOpen(false); alert('ระบบพูดกำลังมา!'); }} className="flex flex-col items-center gap-2">
+              <div className="w-12 h-12 rounded-[1rem] bg-[#43936C] flex items-center justify-center text-white hover:bg-[#367a59] transition-colors shadow-md shadow-[#43936C]/30">
+                <Mic className="w-5 h-5" />
               </div>
+              <span className="text-[10px] font-medium text-slate-600">พูด</span>
             </button>
             
             <button onClick={() => { setIsFabOpen(false); alert('พิมพ์เร็วกำลังมา!'); }} className="flex flex-col items-center gap-2">
@@ -142,6 +143,12 @@ export function AppShell({
                 <ScanLine className="w-5 h-5" />
               </div>
               <span className="text-[10px] font-medium text-slate-600">สแกน QR</span>
+            </button>
+            <button onClick={() => { setIsFabOpen(false); router.push('/recipes'); }} className="flex flex-col items-center gap-2">
+              <div className="w-12 h-12 rounded-[1rem] bg-amber-50 flex items-center justify-center text-amber-600 hover:bg-amber-100 transition-colors border border-amber-200/50">
+                <ChefHat className="w-5 h-5" />
+              </div>
+              <span className="text-[10px] font-medium text-slate-600">สูตร & ต้นทุน</span>
             </button>
           </div>
         </div>
