@@ -207,6 +207,7 @@ export const shopsRelations = relations(shops, ({ many }) => ({
   categories: many(categories),
   dailyShifts: many(dailyShifts),
   credits: many(credits),
+  transactionItems: many(transactionItems),
 }));
 
 export const dailyShiftsRelations = relations(dailyShifts, ({ one }) => ({
@@ -255,6 +256,7 @@ export const transactionsRelations = relations(transactions, ({ one, many }) => 
     references: [slipJobs.id],
   }),
   credits: many(credits),
+  items: many(transactionItems),
 }));
 
 export const insightsRelations = relations(insights, ({ one }) => ({
@@ -321,6 +323,39 @@ export const creditsRelations = relations(credits, ({ one }) => ({
   }),
 }));
 
+export const transactionItems = pgTable("transaction_items", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  shopId: uuid("shop_id")
+    .notNull()
+    .references(() => shops.id, { onDelete: "cascade" }),
+  transactionId: uuid("transaction_id")
+    .notNull()
+    .references(() => transactions.id, { onDelete: "cascade" }),
+  itemName: text("item_name").notNull(),
+  unitPrice: numeric("unit_price", { precision: 12, scale: 2 }).notNull(),
+  quantity: integer("quantity").default(1).notNull(),
+  totalAmount: numeric("total_amount", { precision: 12, scale: 2 }).notNull(),
+  supplierName: text("supplier_name"),
+  previousUnitPrice: numeric("previous_unit_price", { precision: 12, scale: 2 }),
+  priceChangePercent: numeric("price_change_percent", { precision: 5, scale: 2 }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+}, (t) => [
+  index("tx_items_shop_item_name_idx").on(t.shopId, t.itemName),
+]);
+
+export const transactionItemsRelations = relations(transactionItems, ({ one }) => ({
+  shop: one(shops, {
+    fields: [transactionItems.shopId],
+    references: [shops.id],
+  }),
+  transaction: one(transactions, {
+    fields: [transactionItems.transactionId],
+    references: [transactions.id],
+  }),
+}));
+
 export type Profile = typeof profiles.$inferSelect;
 export type Shop = typeof shops.$inferSelect;
 export type ShopMember = typeof shopMembers.$inferSelect;
@@ -332,3 +367,5 @@ export type Category = typeof categories.$inferSelect;
 export type DailyShift = typeof dailyShifts.$inferSelect;
 export type Credit = typeof credits.$inferSelect;
 export type NewCredit = typeof credits.$inferInsert;
+export type TransactionItem = typeof transactionItems.$inferSelect;
+export type NewTransactionItem = typeof transactionItems.$inferInsert;
