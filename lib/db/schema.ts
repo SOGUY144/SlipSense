@@ -134,12 +134,36 @@ export const transactions = pgTable("transactions", {
   partnerAddress: text("partner_address"),
   isVatRegistered: boolean("is_vat_registered").default(false),
   source: transactionSourceEnum("source").default("manual"),
+  isPersonal: boolean("is_personal").default(false).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
 }, (t) => [
   index("transactions_shop_id_idx").on(t.shopId),
   index("transactions_shop_date_idx").on(t.shopId, t.occurredAt),
+]);
+
+export const dailyShifts = pgTable("daily_shifts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  shopId: uuid("shop_id")
+    .notNull()
+    .references(() => shops.id, { onDelete: "cascade" }),
+  shiftDate: timestamp("shift_date", { withTimezone: true }).notNull(),
+  transferTotal: numeric("transfer_total", { precision: 12, scale: 2 })
+    .default("0.00")
+    .notNull(),
+  cashTotal: numeric("cash_total", { precision: 12, scale: 2 })
+    .default("0.00")
+    .notNull(),
+  grossTotal: numeric("gross_total", { precision: 12, scale: 2 })
+    .default("0.00")
+    .notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+}, (t) => [
+  index("daily_shifts_shop_date_idx").on(t.shopId, t.shiftDate),
 ]);
 
 export const categories = pgTable("categories", {
@@ -173,6 +197,14 @@ export const shopsRelations = relations(shops, ({ many }) => ({
   slipJobs: many(slipJobs),
   insights: many(insights),
   categories: many(categories),
+  dailyShifts: many(dailyShifts),
+}));
+
+export const dailyShiftsRelations = relations(dailyShifts, ({ one }) => ({
+  shop: one(shops, {
+    fields: [dailyShifts.shopId],
+    references: [shops.id],
+  }),
 }));
 
 export const categoriesRelations = relations(categories, ({ one }) => ({
@@ -253,3 +285,4 @@ export type Transaction = typeof transactions.$inferSelect;
 export type Insight = typeof insights.$inferSelect;
 export type BillReminder = typeof billReminders.$inferSelect;
 export type Category = typeof categories.$inferSelect;
+export type DailyShift = typeof dailyShifts.$inferSelect;
