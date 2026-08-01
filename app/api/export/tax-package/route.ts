@@ -10,6 +10,10 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const month = searchParams.get("month"); // YYYY-MM
 
+    if (month && !/^\d{4}-\d{2}$/.test(month)) {
+      return apiError("รูปแบบเดือนไม่ถูกต้อง (ต้องเป็น YYYY-MM)", 400);
+    }
+
     const now = new Date();
     const year = month ? parseInt(month.split("-")[0], 10) : now.getFullYear();
     const monthNum = month ? parseInt(month.split("-")[1], 10) : now.getMonth() + 1;

@@ -34,6 +34,20 @@ export async function GET(request: Request) {
       monthsBack = Math.max(6, Math.min(diffMonths, 60));
     }
 
+    const startDate = new Date(now.getFullYear(), now.getMonth() - monthsBack + 1, 1);
+
+    // Single query for all non-personal transactions over the requested timeframe (eliminates N+1 loop)
+    const allRecentTxs = await db
+      .select()
+      .from(transactions)
+      .where(
+        and(
+          eq(transactions.shopId, shop.id),
+          eq(transactions.isPersonal, false),
+          gte(transactions.occurredAt, startDate)
+        )
+      );
+
     const monthlyData = [];
     for (let i = monthsBack - 1; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
@@ -42,17 +56,10 @@ export async function GET(request: Request) {
       const start = new Date(year, month - 1, 1);
       const end = new Date(year, month, 0, 23, 59, 59, 999);
 
-      const txs = await db
-        .select()
-        .from(transactions)
-        .where(
-          and(
-            eq(transactions.shopId, shop.id),
-            eq(transactions.isPersonal, false),
-            gte(transactions.occurredAt, start),
-            lte(transactions.occurredAt, end)
-          )
-        );
+      const txs = allRecentTxs.filter((t) => {
+        const txDate = new Date(t.occurredAt);
+        return txDate >= start && txDate <= end;
+      });
 
       const income = txs
         .filter((t) => t.type === "income")
@@ -179,23 +186,22 @@ export async function GET(request: Request) {
 
     // 1. Calculate Hourly Trend & Peak Hours
     const hourlyBuckets = [
-      { label: "06:00 - 08:00", hourStart: 6, hourEnd: 8, income: 0 },
-      { label: "08:00 - 10:00", hourStart: 8, hourEnd: 10, income: 0 },
-      { label: "10:00 - 12:00", hourStart: 10, hourEnd: 12, income: 0 },
-      { label: "12:00 - 14:00", hourStart: 12, hourEnd: 14, income: 0 },
-      { label: "14:00 - 16:00", hourStart: 14, hourEnd: 16, income: 0 },
-      { label: "16:00 - 18:00", hourStart: 16, hourEnd: 18, income: 0 },
-      { label: "18:00 - 20:00", hourStart: 18, hourEnd: 20, income: 0 },
-      { label: "20:00 - 22:00", hourStart: 20, hourEnd: 22, income: 0 },
+      { label: "06:00 - 08:00", isMatch: (h: number) => h >= 6 && h < 8, income: 0 },
+      { label: "08:00 - 10:00", isMatch: (h: number) => h >= 8 && h < 10, income: 0 },
+      { label: "10:00 - 12:00", isMatch: (h: number) => h >= 10 && h < 12, income: 0 },
+      { label: "12:00 - 14:00", isMatch: (h: number) => h >= 12 && h < 14, income: 0 },
+      { label: "14:00 - 16:00", isMatch: (h: number) => h >= 14 && h < 16, income: 0 },
+      { label: "16:00 - 18:00", isMatch: (h: number) => h >= 16 && h < 18, income: 0 },
+      { label: "18:00 - 20:00", isMatch: (h: number) => h >= 18 && h < 20, income: 0 },
+      { label: "20:00 - 22:00", isMatch: (h: number) => h >= 20 && h < 22, income: 0 },
+      { label: "22:00 - 06:00", isMatch: (h: number) => h >= 22 || h < 6, income: 0 },
     ];
 
     allRecentTxs
       .filter((t) => t.type === "income")
       .forEach((t) => {
         const hour = new Date(t.occurredAt).getHours();
-        const bucket = hourlyBuckets.find(
-          (b) => hour >= b.hourStart && hour < b.hourEnd
-        );
+        const bucket = hourlyBuckets.find((b) => b.isMatch(hour));
         if (bucket) {
           bucket.income += parseFloat(t.amount);
         }
