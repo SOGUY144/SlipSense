@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
-import { transactions, slipJobs } from "@/lib/db/schema";
-import { eq, inArray } from "drizzle-orm";
+import { transactions, slipJobs, ingredients } from "@/lib/db/schema";
+import { eq, inArray, and } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth/helpers";
 import { apiError, apiSuccess } from "@/lib/api/response";
 import { transactionSchema } from "@/lib/validations/schemas";
@@ -83,6 +83,48 @@ export async function POST(request: Request) {
       .values(insertData)
       .onConflictDoNothing({ target: transactions.transRef })
       .returning();
+
+    // Auto-Sync Ingredient Cost: for expense transactions that came from a bill/receipt,
+    // upsert the ingredient unit cost using the receiver name as ingredient name.
+    const expenseTxs = insertedTransactions.filter(
+      (t) => t.type === "expense" && (t.receiver || t.category)
+    );
+
+    if (expenseTxs.length > 0) {
+      for (const tx of expenseTxs) {
+        const ingredientName = (tx.receiver || tx.category || "").trim();
+        if (!ingredientName || ingredientName.length < 2) continue;
+
+        const amount = parseFloat(tx.amount);
+        if (!amount || amount <= 0) continue;
+
+        // Default unit cost = total amount (assume 1 unit per transaction)
+        const costPerUnit = amount;
+
+        const existing = await db.query.ingredients.findFirst({
+          where: and(
+            eq(ingredients.shopId, shop.id),
+            eq(ingredients.name, ingredientName)
+          ),
+        });
+
+        if (existing) {
+          // Update to latest price from this slip
+          await db
+            .update(ingredients)
+            .set({ costPerUnit: String(costPerUnit) })
+            .where(and(eq(ingredients.shopId, shop.id), eq(ingredients.name, ingredientName)));
+        } else {
+          // Create new ingredient entry
+          await db.insert(ingredients).values({
+            shopId: shop.id,
+            name: ingredientName,
+            unit: "ชุด",
+            costPerUnit: String(costPerUnit),
+          }).onConflictDoNothing();
+        }
+      }
+    }
 
     return apiSuccess(insertedTransactions, 201);
   } catch (error) {
