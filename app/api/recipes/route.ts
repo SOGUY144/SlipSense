@@ -59,7 +59,16 @@ export async function POST(req: Request) {
     for (const item of items) {
       const { ingredientId, ingredientName, quantity, unit, unitCost, cost } = item;
       const qtyNum = Number(quantity);
-      const itemCost = cost !== undefined ? Number(cost) : qtyNum * Number(unitCost || 0);
+      const unitCostNum = Number(unitCost || 0);
+
+      if (isNaN(qtyNum) || qtyNum <= 0) {
+        return apiError("จำนวนวัตถุดิบต้องเป็นตัวเลขมากกว่า 0", 400);
+      }
+
+      const itemCost = cost !== undefined ? Number(cost) : qtyNum * unitCostNum;
+      if (isNaN(itemCost) || itemCost < 0) {
+        return apiError("ต้นทุนวัตถุดิบไม่ถูกต้อง", 400);
+      }
 
       totalCost += itemCost;
       processedItems.push({
@@ -122,17 +131,15 @@ export async function POST(req: Request) {
         })
         .returning();
 
-      const createdItems = [];
-      for (const itemData of itemInserts) {
-        const [savedItem] = await tx
-          .insert(recipeItems)
-          .values({
+      const createdItems = await tx
+        .insert(recipeItems)
+        .values(
+          itemInserts.map((itemData) => ({
             recipeId: newRecipe.id,
             ...itemData,
-          })
-          .returning();
-        createdItems.push(savedItem);
-      }
+          }))
+        )
+        .returning();
 
       return {
         ...newRecipe,

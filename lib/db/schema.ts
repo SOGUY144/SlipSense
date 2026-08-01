@@ -384,45 +384,57 @@ export const reorderCyclesRelations = relations(reorderCycles, ({ one }) => ({
   }),
 }));
 
-export const ingredients = pgTable("ingredients", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  shopId: uuid("shop_id")
-    .notNull()
-    .references(() => shops.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  unit: text("unit").notNull(),
-  costPerUnit: numeric("cost_per_unit").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-});
+export const ingredients = pgTable(
+  "ingredients",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    shopId: uuid("shop_id")
+      .notNull()
+      .references(() => shops.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    unit: text("unit").notNull(),
+    costPerUnit: numeric("cost_per_unit", { precision: 12, scale: 4 }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [index("ingredients_shop_id_idx").on(table.shopId)]
+);
 
-export const recipes = pgTable("recipes", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  shopId: uuid("shop_id")
-    .notNull()
-    .references(() => shops.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  sellingPrice: numeric("selling_price").notNull(),
-  totalCost: numeric("total_cost").notNull(),
-  marginPercent: numeric("margin_percent").notNull(),
-  category: text("category").default("อาหาร/สินค้า"),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-});
+export const recipes = pgTable(
+  "recipes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    shopId: uuid("shop_id")
+      .notNull()
+      .references(() => shops.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    sellingPrice: numeric("selling_price", { precision: 12, scale: 2 }).notNull(),
+    totalCost: numeric("total_cost", { precision: 12, scale: 2 }).notNull(),
+    marginPercent: numeric("margin_percent", { precision: 5, scale: 2 }).notNull(),
+    category: text("category").default("อาหาร/สินค้า"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [index("recipes_shop_id_idx").on(table.shopId)]
+);
 
-export const recipeItems = pgTable("recipe_items", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  recipeId: uuid("recipe_id")
-    .notNull()
-    .references(() => recipes.id, { onDelete: "cascade" }),
-  ingredientId: uuid("ingredient_id").references(() => ingredients.id, { onDelete: "set null" }),
-  ingredientName: text("ingredient_name").notNull(),
-  quantity: numeric("quantity").notNull(),
-  unit: text("unit").notNull(),
-  cost: numeric("cost").notNull(),
-});
+export const recipeItems = pgTable(
+  "recipe_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    recipeId: uuid("recipe_id")
+      .notNull()
+      .references(() => recipes.id, { onDelete: "cascade" }),
+    ingredientId: uuid("ingredient_id").references(() => ingredients.id, { onDelete: "set null" }),
+    ingredientName: text("ingredient_name").notNull(),
+    quantity: numeric("quantity", { precision: 12, scale: 4 }).notNull(),
+    unit: text("unit").notNull(),
+    cost: numeric("cost", { precision: 12, scale: 2 }).notNull(),
+  },
+  (table) => [index("recipe_items_recipe_id_idx").on(table.recipeId)]
+);
 
 export const recipesRelations = relations(recipes, ({ one, many }) => ({
   shop: one(shops, { fields: [recipes.shopId], references: [shops.id] }),
