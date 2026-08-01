@@ -20,6 +20,7 @@ import { ExportButton } from "@/components/export/export-button";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { ALL_CATEGORIES } from "@/lib/validations/schemas";
 import type { Transaction } from "@/lib/db/schema";
+import { PersonalToggleBadge } from "@/components/transactions/personal-toggle-badge";
 
 export default function TransactionsPage() {
   const router = useRouter();
@@ -129,8 +130,19 @@ export default function TransactionsPage() {
                       {tx.type === 'income' ? '+' : '-'}
                     </div>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-[14px] font-bold text-slate-800 truncate">{tx.category}</p>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="text-[14px] font-bold text-slate-800 truncate">{tx.category}</p>
+                      <PersonalToggleBadge
+                        transactionId={tx.id}
+                        isPersonal={tx.isPersonal ?? false}
+                        onToggle={(newVal) => {
+                          setTransactions((prev) =>
+                            prev.map((t) => (t.id === tx.id ? { ...t, isPersonal: newVal } : t))
+                          );
+                        }}
+                      />
+                    </div>
                     <p className="text-[11px] text-slate-500 truncate mt-0.5 flex items-center gap-1">
                       {(tx.type === "income" ? tx.sender : tx.receiver) ?? "ไม่มีรายละเอียด"}
                     </p>
