@@ -46,7 +46,7 @@ export function AppShell({
     { href: "/transactions", label: "รายการ", icon: List },
   ];
   
-  const navItemsRight = [
+  const navItemsRight: Array<{ href: string; label: string; icon: any; badge?: string | number }> = [
     { href: "/chat", label: "แชท AI", icon: Bot },
     { href: "/profile", label: "สมุด", icon: Users },
   ];

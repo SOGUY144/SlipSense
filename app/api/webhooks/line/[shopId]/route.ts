@@ -57,11 +57,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ shopId:
           status: "processing",
         }).returning();
 
-        // Get categories
-        const activeCategories = await db.query.categories.findMany({
-          where: eq(db.categories.shopId, shop.id), // note: this uses db.query but maybe we should use normal select. Wait, we don't have dbCategories imported here.
-        });
-        
+        // Get categories        
         const categoriesData = await db.query.categories.findMany({
            where: (cats, { eq }) => eq(cats.shopId, shop.id)
         });

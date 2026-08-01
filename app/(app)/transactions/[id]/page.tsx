@@ -128,7 +128,11 @@ export default function TransactionDetailPage({
       body: JSON.stringify(taxData),
     });
     if (res.ok) {
-      setTransaction(prev => prev ? { ...prev, ...taxData } : null);
+      setTransaction(prev => prev ? { 
+        ...prev, 
+        ...taxData,
+        taxInvoiceDate: taxData.taxInvoiceDate ? new Date(taxData.taxInvoiceDate) : null
+      } : null);
       setIsEditingTax(false);
     }
     setSaving(false);

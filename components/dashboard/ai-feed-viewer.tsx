@@ -5,7 +5,7 @@ import { Loader2, Sparkles, AlertTriangle, Target, Lightbulb, RefreshCw } from "
 type Insight = {
   id: string;
   content: string;
-  metadata: { type: "summary" | "risk" | "action" } | any;
+  metadata?: { type: "summary" | "risk" | "action" } | any;
 };
 
 interface AiFeedViewerProps {

@@ -7,6 +7,21 @@ import { eq, desc, and, gte, lte, sql } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth/helpers";
 import { apiError } from "@/lib/api/response";
 
+const summarySchema = z.object({
+  startDate: z.string().describe("วันเริ่มต้น YYYY-MM-DD"),
+  endDate: z.string().describe("วันสิ้นสุด YYYY-MM-DD"),
+});
+
+const categorySchema = z.object({
+  type: z.enum(["income", "expense"]).describe("ประเภทธุรกรรม"),
+  startDate: z.string().describe("วันเริ่มต้น YYYY-MM-DD"),
+  endDate: z.string().describe("วันสิ้นสุด YYYY-MM-DD"),
+});
+
+const recentSchema = z.object({
+  limit: z.number().default(10).describe("จำนวนรายการที่ต้องการดึง"),
+});
+
 export async function POST(req: Request) {
   try {
     const { shop } = await requireAuth();
@@ -30,11 +45,10 @@ export async function POST(req: Request) {
       tools: {
         get_financial_summary: tool({
           description: "ดึงยอดสรุปรายรับ รายจ่าย และกำไร ในช่วงเวลาที่ระบุ",
-          parameters: z.object({
-            startDate: z.string().describe("วันเริ่มต้น YYYY-MM-DD"),
-            endDate: z.string().describe("วันสิ้นสุด YYYY-MM-DD"),
-          }),
-          execute: async ({ startDate, endDate }) => {
+          parameters: summarySchema,
+          // @ts-ignore
+          execute: async (args: z.infer<typeof summarySchema>) => {
+            const { startDate, endDate } = args;
             const start = new Date(startDate);
             const end = new Date(endDate);
             end.setHours(23, 59, 59, 999);
@@ -72,12 +86,10 @@ export async function POST(req: Request) {
         }),
         get_transactions_by_category: tool({
           description: "ดึงยอดสรุปรายจ่ายหรือรายรับ แยกตามหมวดหมู่ ในช่วงเวลาที่ระบุ",
-          parameters: z.object({
-            type: z.enum(["income", "expense"]).describe("ประเภทธุรกรรม"),
-            startDate: z.string().describe("วันเริ่มต้น YYYY-MM-DD"),
-            endDate: z.string().describe("วันสิ้นสุด YYYY-MM-DD"),
-          }),
-          execute: async ({ type, startDate, endDate }) => {
+          parameters: categorySchema,
+          // @ts-ignore
+          execute: async (args: z.infer<typeof categorySchema>) => {
+            const { type, startDate, endDate } = args;
             const start = new Date(startDate);
             const end = new Date(endDate);
             end.setHours(23, 59, 59, 999);
@@ -104,10 +116,10 @@ export async function POST(req: Request) {
         }),
         get_recent_transactions: tool({
           description: "ดึงประวัติธุรกรรมล่าสุด 10-50 รายการ",
-          parameters: z.object({
-            limit: z.number().default(10).describe("จำนวนรายการที่ต้องการดึง"),
-          }),
-          execute: async ({ limit }) => {
+          parameters: recentSchema,
+          // @ts-ignore
+          execute: async (args: z.infer<typeof recentSchema>) => {
+            const { limit } = args;
             const txs = await db
               .select()
               .from(transactions)

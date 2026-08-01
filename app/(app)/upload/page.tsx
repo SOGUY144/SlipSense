@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Upload, Camera, Loader2, CheckCircle, XCircle } from "lucide-react";
 import { triggerHaptic } from "@/lib/utils";
@@ -41,6 +41,13 @@ export default function UploadPage() {
   const [uploadType, setUploadType] = useState<"slip" | "bill">("slip");
   const [showConfirmDrawer, setShowConfirmDrawer] = useState(false);
   const [doNotShowAgain, setDoNotShowAgain] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("mode") === "manual") {
+      setMode("manual");
+    }
+  }, []);
 
   const form = useForm<FormData>({
     resolver: zodResolver(transactionSchema),

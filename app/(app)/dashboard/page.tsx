@@ -18,13 +18,14 @@ import { AiFeedViewer } from "@/components/dashboard/ai-feed-viewer";
 
 interface Summary {
   shopName: string;
+  totalBalance: number;
   current: { income: number; expense: number; profit: number };
   previous: { income: number; expense: number; profit: number };
   profitChangePercent: number;
   recentTransactions: Transaction[];
 }
 
-interface Insight {
+interface DashboardInsight {
   id: string;
   content: string;
   metadata?: {
@@ -62,7 +63,7 @@ interface ForecastData {
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<Summary | null>(null);
-  const [insights, setInsights] = useState<Insight[]>([]);
+  const [insights, setInsights] = useState<DashboardInsight[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [forecast, setForecast] = useState<ForecastData | null>(null);
   const [loading, setLoading] = useState(true);

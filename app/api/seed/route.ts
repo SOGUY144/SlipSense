@@ -10,7 +10,7 @@ const DEMO_TRANSACTIONS = [
     amount: "8500.00",
     sender: "ลูกค้า Walk-in",
     note: "ยอดขายวันเสาร์",
-    daysAgo: 1,
+    daysAgo: 0,
   },
   {
     type: "expense" as const,
@@ -18,7 +18,7 @@ const DEMO_TRANSACTIONS = [
     amount: "3200.00",
     receiver: "ตลาดสดเจริญกรุง",
     note: "ซื้อผัก เนื้อ ของสด",
-    daysAgo: 2,
+    daysAgo: 0,
   },
   {
     type: "income" as const,
@@ -26,7 +26,7 @@ const DEMO_TRANSACTIONS = [
     amount: "12300.00",
     sender: "ลูกค้า Walk-in",
     note: "ยอดขายวันศุกร์",
-    daysAgo: 3,
+    daysAgo: 0,
   },
   {
     type: "expense" as const,
