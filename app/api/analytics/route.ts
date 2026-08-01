@@ -147,17 +147,6 @@ export async function GET(request: Request) {
     const dowMap = new Map<number, { income: number; count: number; datesMap: Map<string, number> }>();
     for (let i = 0; i < 7; i++) dowMap.set(i, { income: 0, count: 0, datesMap: new Map() });
 
-    const allRecentTxs = await db
-      .select()
-      .from(transactions)
-      .where(
-        and(
-          eq(transactions.shopId, shop.id),
-          eq(transactions.isPersonal, false),
-          gte(transactions.occurredAt, new Date(now.getFullYear(), now.getMonth() - monthsBack + 1, 1))
-        )
-      );
-
     allRecentTxs.filter(t => t.type === "income").forEach((t) => {
       const d = new Date(t.occurredAt);
       const dow = d.getDay();
