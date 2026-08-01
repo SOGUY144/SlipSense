@@ -10,9 +10,9 @@ import {
   Receipt,
   ArrowLeft,
   Zap,
-  ShoppingCart,
-  PackageCheck,
-  Sparkles,
+  ChevronRight,
+  ImagePlus,
+  ScanLine,
 } from "lucide-react";
 import { triggerHaptic } from "@/lib/utils";
 import Link from "next/link";
@@ -22,15 +22,10 @@ interface UploadResult {
   status: "pending" | "uploading" | "processing" | "done" | "error";
   jobId?: string;
   error?: string;
+  thumbnail?: string;
 }
 
-const statusConfig = {
-  pending:    { label: "รอคิว...",           color: "text-slate-400" },
-  uploading:  { label: "กำลังอัปโหลด...",   color: "text-blue-500" },
-  processing: { label: "AI กำลังอ่านบิล...", color: "text-amber-500" },
-  done:       { label: "อ่านบิลสำเร็จ",      color: "text-emerald-600" },
-  error:      { label: "",                   color: "text-red-500" },
-};
+type Step = "idle" | "results" | "success";
 
 export default function IngredientScanPage() {
   const router = useRouter();
@@ -39,12 +34,12 @@ export default function IngredientScanPage() {
   const [results, setResults] = useState<UploadResult[]>([]);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [step, setStep] = useState<Step>("idle");
 
   const isWorking =
     uploading || results.some((r) => r.status === "uploading" || r.status === "processing");
   const doneJobs = results.filter((r) => r.status === "done" && r.jobId).map((r) => r.jobId as string);
-  const hasResults = results.length > 0;
+  const allDone = results.length > 0 && results.every((r) => r.status === "done" || r.status === "error");
 
   function pollJobStatus(jobId: string, index: number) {
     let retries = 0;
@@ -68,7 +63,7 @@ export default function IngredientScanPage() {
       } catch {
         if (++retries >= 30) {
           setResults((prev) =>
-            prev.map((r, i) => (i === index ? { ...r, status: "error", error: "หมดเวลารอ กรุณาลองใหม่" } : r))
+            prev.map((r, i) => (i === index ? { ...r, status: "error", error: "หมดเวลารอ" } : r))
           );
           clearInterval(interval);
         }
@@ -78,8 +73,22 @@ export default function IngredientScanPage() {
 
   async function processFiles(files: FileList | File[]) {
     const fileArray = Array.from(files);
-    setResults(fileArray.map((f) => ({ fileName: f.name, status: "pending" })));
+    const thumbnails = await Promise.all(
+      fileArray.map(
+        (f) =>
+          new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target?.result as string);
+            reader.readAsDataURL(f);
+          })
+      )
+    );
+    setResults(
+      fileArray.map((f, idx) => ({ fileName: f.name, status: "pending", thumbnail: thumbnails[idx] }))
+    );
+    setStep("results");
     setUploading(true);
+
     for (let i = 0; i < fileArray.length; i++) {
       setResults((prev) => prev.map((r, idx) => (idx === i ? { ...r, status: "uploading" } : r)));
       const formData = new FormData();
@@ -89,13 +98,19 @@ export default function IngredientScanPage() {
         const res = await fetch("/api/slips", { method: "POST", body: formData });
         const data = await res.json();
         if (!res.ok) {
-          setResults((prev) => prev.map((r, idx) => (idx === i ? { ...r, status: "error", error: data.error } : r)));
+          setResults((prev) =>
+            prev.map((r, idx) => (idx === i ? { ...r, status: "error", error: data.error } : r))
+          );
           continue;
         }
-        setResults((prev) => prev.map((r, idx) => (idx === i ? { ...r, status: "processing", jobId: data.job.id } : r)));
+        setResults((prev) =>
+          prev.map((r, idx) => (idx === i ? { ...r, status: "processing", jobId: data.job.id } : r))
+        );
         pollJobStatus(data.job.id, i);
       } catch {
-        setResults((prev) => prev.map((r, idx) => (idx === i ? { ...r, status: "error", error: "อัปโหลดไม่สำเร็จ" } : r)));
+        setResults((prev) =>
+          prev.map((r, idx) => (idx === i ? { ...r, status: "error", error: "อัปโหลดไม่สำเร็จ" } : r))
+        );
       }
     }
     setUploading(false);
@@ -112,221 +127,273 @@ export default function IngredientScanPage() {
       });
       if (!res.ok) throw new Error("save failed");
       triggerHaptic("success");
-      setShowSuccess(true);
-      setTimeout(() => router.push("/recipes"), 1800);
+      setStep("success");
+      setTimeout(() => router.push("/recipes"), 2000);
     } catch {
       alert("ไม่สามารถบันทึกได้ กรุณาลองใหม่");
       setSaving(false);
     }
   }
 
-  // ─── Success Screen ────────────────────────────────────────────
-  if (showSuccess) {
+  // ═══════════════════════════════════════
+  // SUCCESS SCREEN
+  // ═══════════════════════════════════════
+  if (step === "success") {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[75vh] gap-6 text-center px-8">
-        <div className="relative">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-xl shadow-emerald-500/30">
-            <CheckCircle2 className="w-12 h-12 text-white" />
-          </div>
-          <div className="absolute -top-1 -right-1 w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center shadow-md">
-            <Sparkles className="w-4 h-4 text-white" />
+      <div className="fixed inset-0 bg-white flex flex-col items-center justify-center gap-8 px-8 z-50">
+        {/* Animated checkmark */}
+        <div className="relative flex items-center justify-center">
+          <div className="w-28 h-28 rounded-full bg-emerald-50 animate-ping absolute opacity-20" />
+          <div className="w-24 h-24 rounded-full bg-emerald-100 flex items-center justify-center relative">
+            <CheckCircle2 className="w-12 h-12 text-emerald-500" strokeWidth={1.5} />
           </div>
         </div>
-        <div className="space-y-2">
-          <h2 className="text-2xl font-extrabold text-slate-900">ซิงก์ราคาเรียบร้อย!</h2>
-          <p className="text-sm text-slate-500 leading-relaxed max-w-xs mx-auto">
-            ระบบอัปเดตราคาวัตถุดิบในคลังจากบิลแล้ว<br />กำลังพาไปหน้าสูตร & ต้นทุน...
+
+        <div className="text-center space-y-2">
+          <h2 className="text-2xl font-black text-slate-900 tracking-tight">ซิงก์เรียบร้อย</h2>
+          <p className="text-[13px] text-slate-500 leading-relaxed">
+            ราคาวัตถุดิบถูกอัปเดตในคลังแล้ว<br />กำลังพาไปหน้าสูตร & ต้นทุน
           </p>
         </div>
-        <div className="flex items-center gap-2 text-emerald-600 text-xs font-semibold">
-          <Loader2 className="w-4 h-4 animate-spin" />
-          กำลังโหลด...
+
+        {/* Progress dots */}
+        <div className="flex gap-2">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="w-2 h-2 rounded-full bg-emerald-400"
+              style={{ animationDelay: `${i * 0.15}s`, animation: "pulse 1s infinite" }}
+            />
+          ))}
         </div>
       </div>
     );
   }
 
-  // ─── Main Page ─────────────────────────────────────────────────
-  return (
-    <div className="min-h-screen bg-[#F5F5F7] -mx-4 -mt-2 px-4 pt-2 pb-36">
-      {/* Top Bar */}
-      <div className="flex items-center gap-3 pt-2 pb-5">
-        <Link href="/dashboard">
-          <button className="w-9 h-9 rounded-2xl bg-white shadow-sm flex items-center justify-center text-slate-500 active:scale-95 transition-transform border border-slate-100">
+  // ═══════════════════════════════════════
+  // RESULTS SCREEN
+  // ═══════════════════════════════════════
+  if (step === "results") {
+    return (
+      <div className="min-h-screen flex flex-col">
+        {/* Sticky Header */}
+        <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-lg border-b border-slate-100 px-4 py-3 flex items-center justify-between">
+          <button
+            onClick={() => { setStep("idle"); setResults([]); }}
+            className="flex items-center gap-1.5 text-slate-500 text-sm font-medium"
+          >
             <ArrowLeft className="w-4 h-4" />
+            ยกเลิก
           </button>
-        </Link>
-        <div>
-          <h1 className="text-[17px] font-extrabold text-slate-900 leading-tight">สแกนบิลวัตถุดิบ</h1>
-          <p className="text-[11px] text-slate-500">AI อัปเดตราคาคลังวัตถุดิบอัตโนมัติ</p>
+          <span className="text-sm font-bold text-slate-800">
+            {results.length} บิล
+          </span>
+          <button
+            onClick={() => galleryInputRef.current?.click()}
+            disabled={isWorking}
+            className="text-emerald-600 text-sm font-bold disabled:opacity-40"
+          >
+            + เพิ่ม
+          </button>
         </div>
-      </div>
 
-      {/* Hero Card — Upload Zone */}
-      {!hasResults && (
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="w-full bg-gradient-to-br from-emerald-500 to-teal-600 rounded-[2rem] p-6 text-left shadow-xl shadow-emerald-500/25 active:scale-[0.98] transition-all duration-200 mb-4"
-        >
-          <div className="flex items-start justify-between mb-8">
-            <div className="p-3 bg-white/20 backdrop-blur rounded-2xl">
-              <Receipt className="w-7 h-7 text-white" />
-            </div>
-            <div className="text-right">
-              <span className="text-[10px] font-bold text-emerald-100 bg-white/20 px-2.5 py-1 rounded-full">
-                ⚡ Auto-Sync
-              </span>
-            </div>
-          </div>
-          <div className="space-y-1">
-            <h2 className="text-xl font-extrabold text-white leading-tight">
-              แตะเพื่อถ่ายหรือ<br />เลือกบิลวัตถุดิบ
-            </h2>
-            <p className="text-[12px] text-emerald-100 leading-relaxed">
-              บิล Makro · ตลาดสด · ร้านขายส่ง<br />รองรับ JPEG, PNG, WebP
-            </p>
-          </div>
-        </button>
-      )}
+        {/* Bill Grid */}
+        <div className="flex-1 p-4 grid grid-cols-2 gap-3 pb-40">
+          {results.map((r, i) => (
+            <div key={i} className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-slate-100">
+              {/* Thumbnail */}
+              {r.thumbnail && (
+                <img
+                  src={r.thumbnail}
+                  alt="bill"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              )}
 
-      {/* Accepted Bill Types */}
-      {!hasResults && (
-        <div className="grid grid-cols-3 gap-2.5 mb-4">
-          {[
-            { icon: ShoppingCart, label: "บิล Makro", sub: "ตลาดขายส่ง", color: "text-blue-500", bg: "bg-blue-50" },
-            { icon: Receipt,      label: "ตลาดสด",   sub: "วัตถุดิบสด",  color: "text-amber-500", bg: "bg-amber-50" },
-            { icon: PackageCheck, label: "ใบสั่งซื้อ", sub: "ร้านขายส่ง", color: "text-violet-500", bg: "bg-violet-50" },
-          ].map(({ icon: Icon, label, sub, color, bg }) => (
-            <div
-              key={label}
-              className="bg-white rounded-2xl p-3.5 text-center shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-100/80"
-            >
-              <div className={`w-9 h-9 ${bg} rounded-xl flex items-center justify-center mx-auto mb-2`}>
-                <Icon className={`w-4.5 h-4.5 ${color}`} />
-              </div>
-              <p className="text-[11px] font-bold text-slate-700">{label}</p>
-              <p className="text-[10px] text-slate-400 mt-0.5">{sub}</p>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Info Banner */}
-      {!hasResults && (
-        <div className="bg-white rounded-2xl p-4 flex gap-3 items-center shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-100/80">
-          <div className="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center shrink-0">
-            <Sparkles className="w-4 h-4 text-emerald-600" />
-          </div>
-          <p className="text-[11px] text-slate-600 leading-relaxed">
-            หลังกด <span className="font-bold text-emerald-700">บันทึก</span> ระบบจะซิงก์ราคาวัตถุดิบเข้าคลังโดยอัตโนมัติ ช่วยคำนวณต้นทุนสูตรอาหารแม่นยำขึ้น
-          </p>
-        </div>
-      )}
-
-      {/* Results List */}
-      {hasResults && (
-        <div className="space-y-3">
-          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider px-1">
-            สถานะการประมวลผล
-          </p>
-          {results.map((r, i) => {
-            const cfg = statusConfig[r.status];
-            return (
+              {/* Overlay based on status */}
               <div
-                key={i}
-                className="bg-white rounded-2xl p-4 flex items-center gap-3.5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-100/80"
+                className={`absolute inset-0 flex flex-col items-center justify-center transition-all ${
+                  r.status === "done"
+                    ? "bg-emerald-900/40"
+                    : r.status === "error"
+                    ? "bg-red-900/50"
+                    : "bg-slate-900/50"
+                }`}
               >
-                {/* Status Icon */}
-                <div
-                  className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${
-                    r.status === "done"
-                      ? "bg-emerald-50"
-                      : r.status === "error"
-                      ? "bg-red-50"
-                      : "bg-amber-50"
-                  }`}
-                >
-                  {r.status === "done" ? (
-                    <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                  ) : r.status === "error" ? (
-                    <XCircle className="w-5 h-5 text-red-400" />
-                  ) : (
-                    <Loader2 className="w-5 h-5 text-amber-500 animate-spin" />
-                  )}
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-slate-800 truncate">{r.fileName}</p>
-                  <p className={`text-[11px] mt-0.5 font-medium ${cfg.color}`}>
-                    {r.status === "error" ? r.error : cfg.label}
-                  </p>
-                </div>
-
-                {/* Progress pulse */}
-                {(r.status === "uploading" || r.status === "processing") && (
-                  <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
-                )}
                 {r.status === "done" && (
-                  <div className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full shrink-0">
-                    สำเร็จ
+                  <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
+                    <CheckCircle2 className="w-8 h-8 text-white" strokeWidth={2} />
+                  </div>
+                )}
+                {r.status === "error" && (
+                  <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
+                    <XCircle className="w-8 h-8 text-white" strokeWidth={2} />
+                  </div>
+                )}
+                {(r.status === "uploading" || r.status === "processing" || r.status === "pending") && (
+                  <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
+                    <Loader2 className="w-8 h-8 text-white animate-spin" strokeWidth={2} />
                   </div>
                 )}
               </div>
-            );
-          })}
 
-          {/* Add more button */}
-          {!isWorking && (
+              {/* Status Badge */}
+              <div className="absolute bottom-0 left-0 right-0 px-2.5 pb-2.5">
+                <div
+                  className={`w-full py-1.5 rounded-xl text-center text-[10px] font-bold backdrop-blur-sm ${
+                    r.status === "done"
+                      ? "bg-emerald-500/80 text-white"
+                      : r.status === "error"
+                      ? "bg-red-500/80 text-white"
+                      : "bg-white/20 text-white"
+                  }`}
+                >
+                  {r.status === "done" && "อ่านสำเร็จ ✓"}
+                  {r.status === "error" && "ล้มเหลว ✗"}
+                  {r.status === "uploading" && "อัปโหลด..."}
+                  {r.status === "processing" && "AI อ่านบิล..."}
+                  {r.status === "pending" && "รอคิว..."}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom CTA */}
+        <div className="fixed bottom-0 left-0 right-0 mx-auto max-w-lg px-4 pb-[calc(80px+env(safe-area-inset-bottom))] pt-4 bg-white border-t border-slate-100">
+          {isWorking ? (
+            <div className="flex items-center justify-center gap-2 py-3 text-slate-500 text-sm">
+              <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
+              AI กำลังอ่านบิล กรุณารอสักครู่...
+            </div>
+          ) : (
             <button
-              onClick={() => galleryInputRef.current?.click()}
-              className="w-full border-2 border-dashed border-slate-200 rounded-2xl py-4 text-[12px] font-semibold text-slate-400 hover:border-emerald-300 hover:text-emerald-600 transition-colors active:scale-[0.99]"
+              onClick={handleSave}
+              disabled={saving || doneJobs.length === 0}
+              className="w-full h-[52px] bg-slate-900 disabled:bg-slate-300 text-white rounded-2xl font-bold text-[15px] flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
             >
-              + เพิ่มบิลอีก
+              {saving ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>
+                  <Zap className="w-4 h-4" />
+                  ซิงก์ราคาวัตถุดิบ
+                  <span className="ml-1 text-[11px] font-normal bg-white/20 px-2 py-0.5 rounded-full">
+                    {doneJobs.length} บิล
+                  </span>
+                </>
+              )}
             </button>
           )}
         </div>
-      )}
 
-      {/* Hidden File Inputs */}
+        <input ref={galleryInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={(e) => e.target.files && processFiles(e.target.files)} />
+      </div>
+    );
+  }
+
+  // ═══════════════════════════════════════
+  // IDLE / LANDING SCREEN
+  // ═══════════════════════════════════════
+  return (
+    <div className="min-h-screen flex flex-col">
+      {/* Back button */}
+      <div className="px-1 pt-2 pb-4">
+        <Link href="/dashboard">
+          <button className="flex items-center gap-1 text-[13px] font-medium text-slate-500 active:opacity-60">
+            <ArrowLeft className="w-4 h-4" />
+            กลับ
+          </button>
+        </Link>
+      </div>
+
+      {/* Big Title Block */}
+      <div className="px-1 mb-8">
+        <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1 mb-3">
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-[11px] font-bold text-emerald-700">Auto-Sync ราคาวัตถุดิบ</span>
+        </div>
+        <h1 className="text-3xl font-black text-slate-900 leading-tight tracking-tight">
+          สแกน<br />บิลวัตถุดิบ
+        </h1>
+        <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+          ถ่ายหรือเลือกบิลซื้อของ AI จะอ่านราคา<br />แล้วอัปเดตคลังวัตถุดิบให้ทันที
+        </p>
+      </div>
+
+      {/* How it works — 3 Steps */}
+      <div className="px-1 mb-6">
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">วิธีใช้งาน</p>
+        <div className="space-y-0">
+          {[
+            { n: "1", title: "ถ่ายหรือเลือกบิล", sub: "บิล Makro, ตลาดสด, ร้านขายส่ง" },
+            { n: "2", title: "AI อ่านราคา", sub: "ประมวลผลในไม่กี่วินาที" },
+            { n: "3", title: "ซิงก์อัตโนมัติ", sub: "คลังวัตถุดิบอัปเดตทันที" },
+          ].map((item, idx, arr) => (
+            <div key={item.n} className="flex items-stretch gap-4">
+              <div className="flex flex-col items-center">
+                <div className="w-8 h-8 rounded-full bg-slate-900 text-white text-[13px] font-black flex items-center justify-center shrink-0">
+                  {item.n}
+                </div>
+                {idx < arr.length - 1 && <div className="w-px flex-1 bg-slate-200 my-1" />}
+              </div>
+              <div className="pb-5 pt-1 min-w-0">
+                <p className="text-[14px] font-bold text-slate-800">{item.title}</p>
+                <p className="text-[12px] text-slate-400 mt-0.5">{item.sub}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Supported Bill Types */}
+      <div className="px-1 mb-8">
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">ประเภทบิลที่รองรับ</p>
+        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+          {["บิล Makro", "ตลาดสด", "บิลขายส่ง", "ใบเสร็จร้านค้า", "ใบสั่งซื้อ"].map((label) => (
+            <span
+              key={label}
+              className="shrink-0 px-3 py-1.5 border border-slate-200 rounded-full text-[12px] font-medium text-slate-600 bg-white"
+            >
+              {label}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Spacer */}
+      <div className="flex-1" />
+
+      {/* Bottom Action Buttons */}
+      <div className="px-0 pb-[calc(88px+env(safe-area-inset-bottom))] space-y-2.5">
+        {/* Primary — Camera */}
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className="w-full h-[56px] bg-slate-900 text-white rounded-2xl font-bold text-[15px] flex items-center justify-between px-5 active:scale-[0.98] transition-transform"
+        >
+          <div className="flex items-center gap-3">
+            <Camera className="w-5 h-5" />
+            ถ่ายบิล
+          </div>
+          <ChevronRight className="w-4 h-4 opacity-50" />
+        </button>
+
+        {/* Secondary — Gallery */}
+        <button
+          onClick={() => galleryInputRef.current?.click()}
+          className="w-full h-[52px] border-2 border-slate-200 text-slate-700 rounded-2xl font-bold text-[15px] flex items-center justify-between px-5 active:scale-[0.98] transition-transform"
+        >
+          <div className="flex items-center gap-3">
+            <ImagePlus className="w-5 h-5 text-slate-400" />
+            เลือกจากคลังรูป
+          </div>
+          <ChevronRight className="w-4 h-4 text-slate-300" />
+        </button>
+      </div>
+
+      {/* Hidden Inputs */}
       <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" capture="environment" multiple className="hidden" onChange={(e) => e.target.files && processFiles(e.target.files)} />
       <input ref={galleryInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={(e) => e.target.files && processFiles(e.target.files)} />
-
-      {/* Bottom CTA */}
-      <div className="fixed bottom-0 left-0 right-0 mx-auto max-w-lg px-4 pb-[calc(88px+env(safe-area-inset-bottom))] pt-3 bg-gradient-to-t from-[#F5F5F7] via-[#F5F5F7]/95 to-transparent">
-        {!hasResults || isWorking ? (
-          <div className="flex gap-3">
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isWorking}
-              className="flex-1 h-[52px] bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 active:scale-[0.98] transition-all"
-            >
-              {isWorking ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
-              {isWorking ? "กำลังประมวลผล..." : "ถ่ายบิล"}
-            </button>
-            <button
-              onClick={() => galleryInputRef.current?.click()}
-              disabled={isWorking}
-              className="flex-1 h-[52px] bg-white border border-slate-200 text-slate-700 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shadow-sm active:scale-[0.98] transition-all"
-            >
-              เลือกไฟล์
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={handleSave}
-            disabled={saving || doneJobs.length === 0}
-            className="w-full h-[52px] bg-gradient-to-r from-emerald-500 to-teal-600 disabled:opacity-50 text-white rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/30 active:scale-[0.98] transition-all"
-          >
-            {saving ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Zap className="w-5 h-5" />
-            )}
-            บันทึก & ซิงก์ราคาวัตถุดิบ ({doneJobs.length} บิล)
-          </button>
-        )}
-      </div>
     </div>
   );
 }
