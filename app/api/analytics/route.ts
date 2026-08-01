@@ -215,18 +215,43 @@ export async function GET(request: Request) {
       .where(eq(transactionItems.shopId, shop.id))
       .groupBy(transactionItems.supplierName);
 
-    const totalSupplierSpend = supplierItems.reduce(
+    let totalSupplierSpend = supplierItems.reduce(
       (sum, item) => sum + Number(item.totalSpend || 0),
       0
     );
-    const supplierBreakdown = supplierItems.map((item) => ({
-      supplierName: item.supplierName || "ไม่ระบุชื่อซัพพลายเออร์",
-      amount: Number(item.totalSpend || 0),
-      percentage:
-        totalSupplierSpend > 0
-          ? (Number(item.totalSpend || 0) / totalSupplierSpend) * 100
-          : 0,
-    }));
+
+    let supplierBreakdown = supplierItems
+      .filter((item) => item.supplierName && Number(item.totalSpend) > 0)
+      .map((item) => ({
+        supplierName: item.supplierName || "ไม่ระบุชื่อซัพพลายเออร์",
+        amount: Number(item.totalSpend || 0),
+        percentage:
+          totalSupplierSpend > 0
+            ? (Number(item.totalSpend || 0) / totalSupplierSpend) * 100
+            : 0,
+      }));
+
+    // Fallback: If no transaction_items yet, derive supplier spend from expense transaction categories/merchants
+    if (supplierBreakdown.length === 0) {
+      const expenseMap = new Map<string, number>();
+      allRecentTxs
+        .filter((t) => t.type === "expense")
+        .forEach((t) => {
+          const supplier = t.merchantName || t.category || "อื่นๆ";
+          const current = expenseMap.get(supplier) || 0;
+          expenseMap.set(supplier, current + parseFloat(t.amount));
+        });
+
+      totalSupplierSpend = Array.from(expenseMap.values()).reduce((s, v) => s + v, 0);
+
+      supplierBreakdown = Array.from(expenseMap.entries())
+        .map(([supplierName, amount]) => ({
+          supplierName,
+          amount,
+          percentage: totalSupplierSpend > 0 ? (amount / totalSupplierSpend) * 100 : 0,
+        }))
+        .sort((a, b) => b.amount - a.amount);
+    }
 
     // 3. Query Payment Method Breakdown (Transfer vs Cash)
     const shifts = await db
@@ -234,14 +259,22 @@ export async function GET(request: Request) {
       .from(dailyShifts)
       .where(eq(dailyShifts.shopId, shop.id));
 
-    const totalCash = shifts.reduce(
+    let totalCash = shifts.reduce(
       (sum, s) => sum + Number(s.cashTotal || 0),
       0
     );
-    const totalTransfer = shifts.reduce(
+    let totalTransfer = shifts.reduce(
       (sum, s) => sum + Number(s.transferTotal || 0),
       0
     );
+
+    // Fallback: If no daily shifts yet, count all non-personal income transactions as PromptPay Transfer
+    if (totalCash === 0 && totalTransfer === 0) {
+      totalTransfer = allRecentTxs
+        .filter((t) => t.type === "income")
+        .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+    }
+
     const totalPayment = totalCash + totalTransfer;
 
     const paymentMethodBreakdown = [
