@@ -175,7 +175,13 @@ export default function ReportPage() {
           </div>
         </div>
 
-        <h3 className="text-lg font-bold mb-4 border-b pb-2">รายละเอียดรายการ</h3>
+        <div className="flex items-center justify-between mb-4 border-b pb-2">
+          <h3 className="text-lg font-bold">รายละเอียดรายการ</h3>
+          <div className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full sm:hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 8L21 12L17 16M3 12H21"/></svg>
+            เลื่อนขวาเพื่อดูทั้งหมด
+          </div>
+        </div>
         
         <div className="overflow-x-auto -mx-4 sm:-mx-8 px-4 sm:px-8">
           <table className="w-full min-w-[480px] text-xs sm:text-sm text-left border-collapse">
