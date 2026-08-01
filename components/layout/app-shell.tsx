@@ -120,7 +120,7 @@ export function AppShell({
               </div>
               <span className="text-[10px] font-medium text-slate-600">ถ่ายสลิป</span>
             </button>
-            <button onClick={() => { setIsFabOpen(false); router.push('/upload'); }} className="flex flex-col items-center gap-2">
+            <button onClick={() => { setIsFabOpen(false); router.push('/ingredients/scan'); }} className="flex flex-col items-center gap-2">
               <div className="w-12 h-12 rounded-[1rem] bg-emerald-50 flex items-center justify-center text-emerald-600 hover:bg-emerald-100 transition-colors border border-emerald-200/50">
                 <Receipt className="w-5 h-5" />
               </div>
