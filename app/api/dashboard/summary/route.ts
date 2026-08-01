@@ -33,6 +33,7 @@ export async function GET(request: Request) {
         .where(
           and(
             eq(transactions.shopId, shop.id),
+            eq(transactions.isPersonal, false),
             gte(transactions.occurredAt, current.start),
             lte(transactions.occurredAt, current.end)
           )
@@ -43,6 +44,7 @@ export async function GET(request: Request) {
         .where(
           and(
             eq(transactions.shopId, shop.id),
+            eq(transactions.isPersonal, false),
             gte(transactions.occurredAt, previous.start),
             lte(transactions.occurredAt, previous.end)
           )
@@ -50,13 +52,23 @@ export async function GET(request: Request) {
       db
         .select()
         .from(transactions)
-        .where(eq(transactions.shopId, shop.id))
+        .where(
+          and(
+            eq(transactions.shopId, shop.id),
+            eq(transactions.isPersonal, false)
+          )
+        )
         .orderBy(desc(transactions.createdAt), desc(transactions.occurredAt))
         .limit(10),
       db
         .select({ type: transactions.type, amount: transactions.amount })
         .from(transactions)
-        .where(eq(transactions.shopId, shop.id)),
+        .where(
+          and(
+            eq(transactions.shopId, shop.id),
+            eq(transactions.isPersonal, false)
+          )
+        ),
     ]);
 
     const sumByType = (txs: typeof currentTxs | typeof allTimeTxs) => ({

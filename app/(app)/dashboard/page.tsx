@@ -15,6 +15,8 @@ import { OnboardingReminders } from "@/components/reminders/onboarding-reminders
 import { SpendingBehaviorModal } from "@/components/onboarding/spending-behavior-modal";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { AiFeedViewer } from "@/components/dashboard/ai-feed-viewer";
+import { DailyShiftWidget } from "@/components/dashboard/daily-shift-widget";
+
 
 interface Summary {
   shopName: string;
@@ -186,6 +188,8 @@ export default function DashboardPage() {
           </Link>
         </div>
       </div>
+
+      <DailyShiftWidget onShiftClosed={load} />
 
       <div className="mb-6">
         <div className="flex justify-between items-center mb-3 px-1">
