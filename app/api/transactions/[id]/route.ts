@@ -1,6 +1,6 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { transactions, slipJobs } from "@/lib/db/schema";
+import { transactions, slipJobs, transactionItems } from "@/lib/db/schema";
 import { requireAuth } from "@/lib/auth/helpers";
 import { apiError, apiSuccess } from "@/lib/api/response";
 import { transactionSchema } from "@/lib/validations/schemas";
@@ -31,9 +31,15 @@ export async function GET(
       imageUrl = data?.signedUrl || null;
     }
 
+    const items = await db
+      .select()
+      .from(transactionItems)
+      .where(and(eq(transactionItems.transactionId, id), eq(transactionItems.shopId, shop.id)));
+
     const transaction = {
       ...result[0].transactions,
       imageUrl,
+      items,
     };
 
     return apiSuccess(transaction);

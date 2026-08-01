@@ -15,12 +15,14 @@ import {
   ShieldAlert,
   AlertTriangle,
   Receipt,
-  Camera
+  Camera,
+  ShoppingBag,
+  TrendingUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import type { Transaction } from "@/lib/db/schema";
+import type { Transaction, TransactionItem } from "@/lib/db/schema";
 import {
   Select,
   SelectContent,
@@ -48,6 +50,7 @@ export default function TransactionDetailPage({
     riskScore?: number | null;
     riskLevel?: "low" | "medium" | "high" | null;
     riskReasons?: string[] | any;
+    items?: TransactionItem[];
   }) | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -386,6 +389,57 @@ export default function TransactionDetailPage({
           </CardContent>
         </Card>
       </div>
+
+      {/* Itemized Products Table */}
+      {transaction.items && transaction.items.length > 0 && (
+        <Card className="border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] bg-white rounded-3xl overflow-hidden">
+          <CardContent className="p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-sm text-slate-700 flex items-center gap-2">
+                <ShoppingBag className="w-4 h-4 text-slate-500" />
+                รายการสินค้า ({transaction.items.length} รายการ)
+              </h3>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-slate-100 text-slate-400 font-medium">
+                    <th className="pb-2">ชื่อสินค้า</th>
+                    <th className="pb-2 text-center">จำนวน</th>
+                    <th className="pb-2 text-right">ราคา/หน่วย</th>
+                    <th className="pb-2 text-right">รวม</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {transaction.items.map((item) => (
+                    <tr key={item.id} className="hover:bg-slate-50/50">
+                      <td className="py-2.5 pr-2 font-medium text-slate-800">
+                        <div>{item.itemName}</div>
+                        {item.supplierName && (
+                          <div className="text-[10px] text-slate-400">{item.supplierName}</div>
+                        )}
+                      </td>
+                      <td className="py-2.5 text-center text-slate-600">{item.quantity}</td>
+                      <td className="py-2.5 text-right text-slate-600">
+                        {formatCurrency(Number(item.unitPrice))}
+                        {item.priceChangePercent && Number(item.priceChangePercent) > 0 && (
+                          <div className="text-[10px] text-rose-500 font-bold flex items-center justify-end gap-0.5 mt-0.5">
+                            <TrendingUp className="w-3 h-3" />+{item.priceChangePercent}%
+                          </div>
+                        )}
+                      </td>
+                      <td className="py-2.5 text-right font-bold text-slate-800">
+                        {formatCurrency(Number(item.totalAmount))}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Slip Data */}
       {transaction.imageUrl && (

@@ -16,6 +16,7 @@ import { SpendingBehaviorModal } from "@/components/onboarding/spending-behavior
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { AiFeedViewer } from "@/components/dashboard/ai-feed-viewer";
 import { DailyShiftWidget } from "@/components/dashboard/daily-shift-widget";
+import { PriceHikeAlertWidget } from "@/components/dashboard/price-hike-alert-widget";
 
 
 interface Summary {
@@ -190,6 +191,8 @@ export default function DashboardPage() {
       </div>
 
       <DailyShiftWidget onShiftClosed={load} />
+
+      <PriceHikeAlertWidget />
 
       <div className="mb-6">
         <div className="flex justify-between items-center mb-3 px-1">
