@@ -210,6 +210,8 @@ export const shopsRelations = relations(shops, ({ many }) => ({
   credits: many(credits),
   transactionItems: many(transactionItems),
   reorderCycles: many(reorderCycles),
+  ingredients: many(ingredients),
+  recipes: many(recipes),
 }));
 
 export const dailyShiftsRelations = relations(dailyShifts, ({ one }) => ({
@@ -382,6 +384,56 @@ export const reorderCyclesRelations = relations(reorderCycles, ({ one }) => ({
   }),
 }));
 
+export const ingredients = pgTable("ingredients", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  shopId: uuid("shop_id")
+    .notNull()
+    .references(() => shops.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  unit: text("unit").notNull(),
+  costPerUnit: numeric("cost_per_unit").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+export const recipes = pgTable("recipes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  shopId: uuid("shop_id")
+    .notNull()
+    .references(() => shops.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  sellingPrice: numeric("selling_price").notNull(),
+  totalCost: numeric("total_cost").notNull(),
+  marginPercent: numeric("margin_percent").notNull(),
+  category: text("category").default("อาหาร/สินค้า"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+export const recipeItems = pgTable("recipe_items", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  recipeId: uuid("recipe_id")
+    .notNull()
+    .references(() => recipes.id, { onDelete: "cascade" }),
+  ingredientId: uuid("ingredient_id").references(() => ingredients.id, { onDelete: "set null" }),
+  ingredientName: text("ingredient_name").notNull(),
+  quantity: numeric("quantity").notNull(),
+  unit: text("unit").notNull(),
+  cost: numeric("cost").notNull(),
+});
+
+export const recipesRelations = relations(recipes, ({ one, many }) => ({
+  shop: one(shops, { fields: [recipes.shopId], references: [shops.id] }),
+  items: many(recipeItems),
+}));
+
+export const recipeItemsRelations = relations(recipeItems, ({ one }) => ({
+  recipe: one(recipes, { fields: [recipeItems.recipeId], references: [recipes.id] }),
+  ingredient: one(ingredients, { fields: [recipeItems.ingredientId], references: [ingredients.id] }),
+}));
+
 export type Profile = typeof profiles.$inferSelect;
 export type Shop = typeof shops.$inferSelect;
 export type ShopMember = typeof shopMembers.$inferSelect;
@@ -397,3 +449,9 @@ export type TransactionItem = typeof transactionItems.$inferSelect;
 export type NewTransactionItem = typeof transactionItems.$inferInsert;
 export type ReorderCycle = typeof reorderCycles.$inferSelect;
 export type NewReorderCycle = typeof reorderCycles.$inferInsert;
+export type Ingredient = typeof ingredients.$inferSelect;
+export type Recipe = typeof recipes.$inferSelect;
+export type RecipeItem = typeof recipeItems.$inferSelect;
+export type NewIngredient = typeof ingredients.$inferInsert;
+export type NewRecipe = typeof recipes.$inferInsert;
+export type NewRecipeItem = typeof recipeItems.$inferInsert;
