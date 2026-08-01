@@ -149,6 +149,7 @@ export const transactions = pgTable("transactions", {
 }, (t) => [
   index("transactions_shop_id_idx").on(t.shopId),
   index("transactions_shop_date_idx").on(t.shopId, t.occurredAt),
+  index("transactions_shop_personal_date_idx").on(t.shopId, t.isPersonal, t.occurredAt),
 ]);
 
 export const dailyShifts = pgTable("daily_shifts", {

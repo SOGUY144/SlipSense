@@ -2,7 +2,7 @@ import { requireAuth } from "@/lib/auth/helpers";
 import { apiError, apiSuccess } from "@/lib/api/response";
 import { db } from "@/lib/db";
 import { transactionItems } from "@/lib/db/schema";
-import { eq, and, gt, desc } from "drizzle-orm";
+import { eq, and, gt, desc, sql } from "drizzle-orm";
 
 export async function GET() {
   try {
@@ -14,7 +14,7 @@ export async function GET() {
       .where(
         and(
           eq(transactionItems.shopId, shop.id),
-          gt(transactionItems.priceChangePercent, "0")
+          gt(sql`${transactionItems.priceChangePercent}::numeric`, 0)
         )
       )
       .orderBy(desc(transactionItems.createdAt))
