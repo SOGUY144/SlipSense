@@ -33,15 +33,23 @@ export async function GET(req: Request) {
         )
       );
 
-    const taxInvoices = taxTxs.filter((t) => t.isVatRegistered || t.taxInvoiceNo || t.taxId);
+    let taxInvoices = taxTxs.filter((t) => t.isVatRegistered || t.taxInvoiceNo || t.taxId);
+    if (taxInvoices.length === 0) {
+      // Fallback: Include all non-personal expense transactions for accountant review
+      taxInvoices = taxTxs.filter((t) => t.type === "expense");
+    }
+
     const totalTaxAmount = taxInvoices.reduce((sum, t) => sum + (Number(t.amount) * 0.07 / 1.07), 0);
 
     return apiSuccess({
-      shopName: shop.name,
-      period: `${monthNum}/${year}`,
-      totalTaxInvoicesCount: taxInvoices.length,
-      totalTaxAmount: totalTaxAmount.toFixed(2),
-      invoices: taxInvoices,
+      success: true,
+      data: {
+        shopName: shop.name,
+        period: `${monthNum}/${year}`,
+        totalTaxInvoicesCount: taxInvoices.length,
+        totalTaxAmount: totalTaxAmount.toFixed(2),
+        invoices: taxInvoices,
+      },
     });
   } catch (error) {
     if (error instanceof Error && error.message === "Unauthorized") {

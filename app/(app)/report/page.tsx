@@ -58,11 +58,13 @@ export default function ReportPage() {
       const res = await fetch(`/api/export/tax-package?month=${monthStr}`);
       const json = await res.json();
 
-      if (json.success && json.data) {
-        setTaxExportResult(json.data);
+      const payloadData = json.data || json;
+
+      if (res.ok && payloadData && (payloadData.invoices || payloadData.shopName)) {
+        setTaxExportResult(payloadData);
 
         // Trigger JSON file download
-        const blob = new Blob([JSON.stringify(json.data, null, 2)], { type: "application/json" });
+        const blob = new Blob([JSON.stringify(payloadData, null, 2)], { type: "application/json" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -72,7 +74,7 @@ export default function ReportPage() {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
       } else {
-        alert("ไม่สามารถส่งออกเอกสารภาษีได้");
+        alert(json.error || "ไม่สามารถส่งออกเอกสารภาษีได้");
       }
     } catch (err) {
       console.error(err);
