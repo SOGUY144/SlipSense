@@ -169,24 +169,30 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick Actions (Overlapping the glass card) */}
-        <div className="flex justify-center gap-5 px-4 -mt-6 relative z-20">
-          <Link href="/upload" className="flex flex-col items-center gap-2 group cursor-pointer w-[72px]">
-            <div className="w-[64px] h-[64px] bg-white rounded-2xl shadow-[0_8px_20px_-4px_rgba(0,0,0,0.1)] border border-slate-50 flex items-center justify-center text-slate-700 group-hover:-translate-y-1 transition-all duration-300">
-              <Camera className="w-[26px] h-[26px]" strokeWidth={2} />
+        <div className="flex justify-center gap-3 px-2 -mt-6 relative z-20">
+          <Link href="/upload" className="flex flex-col items-center gap-2 group cursor-pointer w-[68px]">
+            <div className="w-[58px] h-[58px] bg-white rounded-2xl shadow-[0_8px_20px_-4px_rgba(0,0,0,0.1)] border border-slate-50 flex items-center justify-center text-slate-700 group-hover:-translate-y-1 transition-all duration-300">
+              <Camera className="w-[24px] h-[24px]" strokeWidth={2} />
             </div>
-            <span className="text-[12px] font-bold text-slate-600">ถ่ายสลิป</span>
+            <span className="text-[11px] font-bold text-slate-600">ถ่ายสลิป</span>
           </Link>
-          <Link href="/upload?mode=manual" className="flex flex-col items-center gap-2 group cursor-pointer w-[72px]">
-            <div className="w-[64px] h-[64px] bg-white rounded-2xl shadow-[0_8px_20px_-4px_rgba(0,0,0,0.1)] border border-slate-50 flex items-center justify-center text-slate-700 group-hover:-translate-y-1 transition-all duration-300">
-              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>
+          <Link href="/upload?mode=manual" className="flex flex-col items-center gap-2 group cursor-pointer w-[68px]">
+            <div className="w-[58px] h-[58px] bg-white rounded-2xl shadow-[0_8px_20px_-4px_rgba(0,0,0,0.1)] border border-slate-50 flex items-center justify-center text-slate-700 group-hover:-translate-y-1 transition-all duration-300">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>
             </div>
-            <span className="text-[12px] font-bold text-slate-600">จดมือ</span>
+            <span className="text-[11px] font-bold text-slate-600">จดมือ</span>
           </Link>
-          <Link href="/analytics" className="flex flex-col items-center gap-2 group cursor-pointer w-[72px]">
-            <div className="w-[64px] h-[64px] bg-white rounded-2xl shadow-[0_8px_20px_-4px_rgba(0,0,0,0.1)] border border-slate-50 flex items-center justify-center text-slate-700 group-hover:-translate-y-1 transition-all duration-300">
-              <BarChart3 className="w-[26px] h-[26px]" strokeWidth={2} />
+          <Link href="/analytics" className="flex flex-col items-center gap-2 group cursor-pointer w-[68px]">
+            <div className="w-[58px] h-[58px] bg-white rounded-2xl shadow-[0_8px_20px_-4px_rgba(0,0,0,0.1)] border border-slate-50 flex items-center justify-center text-slate-700 group-hover:-translate-y-1 transition-all duration-300">
+              <BarChart3 className="w-[24px] h-[24px]" strokeWidth={2} />
             </div>
-            <span className="text-[12px] font-bold text-slate-600">วิเคราะห์</span>
+            <span className="text-[11px] font-bold text-slate-600">วิเคราะห์</span>
+          </Link>
+          <Link href="/report" className="flex flex-col items-center gap-2 group cursor-pointer w-[68px]">
+            <div className="w-[58px] h-[58px] bg-white rounded-2xl shadow-[0_8px_20px_-4px_rgba(0,0,0,0.1)] border border-slate-50 flex items-center justify-center text-slate-700 group-hover:-translate-y-1 transition-all duration-300">
+              <Calendar className="w-[24px] h-[24px] text-emerald-600" strokeWidth={2} />
+            </div>
+            <span className="text-[11px] font-bold text-slate-600">รายงานภาษี</span>
           </Link>
         </div>
       </div>
