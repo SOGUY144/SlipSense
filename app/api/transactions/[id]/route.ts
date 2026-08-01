@@ -75,6 +75,7 @@ export async function PATCH(
         ...(parsed.partnerName !== undefined && { partnerName: parsed.partnerName }),
         ...(parsed.partnerAddress !== undefined && { partnerAddress: parsed.partnerAddress }),
         ...(parsed.isVatRegistered !== undefined && { isVatRegistered: parsed.isVatRegistered }),
+        ...(typeof body.isPersonal === "boolean" && { isPersonal: body.isPersonal }),
       })
       .where(and(eq(transactions.id, id), eq(transactions.shopId, shop.id)))
       .returning();

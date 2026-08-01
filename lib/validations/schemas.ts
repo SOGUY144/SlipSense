@@ -64,6 +64,7 @@ export const transactionSchema = z.object({
   partnerName: z.string().optional().nullable(),
   partnerAddress: z.string().optional().nullable(),
   isVatRegistered: z.boolean().optional(),
+  isPersonal: z.boolean().optional(),
 });
 
 export type TransactionInput = z.infer<typeof transactionSchema>;
