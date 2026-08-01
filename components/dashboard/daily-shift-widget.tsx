@@ -73,43 +73,39 @@ export function DailyShiftWidget({ onShiftClosed }: { onShiftClosed?: () => void
   const computedGross = transferTotal + currentCash;
 
   return (
-    <Card className="rounded-[1.5rem] border-0 shadow-md bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950 text-white overflow-hidden relative">
-      <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
-        <Store className="w-32 h-32" />
-      </div>
-
+    <Card className="rounded-[1.75rem] border border-slate-100/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] bg-white text-slate-800 overflow-hidden relative mb-4">
       <CardContent className="p-5 space-y-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="p-2 bg-emerald-500/20 rounded-xl text-emerald-400">
-              <Sparkles className="w-5 h-5" />
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 bg-emerald-50 rounded-2xl text-emerald-600 border border-emerald-100">
+              <Store className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold">ปิดยอดร้านประจำวัน</h3>
-              <p className="text-xs text-slate-400">สรุปยอดเงินโอน + เงินสด 1 นาที</p>
+              <h3 className="text-base font-bold text-slate-900 tracking-tight">ปิดยอดร้านประจำวัน</h3>
+              <p className="text-[11px] font-medium text-slate-400">สรุปยอดเงินโอน + เงินสดประจำวัน</p>
             </div>
           </div>
           {isClosed && (
-            <span className="inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-300 text-xs px-2.5 py-1 rounded-full font-bold">
+            <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[11px] px-2.5 py-1 rounded-full font-bold">
               <CheckCircle2 className="w-3.5 h-3.5" /> ปิดยอดแล้ว
             </span>
           )}
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-3">
-            <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-1">
-              <QrCode className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="bg-slate-50/80 border border-slate-100 rounded-2xl p-3">
+            <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 mb-1">
+              <QrCode className="w-3.5 h-3.5 text-emerald-600" />
               <span>ยอดสแกนโอนวันนี้</span>
             </div>
-            <p className="text-lg font-black text-emerald-400 font-number">
+            <p className="text-lg font-black text-emerald-600 font-number">
               ฿{transferTotal.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
             </p>
           </div>
 
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-3">
-            <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-1">
-              <Banknote className="w-3.5 h-3.5 text-amber-400" />
+          <div className="bg-slate-50/80 border border-slate-100 rounded-2xl p-3">
+            <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 mb-1">
+              <Banknote className="w-3.5 h-3.5 text-amber-500" />
               <span>เงินสดในเกะ</span>
             </div>
             <Input
@@ -117,22 +113,22 @@ export function DailyShiftWidget({ onShiftClosed }: { onShiftClosed?: () => void
               placeholder="0.00"
               value={cashTotal}
               onChange={(e) => setCashTotal(e.target.value)}
-              className="h-8 bg-white/10 border-0 text-white font-bold text-base focus:ring-1 focus:ring-emerald-400 px-2 rounded-lg"
+              className="h-8 bg-white border border-slate-200 text-slate-900 font-bold text-base focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 px-2.5 rounded-xl shadow-xs"
             />
           </div>
         </div>
 
-        <div className="pt-2 border-t border-white/10 flex items-center justify-between">
+        <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
           <div>
-            <span className="text-xs text-slate-400">ยอดขายรวมวันนี้</span>
-            <p className="text-xl font-black text-white font-number">
+            <span className="text-[11px] font-medium text-slate-400">ยอดขายรวมวันนี้</span>
+            <p className="text-xl font-black text-slate-900 font-number">
               ฿{(isClosed ? grossTotal : computedGross).toLocaleString("th-TH", { minimumFractionDigits: 2 })}
             </p>
           </div>
           <Button
             onClick={handleCloseShift}
             disabled={saving}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-lg shadow-emerald-500/20"
+            className="bg-[#43936C] hover:bg-[#367a59] text-white font-bold px-4 py-2.5 rounded-2xl text-xs shadow-sm transition-all"
           >
             {saving ? (
               <Loader2 className="w-4 h-4 animate-spin" />

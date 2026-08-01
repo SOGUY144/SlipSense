@@ -31,9 +31,11 @@ export function PriceHikeAlertWidget() {
   if (loading || alerts.length === 0) return null;
 
   return (
-    <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 space-y-3">
+    <div className="bg-white border border-slate-100/80 rounded-[1.75rem] p-5 space-y-3 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] mb-4">
       <div className="flex items-center gap-2 text-amber-600 font-bold text-sm">
-        <AlertTriangle className="w-4 h-4" />
+        <div className="p-1.5 bg-amber-50 rounded-xl text-amber-600">
+          <AlertTriangle className="w-4 h-4" />
+        </div>
         <span>เตือนสินค้าปรับขึ้นราคา ({alerts.length} รายการ)</span>
       </div>
 
@@ -41,10 +43,12 @@ export function PriceHikeAlertWidget() {
         {alerts.slice(0, 3).map((item) => (
           <div
             key={item.id}
-            className="bg-white rounded-xl p-2.5 flex items-center justify-between text-xs shadow-sm border border-amber-100"
+            className="bg-slate-50/80 rounded-2xl p-3 flex items-center justify-between text-xs border border-slate-100"
           >
-            <div className="flex items-center gap-2">
-              <ShoppingBag className="w-4 h-4 text-amber-500 shrink-0" />
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 bg-amber-100/60 rounded-xl text-amber-600 shrink-0">
+                <ShoppingBag className="w-4 h-4" />
+              </div>
               <div>
                 <p className="font-bold text-slate-800">{item.itemName}</p>
                 <p className="text-[10px] text-slate-400">
@@ -54,7 +58,7 @@ export function PriceHikeAlertWidget() {
             </div>
 
             <div className="text-right">
-              <span className="font-extrabold text-amber-600">
+              <span className="font-extrabold text-amber-600 font-number">
                 {formatCurrency(Number(item.unitPrice))}
               </span>
               <span className="inline-flex items-center text-[10px] font-bold text-rose-500 ml-1">
