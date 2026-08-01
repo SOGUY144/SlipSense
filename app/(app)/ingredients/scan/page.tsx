@@ -58,7 +58,7 @@ export default function IngredientScanPage() {
           setResults((prev) =>
             prev.map((r, i) =>
               i === index
-                ? { ...r, status: "error", error: data.job.errorMessage || "เธเธฃเธฐเธกเธงเธฅเธเธฅเนเธกเนเธชเธณเน€เธฃเนเธ" }
+                ? { ...r, status: "error", error: data.job.errorMessage || "ประมวลผลไม่สำเร็จ" }
                 : r
             )
           );
@@ -69,7 +69,7 @@ export default function IngredientScanPage() {
         if (retries >= 30) {
           setResults((prev) =>
             prev.map((r, i) =>
-              i === index ? { ...r, status: "error", error: "เธซเธกเธ”เน€เธงเธฅเธฒเธฃเธญ เธเธฃเธธเธ“เธฒเธฅเธญเธเนเธซเธกเน" } : r
+              i === index ? { ...r, status: "error", error: "หมดเวลารอ กรุณาลองใหม่" } : r
             )
           );
           clearInterval(interval);
@@ -90,7 +90,7 @@ export default function IngredientScanPage() {
 
       const formData = new FormData();
       formData.append("file", fileArray[i]);
-      formData.append("uploadType", "bill"); // always bill for ingredient scan
+      formData.append("uploadType", "bill");
 
       try {
         const res = await fetch("/api/slips", { method: "POST", body: formData });
@@ -112,7 +112,7 @@ export default function IngredientScanPage() {
       } catch {
         setResults((prev) =>
           prev.map((r, idx) =>
-            idx === i ? { ...r, status: "error", error: "เธญเธฑเธเนเธซเธฅเธ”เนเธกเนเธชเธณเน€เธฃเนเธ" } : r
+            idx === i ? { ...r, status: "error", error: "อัปโหลดไม่สำเร็จ" } : r
           )
         );
       }
@@ -134,7 +134,7 @@ export default function IngredientScanPage() {
       setShowSuccess(true);
       setTimeout(() => router.push("/recipes"), 1800);
     } catch {
-      alert("เนเธกเนเธชเธฒเธกเธฒเธฃเธ–เธเธฑเธเธ—เธถเธเนเธ”เน เธเธฃเธธเธ“เธฒเธฅเธญเธเนเธซเธกเน");
+      alert("ไม่สามารถบันทึกได้ กรุณาลองใหม่");
       setSaving(false);
     }
   }
@@ -146,9 +146,9 @@ export default function IngredientScanPage() {
           <CheckCircle2 className="w-10 h-10 text-emerald-500" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-slate-900">เธญเธฑเธเน€เธ”เธ•เธฃเธฒเธเธฒเธงเธฑเธ•เธ–เธธเธ”เธดเธเนเธฅเนเธง!</h2>
+          <h2 className="text-xl font-bold text-slate-900">อัปเดตราคาวัตถุดิบแล้ว!</h2>
           <p className="text-sm text-slate-500 mt-1">
-            เธฃเธฐเธเธเธเธดเธเธเนเธฃเธฒเธเธฒเธงเธฑเธ•เธ–เธธเธ”เธดเธเธเธฒเธเธเธดเธฅเน€เธฃเธตเธขเธเธฃเนเธญเธขเนเธฅเนเธง เธเธณเธฅเธฑเธเธเธฒเนเธเธซเธเนเธฒเธชเธนเธ•เธฃ & เธ•เนเธเธ—เธธเธ...
+            ระบบซิงก์ราคาวัตถุดิบจากบิลเรียบร้อยแล้ว กำลังพาไปหน้าสูตร &amp; ต้นทุน...
           </p>
         </div>
       </div>
@@ -165,9 +165,9 @@ export default function IngredientScanPage() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-lg font-bold text-slate-900">เธชเนเธเธเธเธดเธฅเธงเธฑเธ•เธ–เธธเธ”เธดเธ</h1>
+          <h1 className="text-lg font-bold text-slate-900">สแกนบิลวัตถุดิบ</h1>
           <p className="text-[11px] text-slate-500">
-            AI เธเธฐเธ”เธถเธเธฃเธฒเธเธฒเธงเธฑเธ•เธ–เธธเธ”เธดเธเธเธฒเธเธเธดเธฅเนเธฅเธฐเธญเธฑเธเน€เธ”เธ•เธเธฅเธฑเธเธงเธฑเธ•เธ–เธธเธ”เธดเธเนเธซเนเธญเธฑเธ•เนเธเธกเธฑเธ•เธด
+            AI จะดึงราคาวัตถุดิบจากบิลและอัปเดตคลังวัตถุดิบให้อัตโนมัติ
           </p>
         </div>
       </div>
@@ -178,10 +178,10 @@ export default function IngredientScanPage() {
           <Zap className="w-4 h-4 text-emerald-600" />
         </div>
         <div>
-          <p className="text-xs font-bold text-emerald-800">Auto-Sync เธฃเธฒเธเธฒเธงเธฑเธ•เธ–เธธเธ”เธดเธ</p>
+          <p className="text-xs font-bold text-emerald-800">Auto-Sync ราคาวัตถุดิบ</p>
           <p className="text-[11px] text-emerald-700 mt-0.5 leading-relaxed">
-            เธซเธฅเธฑเธเธเธฑเธเธ—เธถเธ เธฃเธฐเธเธเธเธฐเธญเธฑเธเน€เธ”เธ•เธฃเธฒเธเธฒเธงเธฑเธ•เธ–เธธเธ”เธดเธเนเธเธเธฅเธฑเธเนเธ”เธขเธญเธฑเธ•เนเธเธกเธฑเธ•เธด
-            เธเนเธงเธขเธเธณเธเธงเธ“เธ•เนเธเธ—เธธเธเธชเธนเธ•เธฃเธญเธฒเธซเธฒเธฃเนเธซเนเนเธกเนเธเธขเธณเธเธถเนเธ
+            หลังบันทึก ระบบจะอัปเดตราคาวัตถุดิบในคลังโดยอัตโนมัติ
+            ช่วยคำนวณต้นทุนสูตรอาหารให้แม่นยำขึ้น
           </p>
         </div>
       </div>
@@ -189,9 +189,9 @@ export default function IngredientScanPage() {
       {/* Tips */}
       <div className="grid grid-cols-3 gap-2">
         {[
-          { icon: ShoppingCart, label: "เธเธดเธฅ Makro", sub: "เธ•เธฅเธฒเธ”เธเธฒเธขเธชเนเธ" },
-          { icon: Receipt, label: "เธเธดเธฅเธ•เธฅเธฒเธ”เธชเธ”", sub: "เธเธทเนเธญเธงเธฑเธ•เธ–เธธเธ”เธดเธเธชเธ”" },
-          { icon: PackageCheck, label: "เนเธเธชเธฑเนเธเธเธทเนเธญ", sub: "เธฃเนเธฒเธเธเธฒเธขเธชเนเธ" },
+          { icon: ShoppingCart, label: "บิล Makro", sub: "ตลาดขายส่ง" },
+          { icon: Receipt, label: "บิลตลาดสด", sub: "ซื้อวัตถุดิบสด" },
+          { icon: PackageCheck, label: "ใบสั่งซื้อ", sub: "ร้านขายส่ง" },
         ].map(({ icon: Icon, label, sub }) => (
           <div
             key={label}
@@ -214,8 +214,8 @@ export default function IngredientScanPage() {
             <Receipt className="w-7 h-7 text-emerald-600" />
           </div>
           <div className="text-center">
-            <p className="text-sm font-bold text-slate-700">เนเธ•เธฐเน€เธเธทเนเธญเธ–เนเธฒเธขเธซเธฃเธทเธญเน€เธฅเธทเธญเธเธเธดเธฅ</p>
-            <p className="text-[11px] text-slate-400 mt-0.5">เธฃเธญเธเธฃเธฑเธ JPEG, PNG, WebP</p>
+            <p className="text-sm font-bold text-slate-700">แตะเพื่อถ่ายหรือเลือกบิล</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">รองรับ JPEG, PNG, WebP</p>
           </div>
         </div>
       )}
@@ -240,11 +240,11 @@ export default function IngredientScanPage() {
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold text-slate-700 truncate">{r.fileName}</p>
                 <p className="text-[10px] text-slate-400 mt-0.5">
-                  {r.status === "pending" && "เธฃเธญเธเธดเธง..."}
-                  {r.status === "uploading" && "เธเธณเธฅเธฑเธเธญเธฑเธเนเธซเธฅเธ”..."}
-                  {r.status === "processing" && "AI เธเธณเธฅเธฑเธเธญเนเธฒเธเธเธดเธฅ..."}
-                  {r.status === "done" && "โ… เธญเนเธฒเธเธเธดเธฅเธชเธณเน€เธฃเนเธ"}
-                  {r.status === "error" && `โ ${r.error}`}
+                  {r.status === "pending" && "รอคิว..."}
+                  {r.status === "uploading" && "กำลังอัปโหลด..."}
+                  {r.status === "processing" && "AI กำลังอ่านบิล..."}
+                  {r.status === "done" && "อ่านบิลสำเร็จ"}
+                  {r.status === "error" && r.error}
                 </p>
               </div>
             </div>
@@ -281,7 +281,7 @@ export default function IngredientScanPage() {
               disabled={isWorking}
             >
               <Camera className="w-5 h-5" />
-              เธ–เนเธฒเธขเธเธดเธฅ
+              ถ่ายบิล
             </Button>
             <Button
               variant="outline"
@@ -289,7 +289,7 @@ export default function IngredientScanPage() {
               onClick={() => galleryInputRef.current?.click()}
               disabled={isWorking}
             >
-              เน€เธฅเธทเธญเธเนเธเธฅเน
+              เลือกไฟล์
             </Button>
           </>
         ) : (
@@ -303,7 +303,7 @@ export default function IngredientScanPage() {
             ) : (
               <Zap className="w-5 h-5" />
             )}
-            เธเธฑเธเธ—เธถเธ & เธเธดเธเธเนเธฃเธฒเธเธฒเธงเธฑเธ•เธ–เธธเธ”เธดเธ ({doneJobs.length} เธเธดเธฅ)
+            บันทึก &amp; ซิงก์ราคาวัตถุดิบ ({doneJobs.length} บิล)
           </Button>
         )}
       </div>
