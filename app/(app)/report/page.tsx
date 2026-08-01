@@ -153,60 +153,64 @@ export default function ReportPage() {
       </div>
 
       {/* Report Content - Styled for A4 */}
-      <div className="p-8 print:p-0 print:m-0 bg-white text-black">
+      <div className="p-4 sm:p-8 print:p-0 print:m-0 bg-white text-black">
         <div className="text-center mb-8 border-b pb-6">
           <h1 className="text-3xl font-bold mb-2">{data.shopName}</h1>
           <h2 className="text-xl text-gray-600">รายงานสรุปรายรับ - รายจ่าย</h2>
           <p className="text-gray-500 mt-1">ประจำเดือน {data.month}</p>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mb-10 text-center">
-          <div className="p-4 bg-gray-50 rounded-lg border">
-            <p className="text-sm text-gray-500 mb-1">รายรับทั้งหมด</p>
-            <p className="text-xl font-bold text-green-600">{formatCurrency(data.summary.income)}</p>
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6 sm:mb-10 text-center">
+          <div className="p-2 sm:p-4 bg-gray-50 rounded-lg border">
+            <p className="text-[10px] sm:text-sm text-gray-500 mb-1">รายรับทั้งหมด</p>
+            <p className="text-sm sm:text-xl font-bold text-green-600">{formatCurrency(data.summary.income)}</p>
           </div>
-          <div className="p-4 bg-gray-50 rounded-lg border">
-            <p className="text-sm text-gray-500 mb-1">รายจ่ายทั้งหมด</p>
-            <p className="text-xl font-bold text-red-600">{formatCurrency(data.summary.expense)}</p>
+          <div className="p-2 sm:p-4 bg-gray-50 rounded-lg border">
+            <p className="text-[10px] sm:text-sm text-gray-500 mb-1">รายจ่ายทั้งหมด</p>
+            <p className="text-sm sm:text-xl font-bold text-red-600">{formatCurrency(data.summary.expense)}</p>
           </div>
-          <div className="p-4 bg-gray-50 rounded-lg border">
-            <p className="text-sm text-gray-500 mb-1">ยอดสุทธิ (กำไร)</p>
-            <p className="text-xl font-bold text-blue-600">{formatCurrency(data.summary.profit)}</p>
+          <div className="p-2 sm:p-4 bg-gray-50 rounded-lg border">
+            <p className="text-[10px] sm:text-sm text-gray-500 mb-1">ยอดสุทธิ (กำไร)</p>
+            <p className="text-sm sm:text-xl font-bold text-blue-600">{formatCurrency(data.summary.profit)}</p>
           </div>
         </div>
 
         <h3 className="text-lg font-bold mb-4 border-b pb-2">รายละเอียดรายการ</h3>
         
-        <table className="w-full text-sm text-left border-collapse">
-          <thead>
-            <tr className="bg-gray-100 border-b-2 border-gray-300">
-              <th className="p-3 font-semibold w-1/4">วันที่-เวลา</th>
-              <th className="p-3 font-semibold w-1/4">หมวดหมู่</th>
-              <th className="p-3 font-semibold w-1/4">ผู้โอน / รับเงิน</th>
-              <th className="p-3 font-semibold text-right w-1/4">จำนวนเงิน</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.transactions.length > 0 ? (
-              data.transactions.map((tx: any, i: number) => (
-                <tr key={tx.id} className={`border-b border-gray-100 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                  <td className="p-3 text-gray-600">{formatDate(tx.occurredAt)}</td>
-                  <td className="p-3 font-medium">{tx.category}</td>
-                  <td className="p-3 text-gray-600 truncate max-w-[150px]">{tx.type === "income" ? tx.sender || '-' : tx.receiver || '-'}</td>
-                  <td className={`p-3 text-right font-bold ${tx.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                    {tx.type === 'income' ? '+' : '-'}{formatCurrency(parseFloat(tx.amount))}
+        <div className="overflow-x-auto -mx-4 sm:-mx-8 px-4 sm:px-8">
+          <table className="w-full min-w-[480px] text-xs sm:text-sm text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-100 border-b-2 border-gray-300">
+                <th className="p-2 sm:p-3 font-semibold w-[22%] whitespace-nowrap">วันที่</th>
+                <th className="p-2 sm:p-3 font-semibold w-[22%]">หมวดหมู่</th>
+                <th className="p-2 sm:p-3 font-semibold w-[36%]">ผู้โอน / รับเงิน</th>
+                <th className="p-2 sm:p-3 font-semibold text-right w-[20%] whitespace-nowrap">จำนวนเงิน</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.transactions.length > 0 ? (
+                data.transactions.map((tx: any, i: number) => (
+                  <tr key={tx.id} className={`border-b border-gray-100 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                    <td className="p-2 sm:p-3 text-gray-600 whitespace-nowrap">{formatDate(tx.occurredAt)}</td>
+                    <td className="p-2 sm:p-3 font-medium">{tx.category}</td>
+                    <td className="p-2 sm:p-3 text-gray-600 max-w-0">
+                      <span className="block truncate">{tx.type === "income" ? tx.sender || '-' : tx.receiver || '-'}</span>
+                    </td>
+                    <td className={`p-2 sm:p-3 text-right font-bold whitespace-nowrap ${tx.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                      {tx.type === 'income' ? '+' : '-'}{formatCurrency(parseFloat(tx.amount))}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="p-8 text-center text-gray-500">
+                    ไม่มีรายการในเดือนนี้
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={4} className="p-8 text-center text-gray-500">
-                  ไม่มีรายการในเดือนนี้
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
         
         <div className="mt-12 text-center text-sm text-gray-400">
           <p>เอกสารสรุปรายรับ-รายจ่าย สร้างโดยระบบ SlipSense</p>

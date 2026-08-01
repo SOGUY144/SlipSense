@@ -58,13 +58,13 @@ export function AppShell({
     <div className="min-h-screen bg-[#F5F5F7] relative overflow-x-hidden">
       <header className="sticky top-0 z-30 bg-[#F5F5F7]/90 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-lg items-center justify-between px-4">
-          <div>
+          <div className="flex-1 min-w-0 mr-4">
             <p className="text-[11px] text-slate-500 font-medium tracking-wider uppercase">SlipSense</p>
-            <p className="text-sm font-bold truncate max-w-[150px] text-slate-800">
+            <p className="text-sm font-bold truncate text-slate-800">
               {shopName}
             </p>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 shrink-0">
             <Link
               href="/chat"
               className="rounded-full bg-teal-50 p-2 text-teal-600 hover:bg-teal-100 transition-colors flex items-center justify-center gap-1.5 shadow-sm border border-teal-100/50"
@@ -92,7 +92,7 @@ export function AppShell({
         </div>
       </header>
 
-      <main className="mx-auto max-w-lg px-4 pb-32 pt-2">{children}</main>
+      <main className="mx-auto max-w-lg px-4 pb-36 pt-2">{children}</main>
 
       {/* FAB Overlay Background */}
       {isFabOpen && (

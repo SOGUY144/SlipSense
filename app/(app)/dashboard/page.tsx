@@ -163,13 +163,13 @@ export default function DashboardPage() {
             </div>
             <p className="text-[13px] text-slate-600 font-bold tracking-wide">ยอดเงินคงเหลือสุทธิ</p>
           </div>
-          <p className="text-[44px] font-extrabold text-slate-800 tracking-tighter font-number drop-shadow-sm">
+          <p className="text-4xl sm:text-[44px] font-extrabold text-slate-800 tracking-tighter font-number drop-shadow-sm truncate max-w-full px-2">
             {formatCurrency(summary?.totalBalance ?? 0)}
           </p>
         </div>
 
         {/* Quick Actions (Overlapping the glass card) */}
-        <div className="flex justify-center gap-3 px-2 -mt-6 relative z-20">
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 px-2 -mt-6 relative z-20">
           <Link href="/upload" className="flex flex-col items-center gap-2 group cursor-pointer w-[68px]">
             <div className="w-[58px] h-[58px] bg-white rounded-2xl shadow-[0_8px_20px_-4px_rgba(0,0,0,0.1)] border border-slate-50 flex items-center justify-center text-slate-700 group-hover:-translate-y-1 transition-all duration-300">
               <Camera className="w-[24px] h-[24px]" strokeWidth={2} />

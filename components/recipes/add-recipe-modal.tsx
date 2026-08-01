@@ -174,7 +174,7 @@ export function AddRecipeModal({ open, onOpenChange, onSuccess }: AddRecipeModal
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg rounded-3xl p-6 max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[95vw] sm:max-w-lg rounded-3xl p-6 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center gap-2 text-emerald-600">
             <div className="p-2 bg-emerald-50 rounded-xl">
@@ -275,8 +275,8 @@ export function AddRecipeModal({ open, onOpenChange, onSuccess }: AddRecipeModal
                       )}
                     </div>
 
-                    <div className="grid grid-cols-12 gap-2 items-center">
-                      <div className="col-span-5 sm:col-span-5">
+                    <div className="grid grid-cols-12 gap-1.5 items-center">
+                      <div className="col-span-4">
                         <Input
                           placeholder="ชื่อวัตถุดิบ"
                           value={item.ingredientName}
@@ -295,7 +295,7 @@ export function AddRecipeModal({ open, onOpenChange, onSuccess }: AddRecipeModal
                         </datalist>
                       </div>
 
-                      <div className="col-span-2 sm:col-span-2">
+                      <div className="col-span-2">
                         <Input
                           type="number"
                           step="any"
@@ -304,29 +304,29 @@ export function AddRecipeModal({ open, onOpenChange, onSuccess }: AddRecipeModal
                           onChange={(e) =>
                             handleItemChange(item.id, "quantity", e.target.value)
                           }
-                          className="rounded-xl border-slate-200 text-xs bg-white text-center font-medium"
+                          className="rounded-xl border-slate-200 text-xs bg-white text-center font-medium px-1"
                         />
                       </div>
 
-                      <div className="col-span-2 sm:col-span-2">
+                      <div className="col-span-3">
                         <Input
                           placeholder="หน่วย"
                           value={item.unit}
                           onChange={(e) => handleItemChange(item.id, "unit", e.target.value)}
-                          className="rounded-xl border-slate-200 text-xs bg-white text-center"
+                          className="rounded-xl border-slate-200 text-xs bg-white text-center px-1.5"
                         />
                       </div>
 
-                      <div className="col-span-3 sm:col-span-3">
+                      <div className="col-span-3">
                         <Input
                           type="number"
                           step="any"
-                          placeholder="ราคา/หน่วย"
+                          placeholder="฿/หน่วย"
                           value={item.unitCost}
                           onChange={(e) =>
                             handleItemChange(item.id, "unitCost", e.target.value)
                           }
-                          className="rounded-xl border-slate-200 text-xs bg-white text-right font-medium"
+                          className="rounded-xl border-slate-200 text-xs bg-white text-right font-medium px-1.5"
                         />
                       </div>
                     </div>
