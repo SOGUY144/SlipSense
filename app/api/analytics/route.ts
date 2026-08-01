@@ -205,6 +205,7 @@ export async function GET(request: Request) {
     const peakHourLabel =
       maxBucket && maxBucket.income > 0 ? `${maxBucket.label} น.` : null;
     const hourlyTrend = hourlyBuckets.map((b) => ({
+      hourLabel: b.label,
       timeSlot: b.label,
       income: b.income,
     }));

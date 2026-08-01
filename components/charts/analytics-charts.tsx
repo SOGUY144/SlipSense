@@ -19,7 +19,7 @@ import {
   Legend,
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
-import { TrendingUp, Wallet, Receipt, PieChart as PieIcon, CalendarDays, BarChart4, X, Info } from "lucide-react";
+import { TrendingUp, Wallet, Receipt, PieChart as PieIcon, CalendarDays, BarChart4, X, Info, Clock, Truck, CreditCard } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const COLORS = [
@@ -62,6 +62,10 @@ interface AnalyticsChartsProps {
   categoryBreakdown: CategoryData[];
   dailyTrend?: DailyTrend[];
   dayOfWeekTrend?: DayOfWeekTrend[];
+  hourlyTrend?: Array<{ hourLabel: string; income: number }>;
+  peakHourLabel?: string | null;
+  supplierBreakdown?: Array<{ supplierName: string; amount: number; percentage: number }>;
+  paymentMethodBreakdown?: Array<{ method: string; amount: number; percentage: number }>;
 }
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -94,6 +98,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 const CustomPieTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
+    const labelName = data.category || data.supplierName || data.method || "รายการ";
     return (
       <div className="bg-background/95 backdrop-blur-md border border-border p-3 rounded-xl shadow-xl flex items-center gap-3">
         <div 
@@ -101,9 +106,9 @@ const CustomPieTooltip = ({ active, payload }: any) => {
           style={{ backgroundColor: payload[0].color }}
         />
         <div>
-          <p className="font-bold text-sm">{data.category}</p>
+          <p className="font-bold text-sm">{labelName}</p>
           <p className="text-sm text-muted-foreground">
-            {formatCurrency(data.amount)} ({data.percentage.toFixed(1)}%)
+            {formatCurrency(data.amount)} ({data.percentage?.toFixed(1) ?? 0}%)
           </p>
         </div>
       </div>
@@ -117,6 +122,10 @@ export function AnalyticsCharts({
   categoryBreakdown,
   dailyTrend = [],
   dayOfWeekTrend = [],
+  hourlyTrend = [],
+  peakHourLabel = null,
+  supplierBreakdown = [],
+  paymentMethodBreakdown = [],
 }: AnalyticsChartsProps) {
   const [selectedDow, setSelectedDow] = useState<DayOfWeekTrend | null>(null);
 
@@ -243,6 +252,53 @@ export function AnalyticsCharts({
                   <Area type="monotone" dataKey="income" name="รายรับ" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#areaIncome)" />
                   <Area type="monotone" dataKey="expense" name="รายจ่าย" stroke="#ef4444" strokeWidth={3} fillOpacity={1} fill="url(#areaExpense)" />
                 </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* Peak Sales Hours Section */}
+      {hourlyTrend.length > 0 && (
+        <Card className="border-none shadow-md bg-gradient-to-b from-card to-muted/20">
+          <div className="p-5 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Clock className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold">ช่วงเวลาขายดี (Peak Sales Hours)</h2>
+                <p className="text-xs text-muted-foreground">รายรับตามช่วงเวลาในแต่ละวัน</p>
+              </div>
+            </div>
+            {peakHourLabel && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 rounded-full text-xs font-semibold self-start sm:self-auto">
+                <span>🔥 ช่วงพีคของวัน: {peakHourLabel}</span>
+              </div>
+            )}
+          </div>
+          <div className="p-5">
+            <div className="h-64 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={hourlyTrend} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-muted" />
+                  <XAxis
+                    dataKey="hourLabel"
+                    tick={{ fontSize: 10 }}
+                    tickLine={false}
+                    axisLine={false}
+                    dy={10}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 11 }}
+                    tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
+                    tickLine={false}
+                    axisLine={false}
+                    dx={-10}
+                  />
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--muted)', opacity: 0.5 }} allowEscapeViewBox={{ x: false, y: true }} />
+                  <Bar dataKey="income" name="ยอดขาย" fill="#f59e0b" radius={[6, 6, 0, 0]} maxBarSize={40} />
+                </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
@@ -377,6 +433,152 @@ export function AnalyticsCharts({
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {/* Supplier Breakdown Section */}
+        {supplierBreakdown.length > 0 && (
+          <Card className="border-none shadow-md bg-gradient-to-b from-card to-muted/20">
+            <div className="p-5 border-b flex items-center gap-2">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Truck className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold">สัดส่วนยอดซื้อซัพพลายเออร์</h2>
+                <p className="text-xs text-muted-foreground">ยอดรายจ่ายสั่งของแยกตามซัพพลายเออร์</p>
+              </div>
+            </div>
+            
+            <div className="p-5 flex flex-col items-center gap-6">
+              <div className="h-48 w-full relative">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={supplierBreakdown}
+                      dataKey="amount"
+                      nameKey="supplierName"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={85}
+                      paddingAngle={5}
+                      stroke="none"
+                    >
+                      {supplierBreakdown.map((_, index) => (
+                        <Cell
+                          key={`cell-supplier-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                          className="hover:opacity-80 transition-opacity duration-300 outline-none"
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomPieTooltip />} wrapperStyle={{ zIndex: 50 }} allowEscapeViewBox={{ x: false, y: true }} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span className="text-xs text-muted-foreground font-medium">รวม</span>
+                  <span className="text-sm font-bold text-foreground">
+                    {formatCurrency(supplierBreakdown.reduce((sum, item) => sum + item.amount, 0))}
+                  </span>
+                </div>
+              </div>
+
+              <div className="w-full space-y-2">
+                {supplierBreakdown.map((item, i) => (
+                  <div
+                    key={item.supplierName}
+                    className="group flex items-center justify-between p-2.5 rounded-lg hover:bg-muted/50 transition-colors border border-transparent hover:border-border"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="h-3 w-3 rounded-full shadow-sm"
+                        style={{ backgroundColor: COLORS[i % COLORS.length] }}
+                      />
+                      <div>
+                        <p className="text-sm font-semibold">{item.supplierName}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-sm">{formatCurrency(item.amount)}</p>
+                      <p className="text-xs text-muted-foreground">{item.percentage.toFixed(1)}%</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {/* Payment Method Breakdown Section */}
+        {paymentMethodBreakdown.length > 0 && (
+          <Card className="border-none shadow-md bg-gradient-to-b from-card to-muted/20">
+            <div className="p-5 border-b flex items-center gap-2">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <CreditCard className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold">ช่องทางการชำระเงิน</h2>
+                <p className="text-xs text-muted-foreground">สัดส่วนเงินโอน PromptPay vs เงินสดในเกะ</p>
+              </div>
+            </div>
+            
+            <div className="p-5 flex flex-col items-center gap-6">
+              <div className="h-48 w-full relative">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={paymentMethodBreakdown}
+                      dataKey="amount"
+                      nameKey="method"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={85}
+                      paddingAngle={5}
+                      stroke="none"
+                    >
+                      {paymentMethodBreakdown.map((_, index) => (
+                        <Cell
+                          key={`cell-pm-${index}`}
+                          fill={COLORS[(index + 3) % COLORS.length]}
+                          className="hover:opacity-80 transition-opacity duration-300 outline-none"
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomPieTooltip />} wrapperStyle={{ zIndex: 50 }} allowEscapeViewBox={{ x: false, y: true }} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span className="text-xs text-muted-foreground font-medium">รวม</span>
+                  <span className="text-sm font-bold text-foreground">
+                    {formatCurrency(paymentMethodBreakdown.reduce((sum, item) => sum + item.amount, 0))}
+                  </span>
+                </div>
+              </div>
+
+              <div className="w-full space-y-2">
+                {paymentMethodBreakdown.map((item, i) => (
+                  <div
+                    key={item.method}
+                    className="group flex items-center justify-between p-2.5 rounded-lg hover:bg-muted/50 transition-colors border border-transparent hover:border-border"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="h-3 w-3 rounded-full shadow-sm"
+                        style={{ backgroundColor: COLORS[(i + 3) % COLORS.length] }}
+                      />
+                      <div>
+                        <p className="text-sm font-semibold">{item.method}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-sm">{formatCurrency(item.amount)}</p>
+                      <p className="text-xs text-muted-foreground">{item.percentage.toFixed(1)}%</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </Card>

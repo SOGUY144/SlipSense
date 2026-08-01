@@ -32,6 +32,21 @@ interface AnalyticsData {
     dayName: string;
     income: number;
   }>;
+  hourlyTrend?: Array<{
+    hourLabel: string;
+    income: number;
+  }>;
+  peakHourLabel?: string | null;
+  supplierBreakdown?: Array<{
+    supplierName: string;
+    amount: number;
+    percentage: number;
+  }>;
+  paymentMethodBreakdown?: Array<{
+    method: string;
+    amount: number;
+    percentage: number;
+  }>;
   totalExpense: number;
 }
 
@@ -112,6 +127,10 @@ export default function AnalyticsPage() {
           categoryBreakdown={data.categoryBreakdown}
           dailyTrend={data.dailyTrend}
           dayOfWeekTrend={data.dayOfWeekTrend}
+          hourlyTrend={data.hourlyTrend}
+          peakHourLabel={data.peakHourLabel}
+          supplierBreakdown={data.supplierBreakdown}
+          paymentMethodBreakdown={data.paymentMethodBreakdown}
         />
       )}
 
