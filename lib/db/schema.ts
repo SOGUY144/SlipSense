@@ -48,6 +48,14 @@ export const riskLevelEnum = pgEnum("risk_level", [
 
 export const shopRoleEnum = pgEnum("shop_role", ["owner", "member"]);
 
+export const creditTypeEnum = pgEnum("credit_type", ["debtor", "creditor"]);
+export const creditStatusEnum = pgEnum("credit_status", [
+  "pending",
+  "paid",
+  "overdue",
+  "cancelled",
+]);
+
 export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey(),
   phone: text("phone"),
@@ -198,6 +206,7 @@ export const shopsRelations = relations(shops, ({ many }) => ({
   insights: many(insights),
   categories: many(categories),
   dailyShifts: many(dailyShifts),
+  credits: many(credits),
 }));
 
 export const dailyShiftsRelations = relations(dailyShifts, ({ one }) => ({
@@ -236,7 +245,7 @@ export const slipJobsRelations = relations(slipJobs, ({ one }) => ({
   }),
 }));
 
-export const transactionsRelations = relations(transactions, ({ one }) => ({
+export const transactionsRelations = relations(transactions, ({ one, many }) => ({
   shop: one(shops, {
     fields: [transactions.shopId],
     references: [shops.id],
@@ -245,6 +254,7 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
     fields: [transactions.slipJobId],
     references: [slipJobs.id],
   }),
+  credits: many(credits),
 }));
 
 export const insightsRelations = relations(insights, ({ one }) => ({
@@ -277,6 +287,40 @@ export const billRemindersRelations = relations(billReminders, ({ one }) => ({
   }),
 }));
 
+export const credits = pgTable("credits", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  shopId: uuid("shop_id")
+    .notNull()
+    .references(() => shops.id, { onDelete: "cascade" }),
+  type: creditTypeEnum("type").notNull(),
+  contactName: text("contact_name").notNull(),
+  contactPhone: text("contact_phone"),
+  amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
+  description: text("description"),
+  dueDate: timestamp("due_date", { withTimezone: true }),
+  status: creditStatusEnum("status").default("pending").notNull(),
+  transactionId: uuid("transaction_id").references(() => transactions.id, {
+    onDelete: "set null",
+  }),
+  paidAt: timestamp("paid_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+}, (t) => [
+  index("credits_shop_type_status_idx").on(t.shopId, t.type, t.status),
+]);
+
+export const creditsRelations = relations(credits, ({ one }) => ({
+  shop: one(shops, {
+    fields: [credits.shopId],
+    references: [shops.id],
+  }),
+  transaction: one(transactions, {
+    fields: [credits.transactionId],
+    references: [transactions.id],
+  }),
+}));
+
 export type Profile = typeof profiles.$inferSelect;
 export type Shop = typeof shops.$inferSelect;
 export type ShopMember = typeof shopMembers.$inferSelect;
@@ -286,3 +330,5 @@ export type Insight = typeof insights.$inferSelect;
 export type BillReminder = typeof billReminders.$inferSelect;
 export type Category = typeof categories.$inferSelect;
 export type DailyShift = typeof dailyShifts.$inferSelect;
+export type Credit = typeof credits.$inferSelect;
+export type NewCredit = typeof credits.$inferInsert;
