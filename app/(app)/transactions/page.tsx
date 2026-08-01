@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Trash2, ChevronRight, Plus } from "lucide-react";
+import { Trash2, ChevronRight, Plus, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,

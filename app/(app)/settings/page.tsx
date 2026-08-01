@@ -97,6 +97,23 @@ export default function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
+            <svg className="w-5 h-5 text-[#00B900]" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.122.303.079.775.038 1.085-.053.376-.24 1.155-.291 1.365-.083.336-.328 1.637 1.442.893 1.768-.743 9.539-5.617 11.134-9.356 1.002-2.35 1.584-4.838 1.584-4.187z"/>
+            </svg>
+            เชื่อมต่อ LINE OA
+          </CardTitle>
+          <CardDescription>ตั้งค่ารับสลิปโอนเงินและตอบกลับลูกค้าผ่านทาง LINE อัตโนมัติ</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button variant="outline" className="text-[#00B900] border-[#00B900]/20 hover:bg-[#00B900]/10" onClick={() => router.push("/settings/line")}>
+            ตั้งค่า LINE OA
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
             AI คำแนะนำ
           </CardTitle>

@@ -100,13 +100,25 @@ export default function DashboardPage() {
   async function handleGenerateInsights() {
     setGeneratingInsights(true);
     const res = await fetch("/api/insights", { method: "POST" });
+    setGeneratingInsights(false);
     if (res.ok) {
-      await load();
+      load(); // Refresh data
     } else {
       alert("ไม่สามารถวิเคราะห์ข้อมูลได้ กรุณาลองใหม่");
     }
-    setGeneratingInsights(false);
   }
+
+  // Handle reminder payment success
+  useEffect(() => {
+    const handleReminderPaid = () => {
+      setShowPaidSuccess(true);
+      setTimeout(() => setShowPaidSuccess(false), 3000); // Hide after 3 seconds
+      load(); // Refresh dashboard data
+    };
+
+    window.addEventListener("reminder-paid", handleReminderPaid);
+    return () => window.removeEventListener("reminder-paid", handleReminderPaid);
+  }, []);
 
   if (loading) {
     return (
@@ -147,7 +159,7 @@ export default function DashboardPage() {
             <p className="text-[13px] text-slate-600 font-bold tracking-wide">ยอดเงินคงเหลือสุทธิ</p>
           </div>
           <p className="text-[44px] font-extrabold text-slate-800 tracking-tighter font-number drop-shadow-sm">
-            {formatCurrency(summary?.current.profit ?? 0)}
+            {formatCurrency(summary?.totalBalance ?? 0)}
           </p>
         </div>
 

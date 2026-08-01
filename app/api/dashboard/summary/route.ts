@@ -26,7 +26,7 @@ export async function GET(request: Request) {
     const prevYear = month === 1 ? year - 1 : year;
     const previous = getMonthRange(prevYear, prevMonth);
 
-    const [currentTxs, previousTxs, recentTxs] = await Promise.all([
+    const [currentTxs, previousTxs, recentTxs, allTimeTxs] = await Promise.all([
       db
         .select()
         .from(transactions)
@@ -53,15 +53,19 @@ export async function GET(request: Request) {
         .where(eq(transactions.shopId, shop.id))
         .orderBy(desc(transactions.createdAt), desc(transactions.occurredAt))
         .limit(10),
+      db
+        .select({ type: transactions.type, amount: transactions.amount })
+        .from(transactions)
+        .where(eq(transactions.shopId, shop.id)),
     ]);
 
-    const sumByType = (txs: typeof currentTxs) => ({
+    const sumByType = (txs: typeof currentTxs | typeof allTimeTxs) => ({
       income: txs
         .filter((t) => t.type === "income")
-        .reduce((s, t) => s + parseFloat(t.amount), 0),
+        .reduce((s, t) => s + parseFloat(t.amount as string), 0),
       expense: txs
         .filter((t) => t.type === "expense")
-        .reduce((s, t) => s + parseFloat(t.amount), 0),
+        .reduce((s, t) => s + parseFloat(t.amount as string), 0),
     });
 
     const currentSums = sumByType(currentTxs);
@@ -77,8 +81,12 @@ export async function GET(request: Request) {
           ? 100
           : 0;
 
+    const allTimeSums = sumByType(allTimeTxs);
+    const totalBalance = allTimeSums.income - allTimeSums.expense;
+
     return apiSuccess({
       shopName: shop.name,
+      totalBalance: totalBalance,
       current: {
         income: currentSums.income,
         expense: currentSums.expense,
