@@ -17,6 +17,7 @@ import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { AiFeedViewer } from "@/components/dashboard/ai-feed-viewer";
 import { DailyShiftWidget } from "@/components/dashboard/daily-shift-widget";
 import { PriceHikeAlertWidget } from "@/components/dashboard/price-hike-alert-widget";
+import { ReorderAlertWidget } from "@/components/dashboard/reorder-alert-widget";
 
 
 interface Summary {
@@ -428,6 +429,8 @@ export default function DashboardPage() {
           isRefreshing={generatingInsights} 
         />
       </div>
+
+      <ReorderAlertWidget />
 
       <div className="space-y-3">
         <div className="flex items-center justify-between px-2">

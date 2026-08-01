@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import type { Transaction } from "@/lib/db/schema";
-import { Loader2, Printer, ChevronLeft } from "lucide-react";
+import { Loader2, Printer, ChevronLeft, Download, FileSpreadsheet, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ReportData {
@@ -14,17 +14,24 @@ interface ReportData {
   transactions: Transaction[];
 }
 
+interface TaxPackageData {
+  shopName: string;
+  period: string;
+  totalTaxInvoicesCount: number;
+  totalTaxAmount: string;
+  invoices: Transaction[];
+}
+
 export default function ReportPage() {
   const router = useRouter();
   const [data, setData] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [exportingTax, setExportingTax] = useState(false);
+  const [taxExportResult, setTaxExportResult] = useState<TaxPackageData | null>(null);
 
   useEffect(() => {
     async function load() {
-      // For simplicity, we fetch dashboard summary which has month data, and then we'd ideally fetch ALL transactions for the month.
-      // But we can just use the dashboard's recent ones or fetch a custom endpoint. Let's create a quick API fetch for the current month.
-      
-      const res = await fetch("/api/transactions?limit=100"); // Let's just fetch recent 100 for the report
+      const res = await fetch("/api/transactions?limit=100");
       const summaryRes = await fetch("/api/dashboard/summary");
       
       if (res.ok && summaryRes.ok) {
@@ -42,6 +49,38 @@ export default function ReportPage() {
     }
     load();
   }, []);
+
+  async function handleExportTaxPackage() {
+    try {
+      setExportingTax(true);
+      const now = new Date();
+      const monthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const res = await fetch(`/api/export/tax-package?month=${monthStr}`);
+      const json = await res.json();
+
+      if (json.success && json.data) {
+        setTaxExportResult(json.data);
+
+        // Trigger JSON file download
+        const blob = new Blob([JSON.stringify(json.data, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `tax-package-${monthStr}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } else {
+        alert("ไม่สามารถส่งออกเอกสารภาษีได้");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("เกิดข้อผิดพลาดในการส่งออกเอกสารภาษี");
+    } finally {
+      setExportingTax(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -64,6 +103,51 @@ export default function ReportPage() {
         <Button onClick={() => window.print()} className="gap-2">
           <Printer className="h-4 w-4" /> บันทึก PDF / พิมพ์
         </Button>
+      </div>
+
+      {/* Tax Package Exporter Card - Hidden when printing */}
+      <div className="print:hidden p-6 bg-slate-50 border-b">
+        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl shrink-0">
+                <FileSpreadsheet className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-800 text-sm">
+                  📦 ชุดเอกสารภาษีส่งสำนักงานบัญชี (Tax Package Exporter)
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  ส่งออกใบกำกับภาษี VAT 7% / WHT รายเดือน เพื่อยื่นภาษีกับสำนักงานบัญชี
+                </p>
+              </div>
+            </div>
+            <Button
+              onClick={handleExportTaxPackage}
+              disabled={exportingTax}
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl gap-2 font-bold text-xs h-9 px-4 shrink-0"
+            >
+              {exportingTax ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Download className="w-4 h-4" />
+              )}
+              ส่งออกเอกสารภาษี
+            </Button>
+          </div>
+
+          {taxExportResult && (
+            <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-3 flex items-center justify-between text-xs text-emerald-800">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>
+                  ส่งออกสำเร็จ ({taxExportResult.totalTaxInvoicesCount} ใบกำกับภาษี • ยอดภาษี {formatCurrency(Number(taxExportResult.totalTaxAmount))})
+                </span>
+              </div>
+              <span className="font-semibold text-[10px] text-emerald-600">ดาวน์โหลดแล้ว</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Report Content - Styled for A4 */}
