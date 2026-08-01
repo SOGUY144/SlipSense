@@ -16,7 +16,8 @@ import {
   Image as ImageIcon,
   Mic,
   Keyboard,
-  ScanLine
+  ScanLine,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -48,7 +49,7 @@ export function AppShell({
   
   const navItemsRight: Array<{ href: string; label: string; icon: any; badge?: string | number }> = [
     { href: "/chat", label: "แชท AI", icon: Bot },
-    { href: "/profile", label: "สมุด", icon: Users },
+    { href: "/credits", label: "สมุดหนี้สิน", icon: BookOpen },
   ];
 
   return (
