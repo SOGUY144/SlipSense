@@ -209,6 +209,7 @@ export const shopsRelations = relations(shops, ({ many }) => ({
   dailyShifts: many(dailyShifts),
   credits: many(credits),
   transactionItems: many(transactionItems),
+  reorderCycles: many(reorderCycles),
 }));
 
 export const dailyShiftsRelations = relations(dailyShifts, ({ one }) => ({
@@ -357,6 +358,30 @@ export const transactionItemsRelations = relations(transactionItems, ({ one }) =
   }),
 }));
 
+export const reorderCycles = pgTable("reorder_cycles", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  shopId: uuid("shop_id")
+    .notNull()
+    .references(() => shops.id, { onDelete: "cascade" }),
+  itemName: text("item_name").notNull(),
+  averageIntervalDays: integer("average_interval_days").default(14).notNull(),
+  lastPurchasedAt: timestamp("last_purchased_at", { withTimezone: true }).notNull(),
+  nextDueDate: timestamp("next_due_date", { withTimezone: true }).notNull(),
+  supplierName: text("supplier_name"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+}, (t) => [
+  index("reorder_shop_due_idx").on(t.shopId, t.nextDueDate),
+]);
+
+export const reorderCyclesRelations = relations(reorderCycles, ({ one }) => ({
+  shop: one(shops, {
+    fields: [reorderCycles.shopId],
+    references: [shops.id],
+  }),
+}));
+
 export type Profile = typeof profiles.$inferSelect;
 export type Shop = typeof shops.$inferSelect;
 export type ShopMember = typeof shopMembers.$inferSelect;
@@ -370,3 +395,5 @@ export type Credit = typeof credits.$inferSelect;
 export type NewCredit = typeof credits.$inferInsert;
 export type TransactionItem = typeof transactionItems.$inferSelect;
 export type NewTransactionItem = typeof transactionItems.$inferInsert;
+export type ReorderCycle = typeof reorderCycles.$inferSelect;
+export type NewReorderCycle = typeof reorderCycles.$inferInsert;
