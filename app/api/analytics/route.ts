@@ -237,7 +237,7 @@ export async function GET(request: Request) {
       allRecentTxs
         .filter((t) => t.type === "expense")
         .forEach((t) => {
-          const supplier = t.merchantName || t.category || "อื่นๆ";
+          const supplier = t.receiver || t.category || "อื่นๆ";
           const current = expenseMap.get(supplier) || 0;
           expenseMap.set(supplier, current + parseFloat(t.amount));
         });
