@@ -142,31 +142,31 @@ export default function CreditsPage() {
       <PullToRefresh onRefresh={fetchCredits}>
         <div className="space-y-6 pb-24">
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 min-w-0">
               <Link href="/dashboard">
-                <Button variant="ghost" size="icon" className="h-8 w-8 -ml-2 rounded-xl">
+                <Button variant="ghost" size="icon" className="h-8 w-8 -ml-1 rounded-xl shrink-0">
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
               </Link>
-              <div>
-                <h1 className="text-xl font-bold text-slate-900">สมุดหนี้สิน & ลูกหนี้</h1>
-                <p className="text-xs text-muted-foreground">จัดการยอดค้างรับ-ค้างจ่าย พร้อม AI ทวงหนี้</p>
+              <div className="min-w-0">
+                <h1 className="text-base sm:text-xl font-bold text-slate-900 truncate">สมุดหนี้สิน & ลูกหนี้</h1>
+                <p className="text-[11px] sm:text-xs text-muted-foreground truncate">จัดการยอดค้างรับ-ค้างจ่าย พร้อม AI ทวงหนี้</p>
               </div>
             </div>
 
             <Button
               onClick={() => handleOpenAddModal(activeTab === "creditor" ? "creditor" : "debtor")}
               size="sm"
-              className="gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3.5 py-2.5 h-auto shadow-sm"
+              className="gap-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-2 text-xs shrink-0 shadow-xs h-9"
             >
-              <Plus className="h-4 w-4" />
-              บันทึกรายการ
+              <Plus className="h-3.5 w-3.5" />
+              <span>บันทึกรายการ</span>
             </Button>
           </div>
 
           {/* Stats Summary Cards */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
             <Card
               onClick={() => {
                 setActiveTab("debtor");
@@ -179,17 +179,17 @@ export default function CreditsPage() {
                   : "bg-white hover:bg-slate-50/80"
               )}
             >
-              <CardContent className="p-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-slate-500 flex items-center gap-1">
-                    <User className="w-3.5 h-3.5 text-amber-600" />
-                    ยอดค้างรับ (ลูกหนี้)
+              <CardContent className="p-3.5 sm:p-4 space-y-1.5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <span className="text-[11px] sm:text-xs font-semibold text-slate-600 flex items-center gap-1 truncate">
+                    <User className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                    ค้างรับ (ลูกหนี้)
                   </span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                  <span className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 self-start sm:self-auto shrink-0">
                     {stats.debtorCount} รายการ
                   </span>
                 </div>
-                <p className="text-lg sm:text-xl font-extrabold text-amber-600">
+                <p className="text-base sm:text-xl font-extrabold text-amber-600 font-number">
                   {formatCurrency(stats.totalDebtorPending)}
                 </p>
               </CardContent>
@@ -207,17 +207,17 @@ export default function CreditsPage() {
                   : "bg-white hover:bg-slate-50/80"
               )}
             >
-              <CardContent className="p-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-slate-500 flex items-center gap-1">
-                    <Store className="w-3.5 h-3.5 text-blue-600" />
-                    ยอดค้างจ่าย (เจ้าหนี้)
+              <CardContent className="p-3.5 sm:p-4 space-y-1.5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <span className="text-[11px] sm:text-xs font-semibold text-slate-600 flex items-center gap-1 truncate">
+                    <Store className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                    ค้างจ่าย (เจ้าหนี้)
                   </span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                  <span className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 self-start sm:self-auto shrink-0">
                     {stats.creditorCount} รายการ
                   </span>
                 </div>
-                <p className="text-lg sm:text-xl font-extrabold text-blue-600">
+                <p className="text-base sm:text-xl font-extrabold text-blue-600 font-number">
                   {formatCurrency(stats.totalCreditorPending)}
                 </p>
               </CardContent>
@@ -225,44 +225,45 @@ export default function CreditsPage() {
           </div>
 
           {/* Navigation Tabs & Status Filter */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-              <div className="flex items-center gap-1">
+          <div className="space-y-2.5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-2.5">
+              {/* Type Tabs */}
+              <div className="flex items-center gap-1 overflow-x-auto pb-0.5 no-scrollbar">
                 <button
                   onClick={() => {
                     setActiveTab("debtor");
                     triggerHaptic("light");
                   }}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
                     activeTab === "debtor"
-                      ? "bg-amber-500 text-white shadow-sm"
-                      : "text-slate-500 hover:text-slate-900"
+                      ? "bg-amber-500 text-white shadow-xs"
+                      : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
                   }`}
                 >
-                  ลูกหนี้ (ค้างรับเงิน)
+                  ลูกหนี้ (ค้างรับ)
                 </button>
                 <button
                   onClick={() => {
                     setActiveTab("creditor");
                     triggerHaptic("light");
                   }}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
                     activeTab === "creditor"
-                      ? "bg-blue-600 text-white shadow-sm"
-                      : "text-slate-500 hover:text-slate-900"
+                      ? "bg-blue-600 text-white shadow-xs"
+                      : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
                   }`}
                 >
-                  เจ้าหนี้ (ค้างชำระ)
+                  เจ้าหนี้ (ค้างจ่าย)
                 </button>
                 <button
                   onClick={() => {
                     setActiveTab("all");
                     triggerHaptic("light");
                   }}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
                     activeTab === "all"
-                      ? "bg-slate-800 text-white shadow-sm"
-                      : "text-slate-500 hover:text-slate-900"
+                      ? "bg-slate-800 text-white shadow-xs"
+                      : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
                   }`}
                 >
                   ทั้งหมด
@@ -270,7 +271,7 @@ export default function CreditsPage() {
               </div>
 
               {/* Status Filter Toggle */}
-              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl self-start sm:self-auto">
                 <button
                   onClick={() => {
                     setStatusFilter("pending");
@@ -279,7 +280,7 @@ export default function CreditsPage() {
                   className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
                     statusFilter === "pending"
                       ? "bg-white text-slate-800 shadow-xs"
-                      : "text-slate-400"
+                      : "text-slate-500"
                   }`}
                 >
                   ค้างอยู่
@@ -292,7 +293,7 @@ export default function CreditsPage() {
                   className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
                     statusFilter === "paid"
                       ? "bg-white text-slate-800 shadow-xs"
-                      : "text-slate-400"
+                      : "text-slate-500"
                   }`}
                 >
                   ชำระแล้ว
@@ -305,7 +306,7 @@ export default function CreditsPage() {
                   className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
                     statusFilter === "all"
                       ? "bg-white text-slate-800 shadow-xs"
-                      : "text-slate-400"
+                      : "text-slate-500"
                   }`}
                 >
                   ทั้งหมด

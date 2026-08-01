@@ -98,28 +98,28 @@ export default function ReportPage() {
   return (
     <div className="max-w-3xl mx-auto bg-white min-h-screen pb-20">
       {/* Controls - Hidden when printing */}
-      <div className="print:hidden sticky top-0 bg-background/95 backdrop-blur z-10 border-b p-4 flex items-center justify-between shadow-sm">
-        <Button variant="ghost" size="sm" onClick={() => router.back()}>
-          <ChevronLeft className="h-4 w-4 mr-1" /> กลับ
+      <div className="print:hidden sticky top-0 bg-background/95 backdrop-blur z-10 border-b px-3 py-2.5 sm:p-4 flex items-center justify-between shadow-xs">
+        <Button variant="ghost" size="sm" onClick={() => router.back()} className="px-2 h-8 text-xs">
+          <ChevronLeft className="h-4 w-4 mr-0.5" /> กลับ
         </Button>
-        <Button onClick={() => window.print()} className="gap-2">
-          <Printer className="h-4 w-4" /> บันทึก PDF / พิมพ์
+        <Button onClick={() => window.print()} size="sm" className="gap-1.5 text-xs h-8 px-3">
+          <Printer className="h-3.5 w-3.5" /> PDF / พิมพ์
         </Button>
       </div>
 
       {/* Tax Package Exporter Card - Hidden when printing */}
-      <div className="print:hidden p-6 bg-slate-50 border-b">
-        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl shrink-0">
+      <div className="print:hidden p-3 sm:p-6 bg-slate-50 border-b">
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs space-y-3 sm:space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-start sm:items-center gap-3">
+              <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl shrink-0 mt-0.5 sm:mt-0">
                 <FileSpreadsheet className="w-5 h-5" />
               </div>
-              <div>
-                <h3 className="font-bold text-slate-800 text-sm">
-                  📦 ชุดเอกสารภาษีส่งสำนักงานบัญชี (Tax Package Exporter)
+              <div className="min-w-0 flex-1">
+                <h3 className="font-bold text-slate-800 text-sm sm:text-base leading-snug">
+                  📦 ชุดเอกสารภาษีส่งสำนักงานบัญชี
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 leading-relaxed">
                   ส่งออกใบกำกับภาษี VAT 7% / WHT รายเดือน เพื่อยื่นภาษีกับสำนักงานบัญชี
                 </p>
               </div>
@@ -127,7 +127,7 @@ export default function ReportPage() {
             <Button
               onClick={handleExportTaxPackage}
               disabled={exportingTax}
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl gap-2 font-bold text-xs h-9 px-4 shrink-0"
+              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white rounded-xl gap-2 font-bold text-xs h-9 px-4 shrink-0 shadow-xs"
             >
               {exportingTax ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
