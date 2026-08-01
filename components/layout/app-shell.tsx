@@ -48,8 +48,8 @@ export function AppShell({
   ];
   
   const navItemsRight: Array<{ href: string; label: string; icon: any; badge?: string | number }> = [
-    { href: "/chat", label: "แชท AI", icon: Bot },
     { href: "/credits", label: "สมุดหนี้สิน", icon: BookOpen },
+    { href: "/profile", label: "ตั้งค่าร้าน", icon: Users },
   ];
 
   return (
