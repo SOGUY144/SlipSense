@@ -1,6 +1,6 @@
-import { eq, and, gte, lte, asc } from "drizzle-orm";
+import { eq, and, gte, lte, asc, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { transactions } from "@/lib/db/schema";
+import { transactions, dailyShifts, transactionItems } from "@/lib/db/schema";
 import { requireAuth } from "@/lib/auth/helpers";
 import { apiError, apiSuccess } from "@/lib/api/response";
 
@@ -15,7 +15,12 @@ export async function GET(request: Request) {
     const earliestTx = await db
       .select({ occurredAt: transactions.occurredAt })
       .from(transactions)
-      .where(eq(transactions.shopId, shop.id))
+      .where(
+        and(
+          eq(transactions.shopId, shop.id),
+          eq(transactions.isPersonal, false)
+        )
+      )
       .orderBy(asc(transactions.occurredAt))
       .limit(1);
 
@@ -43,6 +48,7 @@ export async function GET(request: Request) {
         .where(
           and(
             eq(transactions.shopId, shop.id),
+            eq(transactions.isPersonal, false),
             gte(transactions.occurredAt, start),
             lte(transactions.occurredAt, end)
           )
@@ -84,6 +90,7 @@ export async function GET(request: Request) {
       .where(
         and(
           eq(transactions.shopId, shop.id),
+          eq(transactions.isPersonal, false),
           gte(transactions.occurredAt, currentStart),
           lte(transactions.occurredAt, currentEnd)
         )
@@ -139,6 +146,7 @@ export async function GET(request: Request) {
       .where(
         and(
           eq(transactions.shopId, shop.id),
+          eq(transactions.isPersonal, false),
           gte(transactions.occurredAt, new Date(now.getFullYear(), now.getMonth() - monthsBack + 1, 1))
         )
       );
@@ -169,12 +177,101 @@ export async function GET(request: Request) {
       };
     });
 
+    // 1. Calculate Hourly Trend & Peak Hours
+    const hourlyBuckets = [
+      { label: "06:00 - 08:00", hourStart: 6, hourEnd: 8, income: 0 },
+      { label: "08:00 - 10:00", hourStart: 8, hourEnd: 10, income: 0 },
+      { label: "10:00 - 12:00", hourStart: 10, hourEnd: 12, income: 0 },
+      { label: "12:00 - 14:00", hourStart: 12, hourEnd: 14, income: 0 },
+      { label: "14:00 - 16:00", hourStart: 14, hourEnd: 16, income: 0 },
+      { label: "16:00 - 18:00", hourStart: 16, hourEnd: 18, income: 0 },
+      { label: "18:00 - 20:00", hourStart: 18, hourEnd: 20, income: 0 },
+      { label: "20:00 - 22:00", hourStart: 20, hourEnd: 22, income: 0 },
+    ];
+
+    allRecentTxs
+      .filter((t) => t.type === "income")
+      .forEach((t) => {
+        const hour = new Date(t.occurredAt).getHours();
+        const bucket = hourlyBuckets.find(
+          (b) => hour >= b.hourStart && hour < b.hourEnd
+        );
+        if (bucket) {
+          bucket.income += parseFloat(t.amount);
+        }
+      });
+
+    const maxBucket = [...hourlyBuckets].sort((a, b) => b.income - a.income)[0];
+    const peakHourLabel =
+      maxBucket && maxBucket.income > 0 ? `${maxBucket.label} น.` : null;
+    const hourlyTrend = hourlyBuckets.map((b) => ({
+      timeSlot: b.label,
+      income: b.income,
+    }));
+
+    // 2. Query Supplier Spend Breakdown
+    const supplierItems = await db
+      .select({
+        supplierName: transactionItems.supplierName,
+        totalSpend: sql<number>`sum(${transactionItems.totalAmount})`,
+      })
+      .from(transactionItems)
+      .where(eq(transactionItems.shopId, shop.id))
+      .groupBy(transactionItems.supplierName);
+
+    const totalSupplierSpend = supplierItems.reduce(
+      (sum, item) => sum + Number(item.totalSpend || 0),
+      0
+    );
+    const supplierBreakdown = supplierItems.map((item) => ({
+      supplierName: item.supplierName || "ไม่ระบุชื่อซัพพลายเออร์",
+      amount: Number(item.totalSpend || 0),
+      percentage:
+        totalSupplierSpend > 0
+          ? (Number(item.totalSpend || 0) / totalSupplierSpend) * 100
+          : 0,
+    }));
+
+    // 3. Query Payment Method Breakdown (Transfer vs Cash)
+    const shifts = await db
+      .select()
+      .from(dailyShifts)
+      .where(eq(dailyShifts.shopId, shop.id));
+
+    const totalCash = shifts.reduce(
+      (sum, s) => sum + Number(s.cashTotal || 0),
+      0
+    );
+    const totalTransfer = shifts.reduce(
+      (sum, s) => sum + Number(s.transferTotal || 0),
+      0
+    );
+    const totalPayment = totalCash + totalTransfer;
+
+    const paymentMethodBreakdown = [
+      {
+        method: "สแกนโอน PromptPay (สลิป)",
+        amount: totalTransfer,
+        percentage:
+          totalPayment > 0 ? (totalTransfer / totalPayment) * 100 : 0,
+      },
+      {
+        method: "เงินสดในเกะ",
+        amount: totalCash,
+        percentage: totalPayment > 0 ? (totalCash / totalPayment) * 100 : 0,
+      },
+    ].filter((p) => p.amount > 0);
+
     return apiSuccess({
       monthly: monthlyData,
       categoryBreakdown,
       totalExpense,
       dailyTrend,
       dayOfWeekTrend,
+      hourlyTrend,
+      peakHourLabel,
+      supplierBreakdown,
+      paymentMethodBreakdown,
     });
   } catch (error) {
     if (error instanceof Error && error.message === "Unauthorized") {
@@ -183,3 +280,4 @@ export async function GET(request: Request) {
     return apiError("Failed to fetch analytics", 500);
   }
 }
+
