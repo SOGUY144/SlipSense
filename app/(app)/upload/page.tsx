@@ -202,7 +202,7 @@ export default function UploadPage() {
           onClick={() => setMode("scan")}
           className={`flex items-center gap-2.5 px-4 py-3 rounded-2xl border-2 transition-all font-bold text-sm ${
             mode === "scan"
-              ? "border-slate-900 bg-slate-900 text-white shadow-lg"
+              ? "border-[#43936C] bg-[#43936C] text-white shadow-lg shadow-emerald-500/20"
               : "border-slate-200 bg-white text-slate-500"
           }`}
         >
@@ -213,7 +213,7 @@ export default function UploadPage() {
           onClick={() => setMode("manual")}
           className={`flex items-center gap-2.5 px-4 py-3 rounded-2xl border-2 transition-all font-bold text-sm ${
             mode === "manual"
-              ? "border-slate-900 bg-slate-900 text-white shadow-lg"
+              ? "border-[#43936C] bg-[#43936C] text-white shadow-lg shadow-emerald-500/20"
               : "border-slate-200 bg-white text-slate-500"
           }`}
         >
@@ -380,7 +380,7 @@ export default function UploadPage() {
               {!isWorking && doneJobs.length > 0 && (
                 <div className="pt-2 space-y-2.5">
                   <button
-                    className="w-full flex items-center justify-between px-5 h-[52px] bg-slate-900 text-white rounded-2xl font-bold text-sm active:scale-[0.98] transition-transform cursor-pointer"
+                    className="w-full flex items-center justify-between px-5 h-[52px] bg-[#43936C] text-white rounded-2xl font-bold text-sm active:scale-[0.98] transition-transform cursor-pointer shadow-md shadow-emerald-500/20"
                     onClick={() => router.push(`/review/batch?jobIds=${doneJobs.join(",")}`)}
                     disabled={savingBatch}
                   >
@@ -444,7 +444,7 @@ export default function UploadPage() {
                 ยกเลิก
               </button>
               <button
-                className="h-12 rounded-2xl bg-slate-900 text-white font-bold text-sm cursor-pointer"
+                className="h-12 rounded-2xl bg-[#43936C] text-white font-bold text-sm cursor-pointer"
                 onClick={confirmAutoSave}
               >
                 ตกลง บันทึกเลย
