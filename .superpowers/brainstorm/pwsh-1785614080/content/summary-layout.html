@@ -1,0 +1,63 @@
+<h2>เลือกแนวทางการออกแบบ "สรุปเดือนนี้"</h2>
+<p class="subtitle">คุณอยากให้หน้านี้ออกมาอารมณ์ไหน? (ผมจำลองรูปแบบ 3 สไตล์มาให้เลือกครับ)</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Clean & Modern (เน้นอ่านง่าย)</h3>
+      <p>ดีไซน์แบบสะอาดตา ใช้การ์ดสีขาวเงาบางๆ (Soft shadow) ตัวเลขใหญ่ชัดเจน เน้นจัดเรียงข้อมูลให้เป็นระเบียบเรียบง่าย คล้ายแอปธนาคารยุคใหม่</p>
+      
+      <!-- Mockup snippet -->
+      <div style="margin-top: 1rem; border-radius: 12px; background: #fff; padding: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #f1f5f9;">
+         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+           <span style="font-size: 11px; color: #64748b; font-weight: 600;">รายรับทั้งหมด</span>
+           <span style="font-size: 11px; color: #10b981; background: #ecfdf5; padding: 2px 8px; border-radius: 10px;">+15%</span>
+         </div>
+         <div style="font-size: 24px; font-weight: 800; color: #0f172a;">฿20,800</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Premium Glass (หรูหราทันสมัย)</h3>
+      <p>ใช้สไตล์ Glassmorphism (พื้นหลังกระจกใส) เล่นกับแสงและเงา มีแสงออร่าสีเขียว/น้ำเงินด้านหลังการ์ด ทำให้ดูพรีเมียมและดูล้ำสมัย (คล้ายหน้าที่เพิ่งแก้ไปก่อนหน้านี้)</p>
+      
+      <!-- Mockup snippet -->
+      <div style="margin-top: 1rem; position: relative; border-radius: 16px; background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); padding: 1rem; border: 1px solid rgba(255,255,255,1); overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+         <div style="position: absolute; top: -10px; right: -10px; width: 60px; height: 60px; background: rgba(16, 185, 129, 0.2); filter: blur(20px); border-radius: 50%;"></div>
+         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; position: relative; z-index: 10;">
+           <span style="font-size: 11px; color: #475569; font-weight: 600;">รายรับทั้งหมด</span>
+         </div>
+         <div style="font-size: 24px; font-weight: 800; color: #1e293b; position: relative; z-index: 10;">฿20,800</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Unified Flow (รวมเป็นการ์ดเดียว)</h3>
+      <p>แทนที่จะแยกการ์ดรายรับ-รายจ่าย เราจะรวมข้อมูลทางการเงินมาไว้ในการ์ดใหญ่ใบเดียว มีหลอดพลัง (Progress bar) เพื่อให้เห็นภาพง่ายๆ ว่าตอนนี้รายรับชนะรายจ่ายไปเท่าไหร่แล้ว</p>
+      
+      <!-- Mockup snippet -->
+      <div style="margin-top: 1rem; border-radius: 16px; background: #1e293b; color: white; padding: 1.25rem;">
+         <div style="font-size: 11px; color: #94a3b8; margin-bottom: 0.25rem;">กำไรสุทธิเดือนนี้</div>
+         <div style="font-size: 28px; font-weight: 800; color: #10b981;">฿17,600</div>
+         
+         <div style="margin-top: 1rem;">
+           <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
+             <span style="color: #cbd5e1;">รับ 20.8k</span>
+             <span style="color: #cbd5e1;">จ่าย 3.2k</span>
+           </div>
+           <div style="width: 100%; height: 6px; background: #334155; border-radius: 3px; display: flex; overflow: hidden;">
+             <div style="width: 86%; background: #10b981;"></div>
+             <div style="width: 14%; background: #ef4444;"></div>
+           </div>
+         </div>
+      </div>
+    </div>
+  </div>
+</div>
