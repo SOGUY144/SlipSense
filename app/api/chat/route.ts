@@ -47,7 +47,6 @@ export async function POST(req: Request) {
         get_financial_summary: tool({
           description: "ดึงยอดสรุปรายรับ รายจ่าย และกำไร ในช่วงเวลาที่ระบุ",
           inputSchema: summarySchema,
-          // @ts-ignore
           execute: async (args: z.infer<typeof summarySchema>) => {
             const { startDate, endDate } = args;
             const start = new Date(startDate);
@@ -88,7 +87,6 @@ export async function POST(req: Request) {
         get_transactions_by_category: tool({
           description: "ดึงยอดสรุปรายจ่ายหรือรายรับ แยกตามหมวดหมู่ ในช่วงเวลาที่ระบุ",
           inputSchema: categorySchema,
-          // @ts-ignore
           execute: async (args: z.infer<typeof categorySchema>) => {
             const { type, startDate, endDate } = args;
             const start = new Date(startDate);
@@ -118,7 +116,6 @@ export async function POST(req: Request) {
         get_recent_transactions: tool({
           description: "ดึงประวัติธุรกรรมล่าสุด 10-50 รายการ",
           inputSchema: recentSchema,
-          // @ts-ignore
           execute: async (args: z.infer<typeof recentSchema>) => {
             const { limit } = args;
             const txs = await db
@@ -143,7 +140,6 @@ export async function POST(req: Request) {
     return result.toTextStreamResponse();
   } catch (error) {
     console.error("Chat API Error:", error);
-    require('fs').writeFileSync('c:/Users/Asus/OneDrive/Desktop/SlipSense/scratch-error.log', String(error) + '\n' + ((error as any)?.stack || ''));
     if (error instanceof Error && error.message === "Unauthorized") {
       return apiError("Unauthorized", 401);
     }
