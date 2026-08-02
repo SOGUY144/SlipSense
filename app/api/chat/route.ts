@@ -42,10 +42,11 @@ export async function POST(req: Request) {
       model: openai("gpt-4o-mini"),
       system: systemPrompt,
       messages: messages,
+      maxSteps: 5,
       tools: {
         get_financial_summary: tool({
           description: "ดึงยอดสรุปรายรับ รายจ่าย และกำไร ในช่วงเวลาที่ระบุ",
-          parameters: summarySchema,
+          inputSchema: summarySchema,
           // @ts-ignore
           execute: async (args: z.infer<typeof summarySchema>) => {
             const { startDate, endDate } = args;
@@ -86,7 +87,7 @@ export async function POST(req: Request) {
         }),
         get_transactions_by_category: tool({
           description: "ดึงยอดสรุปรายจ่ายหรือรายรับ แยกตามหมวดหมู่ ในช่วงเวลาที่ระบุ",
-          parameters: categorySchema,
+          inputSchema: categorySchema,
           // @ts-ignore
           execute: async (args: z.infer<typeof categorySchema>) => {
             const { type, startDate, endDate } = args;
@@ -116,7 +117,7 @@ export async function POST(req: Request) {
         }),
         get_recent_transactions: tool({
           description: "ดึงประวัติธุรกรรมล่าสุด 10-50 รายการ",
-          parameters: recentSchema,
+          inputSchema: recentSchema,
           // @ts-ignore
           execute: async (args: z.infer<typeof recentSchema>) => {
             const { limit } = args;
