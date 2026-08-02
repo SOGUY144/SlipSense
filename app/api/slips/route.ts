@@ -69,10 +69,10 @@ export async function POST(request: Request) {
     // Process in background
     processSlipInBackground(job.id, base64, mediaType, activeCategories, {
       name: shop.name,
-      ownerName: (user as any).displayName || (user as any).name || undefined,
-      businessCategory: (shop.preferences as any)?.businessCategory || undefined,
-      businessType: (shop.preferences as any)?.businessType || undefined,
-      description: (shop.preferences as any)?.description || undefined,
+      ownerName: ((user as Record<string, unknown>).displayName as string) || ((user as Record<string, unknown>).name as string) || undefined,
+      businessCategory: (shop.preferences as Record<string, unknown>)?.businessCategory as string || undefined,
+      businessType: (shop.preferences as Record<string, unknown>)?.businessType as string || undefined,
+      description: (shop.preferences as Record<string, unknown>)?.description as string || undefined,
     }, uploadType).catch(console.error);
 
     return apiSuccess({

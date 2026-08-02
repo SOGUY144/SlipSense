@@ -16,6 +16,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { triggerHaptic } from "@/lib/utils";
+import { compressImageForUpload } from "@/lib/image-compress";
 import { TransactionForm } from "@/components/transactions/transaction-form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -75,8 +76,9 @@ export default function UploadPage() {
       triggerHaptic("success");
       setShowSuccess(true);
       setTimeout(() => router.push("/dashboard"), 1500);
-    } catch (error: any) {
-      alert(error.message || "เกิดข้อผิดพลาดในการบันทึก กรุณาลองใหม่");
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : "เกิดข้อผิดพลาดในการบันทึก กรุณาลองใหม่";
+      alert(msg);
       setSavingManual(false);
     }
   }
@@ -136,7 +138,7 @@ export default function UploadPage() {
           clearInterval(interval);
         }
       } catch {
-        if (++retries >= 30) {
+        if (++retries >= 40) {
           setResults((prev) =>
             prev.map((r, i) =>
               i === index ? { ...r, status: "error", error: "หมดเวลารอ กรุณาลองใหม่" } : r
@@ -145,7 +147,7 @@ export default function UploadPage() {
           clearInterval(interval);
         }
       }
-    }, 2000);
+    }, 600);
   }
 
   async function processFiles(files: FileList | File[]) {
@@ -155,10 +157,12 @@ export default function UploadPage() {
 
     for (let i = 0; i < fileArray.length; i++) {
       setResults((prev) => prev.map((r, idx) => (idx === i ? { ...r, status: "uploading" } : r)));
-      const formData = new FormData();
-      formData.append("file", fileArray[i]);
-      formData.append("uploadType", uploadType);
       try {
+        const compressedFile = await compressImageForUpload(fileArray[i]);
+        const formData = new FormData();
+        formData.append("file", compressedFile);
+        formData.append("uploadType", uploadType);
+
         const res = await fetch("/api/slips", { method: "POST", body: formData });
         const data = await res.json();
         if (!res.ok) {

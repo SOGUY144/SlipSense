@@ -14,6 +14,7 @@ import {
   PackageCheck,
 } from "lucide-react";
 import { triggerHaptic } from "@/lib/utils";
+import { compressImageForUpload } from "@/lib/image-compress";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -66,7 +67,7 @@ export default function IngredientScanPage() {
         }
       } catch {
         retries++;
-        if (retries >= 30) {
+        if (retries >= 40) {
           setResults((prev) =>
             prev.map((r, i) =>
               i === index ? { ...r, status: "error", error: "หมดเวลารอ กรุณาลองใหม่" } : r
@@ -75,7 +76,7 @@ export default function IngredientScanPage() {
           clearInterval(interval);
         }
       }
-    }, 2000);
+    }, 600);
   }
 
   async function processFiles(files: FileList | File[]) {
@@ -88,11 +89,12 @@ export default function IngredientScanPage() {
         prev.map((r, idx) => (idx === i ? { ...r, status: "uploading" } : r))
       );
 
-      const formData = new FormData();
-      formData.append("file", fileArray[i]);
-      formData.append("uploadType", "bill");
-
       try {
+        const compressedFile = await compressImageForUpload(fileArray[i]);
+        const formData = new FormData();
+        formData.append("file", compressedFile);
+        formData.append("uploadType", "bill");
+
         const res = await fetch("/api/slips", { method: "POST", body: formData });
         const data = await res.json();
         if (!res.ok) {
