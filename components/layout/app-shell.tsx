@@ -156,54 +156,77 @@ export function AppShell({
       </div>
 
       {!pathname.startsWith("/review") && (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 mx-auto max-w-lg bg-white/95 backdrop-blur-xl border-t border-slate-100/50 pb-1 rounded-t-[1.5rem] shadow-[0_-4px_20px_rgba(0,0,0,0.02)]" style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom))', paddingTop: '12px' }}>
-          <div className="flex items-center justify-between px-8 relative">
+        <nav 
+          className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-lg bg-white/95 backdrop-blur-2xl border border-slate-200/80 rounded-full shadow-[0_12px_40px_rgba(0,0,0,0.12)] p-1.5 transition-all duration-300"
+          style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
+        >
+          <div className="flex items-center justify-around relative px-1">
             
-            <div className="flex gap-8">
-              {navItemsLeft.map(({ href, label, icon: Icon }) => {
-                const active = pathname.startsWith(href) && (href !== "/dashboard" || pathname === "/dashboard");
-                return (
-                  <Link key={href} href={href} className="flex flex-col items-center justify-center min-w-[44px] transition-all duration-300">
-                    <div className={cn("transition-all duration-300 mb-1", active ? "text-slate-900 scale-105" : "text-slate-400")}>
-                      <Icon className="h-6 w-6" strokeWidth={active ? 2.5 : 2} />
-                    </div>
-                    <span className={cn("text-[10px] leading-none transition-all duration-300 mt-0.5", active ? "text-slate-900 font-bold" : "text-slate-500 font-medium")}>{label}</span>
-                  </Link>
-                );
-              })}
-            </div>
+            {/* Left Items */}
+            {navItemsLeft.map(({ href, label, icon: Icon }) => {
+              const active = pathname.startsWith(href) && (href !== "/dashboard" || pathname === "/dashboard");
+              return (
+                <Link 
+                  key={href} 
+                  href={href} 
+                  className={cn(
+                    "flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-300 select-none min-w-[62px]",
+                    active 
+                      ? "bg-slate-100 text-[#43936C]" 
+                      : "text-slate-600 hover:text-slate-900 active:scale-95"
+                  )}
+                >
+                  <Icon className={cn("h-5 w-5 transition-transform duration-300", active && "scale-110 text-[#43936C]")} strokeWidth={active ? 2.5 : 2} />
+                  <span className={cn("text-[10px] leading-tight mt-0.5 whitespace-nowrap", active ? "font-bold text-[#43936C]" : "font-semibold text-slate-700")}>
+                    {label}
+                  </span>
+                </Link>
+              );
+            })}
 
-            <div className="absolute left-1/2 -top-8 -translate-x-1/2">
+            {/* Center (+) Action Button */}
+            <div className="relative flex items-center justify-center min-w-[56px]">
               <button 
                 onClick={() => setIsFabOpen(!isFabOpen)}
                 className={cn(
-                  "w-16 h-16 rounded-full flex items-center justify-center text-white shadow-[0_8px_20px_rgba(67,147,108,0.3)] transition-all duration-300 border-[4px] border-[#F5F5F7]",
-                  isFabOpen ? "bg-slate-800 rotate-45" : "bg-[#43936C]"
+                  "w-12 h-12 rounded-full flex items-center justify-center text-white shadow-[0_6px_18px_rgba(67,147,108,0.35)] transition-all duration-300 active:scale-95",
+                  isFabOpen ? "bg-slate-800 rotate-45" : "bg-[#43936C] hover:bg-[#367a59]"
                 )}
+                aria-label="เมนูด่วน"
               >
-                <Plus className="w-8 h-8" strokeWidth={2.5} />
+                <Plus className="w-6 h-6" strokeWidth={2.5} />
               </button>
             </div>
 
-            <div className="flex gap-8">
-              {navItemsRight.map(({ href, label, icon: Icon, badge }) => {
-                const active = pathname.startsWith(href);
-                return (
-                  <Link key={href} href={href} className="flex flex-col items-center justify-center min-w-[44px] transition-all duration-300 relative">
-                    <div className={cn("transition-all duration-300 mb-1 relative", active ? "text-slate-900 scale-105" : "text-slate-400")}>
-                      <Icon className="h-6 w-6" strokeWidth={active ? 2.5 : 2} />
-                      {badge && (
-                        <span className="absolute -top-1.5 -right-2 bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
-                          {badge}
-                        </span>
-                      )}
-                    </div>
-                    <span className={cn("text-[10px] leading-none transition-all duration-300 mt-0.5", active ? "text-slate-900 font-bold" : "text-slate-500 font-medium")}>{label}</span>
-                  </Link>
-                );
-              })}
-            </div>
-            
+            {/* Right Items */}
+            {navItemsRight.map(({ href, label, icon: Icon, badge }) => {
+              const active = pathname.startsWith(href);
+              return (
+                <Link 
+                  key={href} 
+                  href={href} 
+                  className={cn(
+                    "flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-300 select-none relative min-w-[62px]",
+                    active 
+                      ? "bg-slate-100 text-[#43936C]" 
+                      : "text-slate-600 hover:text-slate-900 active:scale-95"
+                  )}
+                >
+                  <div className="relative">
+                    <Icon className={cn("h-5 w-5 transition-transform duration-300", active && "scale-110 text-[#43936C]")} strokeWidth={active ? 2.5 : 2} />
+                    {badge && (
+                      <span className="absolute -top-1.5 -right-2 bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
+                        {badge}
+                      </span>
+                    )}
+                  </div>
+                  <span className={cn("text-[10px] leading-tight mt-0.5 whitespace-nowrap", active ? "font-bold text-[#43936C]" : "font-semibold text-slate-700")}>
+                    {label}
+                  </span>
+                </Link>
+              );
+            })}
+
           </div>
         </nav>
       )}
