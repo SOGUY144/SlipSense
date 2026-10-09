@@ -7,13 +7,11 @@ import {
   Home,
   List,
   Plus,
-  CheckCircle2,
   Users,
   Settings,
   LogOut,
   Bot,
   Camera,
-  Image as ImageIcon,
   Receipt,
   Mic,
   Keyboard,
@@ -49,7 +47,7 @@ export function AppShell({
     { href: "/transactions", label: "รายการ", icon: List },
   ];
   
-  const navItemsRight: Array<{ href: string; label: string; icon: any; badge?: string | number }> = [
+  const navItemsRight: Array<{ href: string; label: string; icon: React.ComponentType<{ className?: string; strokeWidth?: number }>; badge?: string | number }> = [
     { href: "/credits", label: "สมุดหนี้สิน", icon: BookOpen },
     { href: "/profile", label: "ตั้งค่าร้าน", icon: Users },
   ];
